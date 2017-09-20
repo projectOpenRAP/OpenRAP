@@ -1,0 +1,12 @@
+a. A base image, pristibe image is polished with all necessary software, 
+   made avilable as img file
+b. Run "upgrade <ocdn.tgz> <base_image.img>"
+c. dd the image from step b, to a 32G flash
+d. boot the new flash 
+d1. You may have to run raspi-config --> expand-rootfs
+e. run "megshala_custom" as pi user
+f. re-load the box
+g. login into admin portal, upload the teach-kit
+h. shutdown the box, now the flash in the box is ready for imaging 
+
+i. subsequent images are dd from the imaging flash

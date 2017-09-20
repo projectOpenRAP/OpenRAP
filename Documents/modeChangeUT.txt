@@ -1,0 +1,34 @@
+a. The box comes up as AP, change to host mode
+--> Verify the box in host node, reboot the box and verify in host mode
+--> verify connects to AP with correct credentials
+TESTED PASSED
+
+
+b. The box comes up in host mode, change to ap mode,
+--> verify the box is in AP mode, re-boot and confirm
+--> Verify the AP SSID is as per configurations
+TESTED PASSED
+
+c. The box comes up in AP mode, change to host mode and back to AP mode
+--> Verify box moves from AP, host and AP
+--> re-boot and verify the box is in AP mode
+TESTED PASSS
+
+d. The box comes up in host mode, change to AP mode and back to host mode
+--> Verify box moves from host to AP to host
+--> re-bbot and  verify the box is in host mode
+TESTED PASS
+
+e. The box is AP mode, change to AP mode, with different SSID
+--> Verify SSID changes, reboot and confirm new SSID is workig
+TESTED PASS
+
+f. The box is host mode, change it AP mode with different AP to join
+--> Verify new SSID is used for connection, also verify across re-boot
+TESTED PASS
+
+g. Verify connecting to AP with WPA, PSK
+TESTED PASS
+
+h. Verify connecting to AP run on a phone hotspot
+TESTED PASS

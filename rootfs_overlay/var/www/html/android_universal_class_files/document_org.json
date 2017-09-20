@@ -1,0 +1,76 @@
+{
+  "Message": "Success",
+  "MessageInfo": "",
+  "Payload": [
+    {
+      "FirstName": "Computer Skills",
+      "tag": "computerskills",
+      "type": "null",
+      "Address": "null",
+      "Avatar": "android_universal_class_files/computer.png"
+    },
+    {
+      "FirstName": "English Education",
+      "tag": "englishandlifeskills",
+      "type": "null",
+      "Address": "null",
+      "Avatar": "android_universal_class_files/english1.png"
+    },
+    {
+      "FirstName": "Vocational Skills",
+      "tag": "learnaboutjobs",
+      "type": "null",
+      "Address": "null",
+      "Avatar": "android_universal_class_files/vocational_skills1.png"
+    },
+    {
+      "FirstName": "Fishing/Farming",
+      "tag": "fishingandfarming",
+      "type": "null",
+      "Address": "null",
+      "Avatar": "android_universal_class_files/fishing_and_farming.png"
+    },
+    {
+      "FirstName": "NDLM",
+      "tag": "NDLM",
+      "type": "null",
+      "Address": "null",
+      "Avatar": "android_universal_class_files/ndlm.png"
+    },
+    {
+      "FirstName": "Safety/Security",
+      "tag": "safetyandsecurity",
+      "type": "null",
+      "Address": "null",
+      "Avatar": "android_universal_class_files/safety_security1.png"
+    },
+    {
+      "FirstName": "Assessments",
+      "tag": "mcq",
+      "type": "assessment",
+      "Address": "android_universal_class_files/jsonmcq.json",
+      "Avatar": "android_universal_class_files/mcq_icon.png"
+    },
+    {
+      "FirstName": "Health",
+      "tag": "health",
+      "type": "null",
+      "Address": "null",
+      "Avatar": "android_universal_class_files/health1.png"
+    },
+    {
+      "FirstName": "Wikipedia",
+      "tag": ":8088/wikipedia_en_simple_all/",
+      "type": "webview",
+      "Address": ":8088/wikipedia_en_simple_all/",
+      "Avatar": "android_universal_class_files/wikipedia.png"
+    },
+    {
+      "FirstName": "Khan Academy",
+      "tag": "khan",
+      "type": "webview",
+      "Address": ":8008/learn/khan/",
+      "Avatar": "android_universal_class_files/khanacademy.png"
+    }
+  ]
+}

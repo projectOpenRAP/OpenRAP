@@ -1,0 +1,2 @@
+sleep 2
+/usr/bin/python /opt/opencdn/devmgmt/file_upload/manage.py runserver 0.0.0.0:8008

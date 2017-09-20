@@ -1,0 +1,35 @@
+System test cases
+
+Test case 1
+
+Description: Verify production
+a. Install opencdn.tgz into opencdn_nocdn image, via upgrade command
+b. DD image to flash
+c. boot with the new flash and verify 
+i.  WiFi comes up with correct SSID     ---> Verified
+ii. All IP address are ok   ---> Verified
+iii. admin page is accesable  ---FAILED!!	--> Fixed, issue with django version	
+iv. Meghashala app works   ---> Verified 
+
+
+Test case 2
+Decription: Verify upgrade --> PASSED
+
+
+Test case 3
+Description: Verify Mode change to client
+
+a. Once OCDN is booted, login to to admin page
+b. Change the mode to host mode, connect to a AP
+c. Verify mode change is succsful
+d. Reboot, verify box come back as AP mode
+
+Test case 4
+Description: Verify mode change from AP -> Host -> AP
+
+
+Test case 5
+DHCP client longivity test
+After couple of days, plugin ethernet cable to ethernet port, verify IP 
+address is leased on eth0 interface
+
