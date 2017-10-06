@@ -41,12 +41,12 @@ img{ border:0;}
 .clear{ clear:both; float:none;}
 /*top section*/
 .content-wrpr{ width:100%; background: #fff;}
-.top-section{ background:url(http://192.168.0.1/public/images/header-bg1.jpg) no-repeat scroll center 25%;padding:50px 0 0 0; box-sizing:border-box;}
+/*.top-section{ background:url(http://192.168.0.1/public/images/header-bg1.jpg) no-repeat scroll center 25%;padding:50px 0 0 0; box-sizing:border-box;} */
 .top-section > .layout{ display: table;}
 .left-side, .right-side{ min-width: 50%; display:table-cell; width: 50%;}
 .left-side{ text-align:left; <color = #fff>color:#fff;}
 .right-side{ text-align:right; position: relative;}
-.logo{ padding-bottom: 5.714rem;}
+.logo{ padding-bottom: 1.714rem;}
 .logo + h2{font-size: 3rem;}
 .left-side p{padding: 1.429rem 0;font-size: 2.143rem;}
 .left-side aside{ padding: 2.143rem 0; display:block;}
@@ -62,7 +62,7 @@ img{ border:0;}
 .features li h5{ font-size:1.143rem; font-weight: bold; padding-bottom: 2rem;}
 .features figcaption{ font-size:14px; padding-top: 2rem;}
 .features li:nth-child(4){ margin-right: 0px;}
-footer{ width: 100%; text-align: center; background: #272727; padding:2.500rem 0;}
+footer{ width: 100%; text-align: center; background: #272727; padding:.500rem 0;}
 footer p{ display:inline-block; color:#fff;  border-top: 1px solid #1c1c1c; padding-top:10px;}
 @media screen and (min-width: 320px) and (max-width: 490px) {   
 html{ font-size:10px;}
@@ -118,13 +118,14 @@ html{ font-size: 13px;}
 <section class="top-section"> 
        <div class="layout">            
             <article class="left-side">
-                <h1 class="dpBlk logo"><a href="http://www.meghshala.com/"><img src="public/images/meghshala_logo.png" alt="Meghshala Logo"></a></h1>
+                <h1 class="dpBlk logo"><a href="http://www.ekstep.org/"><img src="public/images/ekstep_logo_captive.png" alt="Ekstep Logo"></a></h1>
                 <h2>Begin your Learning <br> Journey</h2>
 <script type="text/javascript">
 var cj = whichAndroidV();
+cj = 1;
 if (cj) {
    // document.write("Hello All captive");
-    document.write("<p>Welcome to the world of Free and Interactive Education.<br> Turn OFF your data connection (3G/4G) and open <b><u>app.pinut.in</u></b> on your browser, to activate.</p>");
+    document.write("<p>Welcome to the world of Free and Interactive Education.<br> Turn OFF your data connection (3G/4G), download the <b>Genie App</b> from below and enjoy Learning</p> <input type='image' name='Download' onclick=\"location.href = 'public/genie-6.5.local-debug.apk';\" value='Download App' src=\"public/images/android_app_download.png\"  />");
 }
 else {
     //document.write("Hi All NON-Captive");
