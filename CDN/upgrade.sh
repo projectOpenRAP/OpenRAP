@@ -40,8 +40,8 @@ INSTALL_DIR=$TARGET
 # package related paths
 CDNROOT=opencdn 
 VERSION=$CDNROOT/CDN/version.txt
-POSTINSTALL=$CDNROOT/CDN/postpreinstall.sh -post
-PREINSTALL=$CDNROOT/CDN/postpreinstall.sh -pre
+POSTINSTALL="$CDNROOT/CDN/postpreinstall.sh -post"
+PREINSTALL="$CDNROOT/CDN/postpreinstall.sh -pre"
 
 ROOTFS_OVERLAY=$CDNROOT/rootfs_overlay
 
