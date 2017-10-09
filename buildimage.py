@@ -8,8 +8,8 @@ import json
 base_dir = os.environ['PWD'] + "/"
 build_dir = base_dir + 'build/'
 
-rootfs_dir = base_dir + 'rootfs_overlay/'
-cdn_dir    = base_dir + 'CDN/'
+rootfs_dir = base_dir + 'rootfs_overlay'
+cdn_dir    = base_dir + 'CDN'
 ver_file   = cdn_dir + 'version.txt'
 
 build_logfile = "buildimage.log"
@@ -21,7 +21,7 @@ gopath = base_dir + 'build/go/'
 apiserver_parent_dir = gopath + "src/github.com/projectOpenRAP/OpenRAP/"
 
 # Device management server
-dmserver_dir = base_dir + 'devmgmt/'
+dmserver_dir = base_dir + 'devmgmt'
 
 #############
 

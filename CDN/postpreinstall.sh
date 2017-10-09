@@ -1,7 +1,7 @@
 ## Save fles
 
 files_saved="
-/opt/opencd/CDN/rootfs_overlay/etc/hostapd.conf
+/opt/opencdn/rootfs_overlay/etc/hostapd/hostapd.conf
 "
 save_files()
 {

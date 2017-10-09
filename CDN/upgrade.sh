@@ -40,6 +40,8 @@ INSTALL_DIR=$TARGET
 # package related paths
 CDNROOT=opencdn 
 VERSION=$CDNROOT/CDN/version.txt
+PREPOSTFILE=$CDNROOT/CDN/postpreinstall.sh
+
 POSTINSTALL="$CDNROOT/CDN/postpreinstall.sh -post"
 PREINSTALL="$CDNROOT/CDN/postpreinstall.sh -pre"
 
@@ -103,6 +105,14 @@ NVER=`awk -F- '{print $1}' $MOUNT_PATH$TMPDIR/$VERSION`
 OVER=`awk -F- '{print $1}' $MOUNT_PATH$TARGET/$VERSION`
 
 echo "debug- NVER=$NVER OVER=$OVER"
+
+if [ "$NVER" == "$OVER" ]
+	then
+	logmsg "Current and new version are same, upgrade failed "
+	cleanup
+	exit -2
+fi
+
 
 toTest="$NVER
 $OVER"
@@ -226,7 +236,7 @@ check_version
 
 
 ## Execute the pre-install
-tar -C $MOUNT_PATH$TMPDIR -xvzf $pkg_tgz $PREINSTALL 
+tar -C $MOUNT_PATH$TMPDIR -xvzf $pkg_tgz $PREPOSTFILE 
 logmsg "Running preinstall scripts..."
 bash $MOUNT_PATH$TMPDIR/$PREINSTALL
 ## TODO error handling
@@ -238,18 +248,11 @@ run_cmd mv $MOUNT_PATH$TMPDIR/$CDNROOT $MOUNT_PATH$TARGET/$CDNROOT-$NVER
 
 logmsg "Adjusting the /opt/opencdn links..."
 cd $INSTALL_DIR
-# delete .old2 link and directory, if present
-del_dir=`readlink $CDNROOT.old2`
-logmsg "Removing $del_dir ..."
-echo verify-- run_cmd rm -rf ./$del_dir
-echo verify -- run_cmd rm $CDNROOT.old2
-
 
 ## 
 ## backup the existing softlink to opencdn.old and create a new softlink 
 ## If installation succesful, opencdn.old2 will be deleted as part of cleanup process
 ##
-run_cmd "mv $CDNROOT.old $CDNROOT.old2"
 run_cmd "mv $CDNROOT $CDNROOT.old"
 run_cmd ln -s $CDNROOT-$NVER $CDNROOT
 cd $CUR_DIR
