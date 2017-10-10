@@ -141,11 +141,7 @@ if [ "$1" == "hostmode" ]
 ## move to hostmode
 ## Stop hostapd, dhcpserver, dns server and dhcpclient (cleanup)
 
-echo stopping dnsmasq, hostapd and wpa_supplicant
-        /usr/sbin/service dnsmasq stop
-        /usr/sbin/service hostapd stop
-        /usr/sbin/service wpa_supplicant stop
-
+	stop_apmode
 
         SSID=$2 
         if [ $# -eq 3 ]
@@ -158,16 +154,15 @@ echo stopping dnsmasq, hostapd and wpa_supplicant
 
     sync; sync; sync
 
-    # restart wpa_supplicant
-    echo restarting wpa_supplicant
-    /usr/sbin/service wpa_supplicant restart
-
-    # let wpa_suplicant know the changes
-
-    # restart networking 
-    echo restarting networking
-    /usr/sbin/service networking restart
+    sleep 2
+    ifdown wlan0
+    sleep 2
+    ifup wlan0
+    
     echo Done...
+
+
+exit 0
 
     
     ##Let us verify if connection was succefull
