@@ -1,6 +1,6 @@
 import zipfile,os,shutil,sys,json
 
-sys.path.append("/var/edgedevice/devmgmt/file_upload/")
+#sys.path.append("/var/edgedevice/devmgmt/file_upload/")
 os.environ['DJANGO_SETTINGS_MODULE']='file-upload.settings'
 import django
 from django.http import HttpResponse
@@ -69,13 +69,13 @@ def extractit(path_of_file):
 
         for filename in os.listdir(folder):
             if(filename.endswith(".json")):
-                shutil.move(folder+"/"+filename,json_dir_path)
+                shutil.move(folder+"/"+filename,json_dir_path+"/"+filename)
             else:
-                try:
-                    shutil.move(folder+"/"+filename,content_path)
+                try: 
+                    shutil.move(folder+"/"+filename,content_path+"/"+filename)
                 except:
                     print "This file already exists"
-                    #break
+                    break
 
         #remove's the ekstep file uploaded folder which is empty right now 
         shutil.rmtree(folder)
