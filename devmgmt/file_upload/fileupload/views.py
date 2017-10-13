@@ -195,7 +195,7 @@ class EkFileListView(ListView):
         return response
 
 def apply_changes(request):
-    os.system("sh applyChanges.sh")
+    os.system("killall -9 apiserver")
     return JsonResponse({'msg': 'Success'})
 
 def verify_USB2(request):
@@ -249,12 +249,6 @@ def download_to_USBx(request):
             return JsonResponse ({'res': 'Copy aborted! [USB Unplugged/Insufficient Space?]'})
         return JsonResponse({'res': 'Copy successful'})
     return JsonResponse({'res':'Reinsert USB'})
-
-'''
-'''
-def apply_changes(request):
-    os.system("sh applyChages.sh")
-    return JsonResponse({'msg':'Success'})
 
 def split_dirs(text): #Splits the entire path to get the file name
     splitty = text.split('/')
