@@ -24,11 +24,12 @@
 
 <service-group>
 
-  <name replace-wildcards="yes">Open_Resource_Access_Point_on %h</name>
+  <name replace-wildcards="yes">Open Resource Access Point on %h</name>
 
-  <service>
-    <type>_openrap._tcp</type>
-    <port>9090</port>
+  <service protocol="ipv4">
+      <type>_openrap._tcp</type>
+      <port>80</port>
+      <txt-record>admin_url="ip:8008"</txt-record>
   </service>
 
 </service-group>
