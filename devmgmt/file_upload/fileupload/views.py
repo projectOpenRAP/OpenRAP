@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import json, os, subprocess, getpass, shutil, sys
 import logging
-
 from .USBFinder import attemptMount,transfer_file, get_usb_name
 from hashlib import sha1
 from django.http import HttpResponse,HttpResponseRedirect, JsonResponse
@@ -59,56 +58,6 @@ def user_logout(request):
 
 def index(request):
     return render(request,'fileupload/LOGIN.html')
-'''
-<<<<<<< HEAD
-
-=======
-
-
-
-
-Dev's code that is not actually called in the program, can be ignored, kept for future references if needed
-
->>>>>>> refs/remotes/origin/master
-@ensure_csrf_cookie
-def upload(request):
-    if request.method=='POST':
-        instance=EkFile(file=request.FILES['files'])
-        obj=instance.save();
-        print (instance)
-        values=serialize(instance)
-        response=json.dumps(data)
-        data={"files":values}
-        print (response)
-        if instance.type_of_file=="ecar":
-        	print instance.path_of_file
-        	files=extractit(instance.path_of_file)
-        	instance=Content(ekfile=instance,folder_file=files,json_file=files+".json")
-        	instance.save()
-        return HttpResponse(response,content_type="application/json")
-
-@ensure_csrf_cookie
-def list_the_files(request):
-    values=[serialize(instance) for instance in EkFile.objects.all()]
-    data={"files":values}
-    response=json.dumps(data)
-    print (response)
-    return HttpResponse(response,content_type="application/json")
-
-@ensure_csrf_cookie
-def delete_files(request):
-    print ("Delete this file: "+request.POST['id'])
-    instance=EkFile.objects.get(id=request.POST['id'])
-    print (instance)
-    if instance.type_of_file=="ecar":
-    	obj=Content.objects.get(ekfile=instance.id)
-    	deleteit({'folder_file':obj.folder_file,'json_file':obj.json_file})
-    	obj.delete()
-    instance.delete()
-    return HttpResponse(json.dumps({"id":4}),content_type="application/json")
-<<<<<<< HEAD
-
-'''
 
 def verify(request, optional=False):
     flag='INIT'
@@ -273,29 +222,31 @@ def serve_extensions(requests):
 def download_to_USBx(request):
     print 'Hooray I have been called'
     usb_name = get_usb_name()
+    remount = "mount -o remount, rw "+usb_name
+    os.system(remount)
     if usb_name is not None:
         local_files_dir = settings.TELEMETRY
 	print local_files_dir
-        local_files = []
-        for root, folders, files in os.walk(local_files_dir):
-            for file in files:
-                if (not os.path.isdir(file)):
-                    local_files.append(os.path.join(root, file))
-	print local_files
-        actual_index = local_files[0].split('/').index(local_files_dir.split('/')[-2:-1][0]) + 1
-        for file in local_files:
-            os.chdir(usb_name)
-            split_list = file.split('/')
-            for i in range (actual_index, len(split_list) - 1):
-                if not os.path.exists(split_list[i]):
-                    os.makedirs(split_list[i])
-                os.chdir(split_list[i])
-            command = 'cp "' + file + '" "' + os.getcwd() + '"'
-            t = subprocess.Popen(command, shell=True)
-            t.communicate()[0]
-            result = t.returncode
-            if result != 0:
-                return JsonResponse ({'res': 'Copy aborted! [USB Unplugged/Insufficient Space?]'})
+        #local_files = []
+        #for root, folders, files in os.walk(local_files_dir):
+        #    for file in files:
+        #        if (not os.path.isdir(file)):
+        #            local_files.append(os.path.join(root, file))
+	#print local_files
+        #actual_index = local_files[0].split('/').index(local_files_dir.split('/')[-2:-1][0]) + 1
+        #for file in local_files:
+        #    os.chdir(usb_name)
+        #    split_list = file.split('/')
+        #    for i in range (actual_index, len(split_list) - 1):
+        #        if not os.path.exists(split_list[i]):
+        #            os.makedirs(split_list[i])
+        #        os.chdir(split_list[i])
+        command = "cp -r "+ local_files_dir+" "+usb_name
+        t = subprocess.Popen(command, shell=True)
+        t.communicate()[0]
+        result = t.returncode
+        if result != 0:
+            return JsonResponse ({'res': 'Copy aborted! [USB Unplugged/Insufficient Space?]'})
         return JsonResponse({'res': 'Copy successful'})
     return JsonResponse({'res':'Reinsert USB'})
 
@@ -335,13 +286,12 @@ def transferx(request):
             if(settings.ACTIVE_PROFILE == "ekstep"):
                 try:
                     files2 = extractit(subject_model.path_of_file)
+                    for f in files2:
+                        obj=Content(ekfile=subject_model,filename=f)
+                        obj.save()
                 except:
                     subject_model.delete()
                     result = 'notok2'
-                    break
-                for f in files2:
-                    obj=Content(ekfile=subject_model,filename=f)
-                    obj.save()
         print '[Z]Saved ' + name
     return JsonResponse({'result':result})
 
