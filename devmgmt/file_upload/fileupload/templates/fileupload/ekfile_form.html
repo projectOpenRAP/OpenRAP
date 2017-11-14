@@ -42,6 +42,10 @@
                     <i class="glyphicon glyphicon-download"></i>
                     <span>USB download</span>
                 </button>
+                <button type="button" class="btn btn-primary start" id="apply_changes">
+                    <i class="glyphicon glyphicon-ok"></i>
+                    <span>Apply Changes</span>
+                </button>
                 <!--input type="checkbox" class="toggle"-->
                 <!-- The loading indicator is shown during file processing -->
                 <span class="fileupload-loading"></span>
@@ -175,6 +179,13 @@ function usbUpload() {
     window.location.reload();
   });
 }
+
+$('#apply_changes').click(function() {
+  $.getJSON('/upload/apply_changes', function(response) {
+    var ob = JSON.parse(JSON.stringify(response));
+    alert(ob['msg']);
+  });
+});
 /*
 function telemetry_transferx() {
     var loop = true;

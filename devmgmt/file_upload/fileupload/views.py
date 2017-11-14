@@ -245,6 +245,10 @@ class EkFileListView(ListView):
         response['Content-Disposition'] = 'inline; filename=files.json'
         return response
 
+def apply_changes(request):
+    os.system("sh applyChanges.sh")
+    return JsonResponse({'msg': 'Success'})
+
 def verify_USB2(request):
     value = get_usb_name()
     if value is None:

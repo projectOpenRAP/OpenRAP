@@ -18,4 +18,5 @@ urlpatterns = [
     url(r'^download_to_USB/$', views.download_to_USBx, name='downloadtousb'),
     url(r'^return_exts/$', views.serve_extensions, name="serve_exts"),
     url(r'^verify_USB2/$', views.verify_USB2, name='get_usb'),
+    url(r'^apply_changes/$', views.apply_changes, name='apply_changes'),
 ]
