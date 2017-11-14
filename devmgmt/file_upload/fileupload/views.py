@@ -252,7 +252,9 @@ def download_to_USBx(request):
 
 '''
 '''
-
+def apply_changes(request):
+    os.system("sh applyChages.sh")
+    return JsonResponse({'msg':'Success'})
 
 def split_dirs(text): #Splits the entire path to get the file name
     splitty = text.split('/')
