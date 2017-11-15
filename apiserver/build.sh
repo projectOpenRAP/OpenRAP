@@ -9,13 +9,14 @@ if [ $# -ne 1 ]; then
     exit 0
 fi
 
-export GOPATH=$PWD/../../../..
+export GOPATH=$PWD/../../../../..
 export GOBIN=$GOPATH/bin
 export PATH=/usr/local/go/bin:$GOBIN:$PATH
 
 arch=$1
 
 exe_name=apiserver
+echo "GOPATH=$GOPATH"
 
 
 if [ $arch == "arm" ]; then
