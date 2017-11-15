@@ -5,14 +5,15 @@ import subprocess                                                               
 import getpass                                                                                  #used for getuser()
 import time                                                                                     #temp fix; used to sleep
 from stat import *                                                                              #imports stats like ST_SIZE
-import threading                                                                                #Multithreading         
+import threading                                                                                #Multithreading
 from shutil import copy2                                                                        #Copies files
 
 process = None
-
+usb_direct = ''
 staticFileLocRoot = settings.CONTENT_ROOT
 data_folder = settings.USB_DIR
 extns = settings.ACCEPTED_EXTNS
+
 
 def get_usb_name():
     lsblk_out = subprocess.check_output("lsblk", shell=True)
@@ -22,6 +23,9 @@ def get_usb_name():
         if '/media/' in line:
             media_loc = line.index('/media/')
             media_dir = line[media_loc:].strip()
+            print media_dir + ' is the media directory fren'
+    global usb_direct
+    usb_direct = media_dir
     return media_dir
 
 def verify(device_mnt):
@@ -45,14 +49,15 @@ def transfer_file(file):
         file_name=file[index+1:]
         file_name = file
         print "file_name " + file_name + " staticFileLocRoot " + staticFileLocRoot
-        shutil.copy2(file, staticFileLocRoot)
+        global usb_direct
+        shutil.copy2(usb_direct + '/' + data_folder + '/' + file, staticFileLocRoot)
         #sendString = "cp " + file + " " + staticFileLocRoot + file_name
-        #proc = subprocess.Popen (sendString, shell=True)                                    
+        #proc = subprocess.Popen (sendString, shell=True)
         #proc.communicate()[0]
-        #return proc.returncode  
+        #return proc.returncode
         return 0
 
-def attemptMount():     
+def attemptMount():
     lsblk_out = subprocess.check_output("lsblk", shell=True)
     lsblk_list = lsblk_out.split('\n')
     media_dir = None
@@ -61,8 +66,11 @@ def attemptMount():
         if '/media/' in line:
             media_loc = line.index('/media/')
             media_dir = line[media_loc:].strip()
+            print 'Muy bien ' + media_dir
+            print 'Bonjour a ' + media_dir
             try:
                 media_mntpnt = re.findall(devmnt_regex, line)[0]
+                print 'Media mountpoint is at ' + media_mntpnt
             except:
                 return None
             is_needed = verify(media_mntpnt)
@@ -71,6 +79,7 @@ def attemptMount():
     if media_dir is None:
         return None
     try:
+        print media_dir + '/' + data_folder
         os.chdir(media_dir + '/' + data_folder)
     except:
         return None
@@ -96,11 +105,11 @@ def main():
         if len(newDeviceList) > len(oldDeviceList):                                             #new usb device inserted!
             for line in newDeviceList:
                 if line not in oldDeviceList:                                                   #this points to the newer device we have attached
-                    IDAnchor = line.index("ID")                                                     
+                    IDAnchor = line.index("ID")
                     line = line[IDAnchor:]                                                      #slice off unwanted line info [such as bus information]
-                    print ("You have attached " + line)                                         #debug purposes 
-                    time.sleep(3)                                                               #prevents python from attempting to access the files before the OS itself, might need to be increased 
-                    attemptMount()                                                              #attempt mounting the device    
+                    print ("You have attached " + line)                                         #debug purposes
+                    time.sleep(3)                                                               #prevents python from attempting to access the files before the OS itself, might need to be increased
+                    attemptMount()                                                              #attempt mounting the device
 
         if len(newDeviceList) < len(oldDeviceList):                                             #some USB device has been removed!
             for line in oldDeviceList:

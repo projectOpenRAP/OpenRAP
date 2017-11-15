@@ -60,6 +60,11 @@
             // Callback to retrieve the list of files from the server response:
             getFilesFromResponse: function (data) {
                 if (data.result && $.isArray(data.result.files)) {
+                    console.log('La Reconquista');
+                    if (data.result.msg != 'Successful!' && $('#dev_up')[0].files != null) {
+                      console.log('Prepara para la guerra.' + data.result.msg);
+                      alert(data.result.msg);
+                    }
                     console.log("Retrieving the list of the files");
 
                     return data.result.files;
@@ -161,7 +166,7 @@
                     that._forceReflow(template);
                     deferred = that._addFinishedDeferreds();
                     that._transition(template).done(
-                        function () {
+                        function (result) {
                             data.context = $(this);
                             that._trigger('completed', e, data);
                             that._trigger('finished', e, data);
@@ -169,6 +174,9 @@
                         }
                     );
                 }
+              //  var message = JSON.parse(JSON.stringify(data.result));
+                console.log('Prepera para la guerra');
+              //  alert(message['msg']);
             },
             // Callback for failed (abort or error) uploads:
             fail: function (e, data) {
@@ -294,6 +302,7 @@
                         deferred.resolve();
                     }
                 );
+                window.location.reload();
             },
             processstart: function () {
                 $(this).addClass('fileupload-processing');
