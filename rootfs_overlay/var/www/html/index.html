@@ -4,11 +4,11 @@
 
 function whichAndroidV() {
    // document.write("Inside whichAndroidV\n");
-    var userAgent = navigator.userAgent.toLowerCase(); 
+    var userAgent = navigator.userAgent.toLowerCase();
     var check = userAgent.match(/android\s([0-9\.]*)/);
     var captive_js;
     if ((!check) || (check[1] < "5.0")) {
-        
+
         captive_js = 0;
        // document.write("captive_js false ="+captive_js);
     }
@@ -23,7 +23,7 @@ function whichAndroidV() {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pinut: Download App</title>
+<title>Welcome to OpenRAP</title>
 <link href='http://192.168.0.1/public/google-font' rel='stylesheet' type='text/css'>
 <style type="text/css">
 *{ margin:0; padding:0; outline: none;}
@@ -64,10 +64,10 @@ img{ border:0;}
 .features li:nth-child(4){ margin-right: 0px;}
 footer{ width: 100%; text-align: center; background: #272727; padding:.500rem 0;}
 footer p{ display:inline-block; color:#fff;  border-top: 1px solid #1c1c1c; padding-top:10px;}
-@media screen and (min-width: 320px) and (max-width: 490px) {   
+@media screen and (min-width: 320px) and (max-width: 490px) {
 html{ font-size:10px;}
 .layout{ margin:0 3%;}
-.top-section > .layout{ display: block;}        
+.top-section > .layout{ display: block;}
 .left-side, .right-side{ display:block; width: 100%; text-align:center;}
 .right-side{ position: static;}
 .right-side div.dpInblk{ position:static; width:70%;margin-bottom: -1px;}
@@ -80,10 +80,10 @@ html{ font-size:10px;}
 .features li h5{ font-size:2rem;}
 footer p{ font-size:1.5rem;}
         }
-@media screen and (min-width: 491px) and (max-width: 800px){    
+@media screen and (min-width: 491px) and (max-width: 800px){
 html{ font-size: 12px;}
 .layout{ margin:0 5%;}
-.top-section > .layout{ display: block;}        
+.top-section > .layout{ display: block;}
 .left-side, .right-side{ display:block; width: 100%; text-align:center;}
 .right-side{ position: static;}
 .right-side div.dpInblk{ position:static; width:70%;}
@@ -91,47 +91,50 @@ html{ font-size: 12px;}
 .btm-section h2{ font-size: 2.5rem;}
 .btm-section h2 + p {font-size: 1.5rem;}
 .features li {margin:0 .9rem 1rem 0; width:48.6%; height:275px;}
-.features li:nth-child(2n){ margin-right: 0px;} 
+.features li:nth-child(2n){ margin-right: 0px;}
 footer p{ font-size:1.2rem;}
         }
-@media screen and (min-width: 601px) and (max-width: 800px){    
+@media screen and (min-width: 601px) and (max-width: 800px){
 .features li h5{ font-size:2rem;}
 .features li {width:49%;}
 .features figcaption{ font-size:1.2rem;}
 }
-@media screen and (min-width: 801px) and (max-width: 1251px){   
+@media screen and (min-width: 801px) and (max-width: 1251px){
 html{ font-size: 13px;}
 .features li {width:23.4%; height: 325px; max-height: 330px;}
 .features figcaption{ font-size:1.2rem;}
 .layout{ margin:0 7%;}
-}       
+}
 @media screen and (min-width: 1252px) and (max-width: 1366px){
-.features li {width:23.8%;}     
+.features li {width:23.8%;}
         }
 </style>
 </head>
 
 <body>
 
+<script type="text/javascript" src ="public/jquery-3.2.1.min.js"></script>
 
 <div class="content-wrpr">
-<section class="top-section"> 
-       <div class="layout">            
+<section class="top-section">
+       <div class="layout">
             <article class="left-side">
-                <h1 class="dpBlk logo"><a href="http://www.ekstep.org/"><img src="public/images/ekstep_logo_captive.png" alt="Ekstep Logo"></a></h1>
-                <h2>Begin your Learning <br> Journey</h2>
-<script type="text/javascript">
-var cj = whichAndroidV();
-cj = 1;
-if (cj) {
-   // document.write("Hello All captive");
-    document.write("<p>Welcome to the world of Free and Interactive Education.<br> Turn OFF your data connection (3G/4G), download the <b>Genie App</b> from below and enjoy Learning</p> <input type='image' name='Download' onclick=\"location.href = 'public/genie-6.5.local-debug.apk';\" value='Download App' src=\"public/images/android_app_download.png\"  />");
-}
-else {
-    //document.write("Hi All NON-Captive");
-    document.write("<p>Congratulations! You are just one step away from Good Education.<br> Turn ON 3G/4G, Download the <b>Meghshala App</b> from Google Play Store and starting teaching..</p>");
+                <h1 class="dpBlk logo"><a href="http://www.openrap.io/"><img src="public/images/CaptivePortalLogo.png" alt="Logo"></a></h1>
+                <h2 id="head">Begin your Learning <br> Journey</h2>
 
-                }
+<script type="text/javascript">
+
+   $.getJSON("text.json", function (response) {
+     var obj = JSON.parse(JSON.stringify(response));
+     var head = obj["data"]['head'];
+     var text = obj["data"]['text'];
+     document.getElementById("head").innerHTML = head;
+     $('#head').append(text);
+   });
+
+ document.write("<input type='image' name='Download' onclick=\"location.href = 'public/app.apk';\" value='Download App' src=\"public/images/android_app_download.png\"  />");
+
+
                 </script>
 
 
@@ -140,8 +143,8 @@ else {
     </section>
 
     <footer>
-        <p>Copyright ©2017 NutLab Creations Pvt. Ltd. All Rights Reserved.</p>
-    </footer>  
-</div>    
+        <p>Copyright ©2017 EkStep.</p>
+    </footer>
+</div>
 </body>
 </html>
