@@ -41,7 +41,6 @@ class EkFile(models.Model):
         return self.file_upload.name+","+self.type_of_file+","+self.path_of_file+","+self.slug
        #return file_n+","+self.file_upload.name+","+self.type_of_file+","+self.path_of_file
 
-
     def save(self, *args, **kwargs):
         self.slug = self.file_upload.name
         index=self.slug.rfind('.')

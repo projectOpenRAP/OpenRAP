@@ -1,11 +1,10 @@
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import subprocess
 import json
 
 CONFIG_FILE = '/opt/opencdn/CDN/profile.json'
-print 'CONFIG_FILE ' + CONFIG_FILE 
+print 'CONFIG_FILE ' + CONFIG_FILE
 ACCEPTED_EXTNS = []
 with open(CONFIG_FILE) as res_file:
     json_data = json.load(res_file)

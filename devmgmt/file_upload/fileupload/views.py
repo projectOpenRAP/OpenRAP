@@ -17,7 +17,6 @@ from .extract import extractit
 from .deleteExtract import deleteit
 from distutils.dir_util import copy_tree
 from django.conf import settings
-from django.core.exceptions import MultipleObjectsReturned
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -104,15 +103,15 @@ class EkFileCreateView(CreateView):
         print "self Object: "
         print unicode(self.object)
         self.object.file_upload = self.object.slug
+
+        # Checking for duplicate files and deleting them
+
         all_files = EkFile.objects.filter(file_upload = self.object.file_upload)
         if len(all_files) > 1:
             for thing in all_files:
                 if thing is not self.object:
                     del(thing)
-    #    try:
-    #        EkFile.objects.get(file_upload = self.object.file_upload)
-    #    except MultipleObjectsReturned:
-    #        self.object.delete()
+
         files = [serialize(self.object)]
         global first_msg
         first_msg = 'Successful!'
@@ -120,16 +119,12 @@ class EkFileCreateView(CreateView):
         print 'Before you send post request'
         print self.object.path_of_file
         print '-'*10 + 'EXTRACT' + '-'*10
-        #print self.object.slug
-        #if((self.object.slug.endswith(tuple(allowed_exts))) == 0):
-         #   print "I am Not the right extension"
-            #return HttpResponseRedirect('/upload/new/')
-         #   return
+        
         if(self.object.path_of_file.endswith(".json")):
             if not os.path.exists(config_json_dir):
                 os.makedirs(config_json_dir)
             if(self.object.file_upload == config_json_name):
-                os.system("killall -9 apiserver")
+                os.system("service apiserver restart")
             shutil.copy2(self.object.path_of_file, config_json_dir)
             config_db_entry = EkFile.objects.get(file_upload=self.object.file_upload)
             config_db_entry.delete()
@@ -195,7 +190,7 @@ class EkFileListView(ListView):
         return response
 
 def apply_changes(request):
-    os.system("killall -9 apiserver")
+    os.system("service apiserver restart")
     return JsonResponse({'msg': 'Success'})
 
 def verify_USB2(request):
@@ -276,7 +271,7 @@ def transferx(request):
             if not os.path.exists(config_json_dir):
                 os.makedirs(config_json_dir)
                 if(name == config_json_name):
-                    os.system("killall -9 apiserver")
+                    os.system("service apiserver restart")
                     shutil.copy2(subject_model.path_of_file, config_json_dir)
         else:
             if(settings.ACTIVE_PROFILE == "ekstep"):

@@ -60,9 +60,7 @@
             // Callback to retrieve the list of files from the server response:
             getFilesFromResponse: function (data) {
                 if (data.result && $.isArray(data.result.files)) {
-                    console.log('La Reconquista');
                     if (data.result.msg != 'Successful!' && $('#dev_up')[0].files != null) {
-                      console.log('Prepara para la guerra.' + data.result.msg);
                       alert(data.result.msg);
                     }
                     console.log("Retrieving the list of the files");
@@ -174,9 +172,6 @@
                         }
                     );
                 }
-              //  var message = JSON.parse(JSON.stringify(data.result));
-                console.log('Prepera para la guerra');
-              //  alert(message['msg']);
             },
             // Callback for failed (abort or error) uploads:
             fail: function (e, data) {

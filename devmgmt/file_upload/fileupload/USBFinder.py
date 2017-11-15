@@ -45,16 +45,12 @@ def check_if_line_usb(line):
 
 def transfer_file(file):
         print "file " + file + " staticFileLocRoot " + staticFileLocRoot
-        index=file.rfind('/')
-        file_name=file[index+1:]
-        file_name = file
-        print "file_name " + file_name + " staticFileLocRoot " + staticFileLocRoot
+        #index=file.rfind('/')
+        #file_name=file[index+1:]
+        #file_name = file
+        #print "file_name " + file_name + " staticFileLocRoot " + staticFileLocRoot
         global usb_direct
         shutil.copy2(usb_direct + '/' + data_folder + '/' + file, staticFileLocRoot)
-        #sendString = "cp " + file + " " + staticFileLocRoot + file_name
-        #proc = subprocess.Popen (sendString, shell=True)
-        #proc.communicate()[0]
-        #return proc.returncode
         return 0
 
 def attemptMount():

@@ -29,6 +29,7 @@ def write_to_file(filename, data):
 		process.communicate()[0]
 		result = process.returncode
 
+'''
 def captive_display(request):
        heading = ""
        text = ""
@@ -48,6 +49,7 @@ def captive_display(request):
                apk = False
        return render(request, 'changecaptive/captiveportal.html', {'logo': logo, 'heading_text':heading, 'body_text': text, 'apk': apk, 'fail_text' : fail_text, 'status_text' : status_text})
 
+'''
 def change_logo(request):
 	if request.method == 'POST':
 		write_to_file('CaptivePortalLogo.png', request.body)
