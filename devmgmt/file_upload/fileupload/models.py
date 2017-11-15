@@ -14,8 +14,11 @@ def r_file_name(instance, filename):
     filename = filename.encode('utf-8')
     fullname = os.path.join(settings.MEDIA_ROOT, filename)
     if os.path.exists(fullname):
-        old = EkFile.objects.get(file_upload=filename)
-        old.delete()
+        try:
+            old = EkFile.objects.get(file_upload=filename)
+            old.delete()
+        except:
+            pass
     format = filename
     return format
 
@@ -34,12 +37,11 @@ class EkFile(models.Model):
     slug = models.SlugField(max_length=250, blank=True)
     type_of_file=models.CharField(max_length=50,blank=True)
     path_of_file=models.CharField(max_length=250,blank=True)
-
     def __str__(self):
         return self.file_upload.name+","+self.type_of_file+","+self.path_of_file+","+self.slug
        #return file_n+","+self.file_upload.name+","+self.type_of_file+","+self.path_of_file
 
-   
+
     def save(self, *args, **kwargs):
         self.slug = self.file_upload.name
         index=self.slug.rfind('.')
@@ -54,18 +56,18 @@ class EkFile(models.Model):
         """delete -- Remove to leave file."""
         self.file_upload.delete(False)
         super(EkFile, self).delete(*args, **kwargs)
-        
-        
+
+
 class Content(models.Model):
         ekfile=models.ForeignKey(EkFile,on_delete=models.CASCADE)
         filename=models.CharField(max_length=250)
-        
+
         def __str__(self):
                 return self.filename
-                
+
         def save(self,*args,**kwargs):
                 super(Content,self).save(*args,**kwargs)
-                
+
         def delete(self,*args,**kwargs):
                 super(Content,self).delete(*args,**kwargs)
 
@@ -73,7 +75,7 @@ class Content(models.Model):
 class Permission(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	down_to_usb = models.BooleanField(default=False)
-	up_from_usb = models.BooleanField(default=False)	
+	up_from_usb = models.BooleanField(default=False)
 	up_from_dev = models.BooleanField(default=True)
 	delete_files = models.BooleanField(default=False)
 	ssid_mod = models.BooleanField(default=False)

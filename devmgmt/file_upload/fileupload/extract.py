@@ -26,20 +26,7 @@ def extractit(path_of_file):
         #ekstep file uploaded folder which contains the unzip version of the ekstep file uploaded
         zip_ref.extractall(folder)
         zip_ref.close()
-        '''
-        #move the ecar file to ekstep file folder starting with the name do_
-        for filename in os.listdir(folder):
-                if(not filename.endswith(".json")):
-                        break
 
-        index=file_path.rfind('/')
-        file_name=file_path[index+1:]
-        shutil.copy2(file_path,folder+"/"+filename+"/"+file_name)
-
-
-        #change the name of manifest file to folder name
-        change_name=folder[folder.rfind('/')+1:]
-        '''        
         #renames the manifest file inside the ekstep file uploaded folder 
 
         index=file_path.rfind('/')

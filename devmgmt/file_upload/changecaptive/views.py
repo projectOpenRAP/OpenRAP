@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect
-import subprocess
+import subprocess, json, os
 
 # Create your views here.
 status_text = None
@@ -94,8 +94,12 @@ def change_apk(request):
 		write_to_file('app.apk', request.body)
 	return JsonResponse({'ok':'ok'})
 
+def return_text(request):
+	json_file = open(os.path.dirname(os.path.realpath(__file__)) + '/static/changecaptive/text.json', 'r')
+	return JsonResponse(json.load(json_file))
+
 def change_data(request):
-	if request.method == 'POST':	
+	if request.method == 'POST':
 		header_data = request.POST.get('title')
 		text_data = request.POST.get('description')
 		if text_data is None:
@@ -103,12 +107,22 @@ def change_data(request):
 			status_text = 'Please enter some text'
 			return HttpResponseRedirect('../')
 		print text_data
-		text_data = text_data.replace('\n', '<br>')
-		text_data = text_data.rstrip()
-		text_data = remove_scripts(text_data)
-		write_to_file('text.txt', text_data)
-		if header_data is not None:
-			write_to_file('header.txt', header_data)
+		data = dict()
+		with open(os.path.dirname(os.path.realpath(__file__)) +'/static/changecaptive/text.json', 'r+') as json_file:
+		#	print 'Currently ' + json_file.read()
+			temp = json.load(json_file)
+			data = temp['data']
+			text_data = text_data.replace('\n', '<br>')
+			text_data = text_data.rstrip()
+			text_data = remove_scripts(text_data)
+			if header_data is not None:
+				data['head'] = header_data
+			data['text'] = text_data
+		with open(os.path.dirname(os.path.realpath(__file__)) +'/static/changecaptive/text.json', 'w+') as json_file:
+			json_file.write(json.dumps(temp))
+		#write_to_file('text.txt', text_data)
+		#if header_data is not None:
+		#	write_to_file('header.txt', header_data)
 		#edit_php_file(header_data, text_data)
 	status_text = 'ok'
 	return HttpResponseRedirect('../')

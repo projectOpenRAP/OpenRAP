@@ -4,24 +4,14 @@
 {% block content %}
 <input type="hidden" id="refresh" value="no">
 <div class="container">
-    <h1 id="h">File Upload</h1><br/>
+    <h1 id="h">File Upload    <img src='/static/img/loading.gif' id="loading_chakra" alt = "uploading..." height="30px" width="30px"/></h1><br/>
     <div class="input-group">
     	<span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
     	<input id="search" type="text" class="form-control" placeholder="Search for files..." />
     </div><hr />
-    <form id="telemetry_form" action="../download_to_USB/" method="post">
-    {% csrf_token %}
-        <input type="hidden" name="counter" id="counter" value="INIT">
-    </form>
-    <br>
-    <div class="progress" id="progress_outer"> 
-        <div class = "progress-bar progress-bar-striped active" role="progressbar"
-            aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%" id="progress_inner">0%
-        </div>
-    </div>
     <!-- The file upload form used as target for the file upload widget -->
     <form id="fileupload" method="post" action="." enctype="multipart/form-data">{% csrf_token %}
-        
+
         <div class="row fileupload-buttonbar">
             <div class="col-lg-7">
                 <!-- The fileinput-button span is used to style the file input field as button -->
@@ -43,15 +33,19 @@
                     <span>Delete all</span>
                 </button>
                 <span data-toggle="tooltip" title="" id="usb_span" data-placement="right">
-                <button type="button" class="btn btn-primay start" id="usb">
+                <button type="button" class="btn btn-primay start" id="usb" onclick="usbUpload()">
                     <i class="glyphicon glyphicon-upload"></i>
                     <span>USB upload</span>
                 </button>
+              </span>
                 <button type="button" class="btn btn-primay start" id="usb_down" onClick="telemetry_transfer()">
                     <i class="glyphicon glyphicon-download"></i>
                     <span>USB download</span>
                 </button>
-                </span>
+                <button type="button" class="btn btn-primary start" id="apply_changes">
+                    <i class="glyphicon glyphicon-ok"></i>
+                    <span>Apply Changes</span>
+                </button>
                 <!--input type="checkbox" class="toggle"-->
                 <!-- The loading indicator is shown during file processing -->
                 <span class="fileupload-loading"></span>
@@ -70,7 +64,7 @@
         <table role="presentation" class="table table-striped"><tbody class="files" id="files_table"></tbody></table>
     </form>
     <br>
-    
+
 </div>
 <!-- The blueimp Gallery widget -->
 <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
@@ -124,16 +118,24 @@
 <script>
 $(function() {
     $("#telemetry_progress").hide();
-    $("#progress_outer").hide();
+    $("#loading_chakra").hide();
     $.getJSON('../verify_USB/', function (response) {
             var obj = JSON.parse(JSON.stringify(response));
             document.getElementById("usb").setAttribute("class", "btn btn-primay start " + obj.data);
-            document.getElementById("usb_down").setAttribute("class", "btn btn-primay start " + obj.data);
             if (obj.data == 'disabled') {
             	document.getElementById("usb_span").setAttribute("title", "Please insert USB device and refresh");
+              document.getElementById("usb").setAttribute("onclick", "javascript:void(0);");
             	$('[data-toggle="tooltip"]').tooltip();
             }
         });
+    $.getJSON('../verify_USB2/', function(response) {
+      var obj = JSON.parse(JSON.stringify(response));
+      if (obj['value'] == 'null') {
+        console.log(obj['value']);
+        document.getElementById("usb_down").setAttribute("class", "btn btn-primay start disabled");
+        document.getElementById("usb_down").setAttribute("onclick", "javascript:void(0);");
+      }
+    })
     $.getJSON('../return_exts/', function(response) {
         var ob = JSON.parse(JSON.stringify(response));
         var exts = ob['exts'];
@@ -153,22 +155,37 @@ $(function() {
 });
 
 function telemetry_transfer() {
-	$('form').submit(function(e){
-		e.preventDefault();
-		$.ajax({
-			url : '/upload/download_to_USB/',
-			datatype : 'json',
-			type : 'POST',
-			processData : false,
-			contentType : false,
-			cache : false,
-			data : $('#telemetry_form').serialize(),
-			success : function (response) {
-				alert(response);
-			}
-		});
-	});
+  $('#loading_chakra').show();
+  $.getJSON('/upload/download_to_USB', function (response) {
+    var ob = JSON.parse(JSON.stringify(response));
+    alert(ob['res']);
+  $('#loading_chakra').hide();
+  });
 }
+
+function usbUpload() {
+  $('#loading_chakra').show();
+  $.getJSON('/upload/transfer', function(response) {
+    var ob = JSON.parse(JSON.stringify(response));
+    switch(ob['result']) {
+      case 'ok' : alert('Successful!');
+                  break;
+      case 'notok' : alert('Transfer failure!');
+                     break;
+      case 'notok2' : alert("Corrupt ecar file encountered!");
+                      break;
+      default: alert('Unexpected error occured!');
+    }
+    window.location.reload();
+  });
+}
+
+$('#apply_changes').click(function() {
+  $.getJSON('/upload/apply_changes', function(response) {
+    var ob = JSON.parse(JSON.stringify(response));
+    alert(ob['msg']);
+  });
+});
 /*
 function telemetry_transferx() {
     var loop = true;

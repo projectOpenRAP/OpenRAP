@@ -79,7 +79,7 @@
     <link rel="stylesheet" href="/static/css/jquery.fileupload-ui.css">
     <!-- CSS adjustments for browsers with JavaScript disabled -->
     <script>
-    $.ajaxSetup({ 
+    $.ajaxSetup({
      beforeSend: function(xhr, settings) {
          function getCookie(name) {
              var cookieValue = null;
@@ -100,7 +100,7 @@
              // Only send the token to relative URLs i.e. locally.
              xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
          }
-     } 
+     }
 });
     $(function() {
     	$.getJSON("{% url 'backadmin:return_permissions' %}", function(response) {
@@ -119,6 +119,10 @@
         		var x = document.getElementById("usb");
         		if (x != null) {
             		x.style.display="None";
+                y = document.getElementById("apply_changes");
+                if (y != null) {
+                  y.style.display="None";
+                }
             	}
         	}
         	if (!(obj.up_from_dev)) {
@@ -132,7 +136,19 @@
         		if (x != null) {
             		x.style.display="None";
             	}
+            var y = document.getElementById("files_table");
+            if (y != null) {
+              table_rows = y.getElementsByTagName("tr");
+              for (row in table_rows) {
+                cells = table_rows[row].getElementsByTagName("td");
+                for (cell in cells) {
+                  if (cells[cell].getAttribute("name") == 'delete_cell') {
+                    cells[cell].style.display = "None";
+                  }
+                }
+              }
             }
+          }
         	if (!(obj.ssid_mod)) {
         		document.getElementById("ssid_mod_bar").style.display="None";
             	document.getElementById("ssid_mod").style.display="None";
@@ -200,7 +216,7 @@
             alert(obj.msg);
         });*/
     };
-    
+
     function upgrade_ext() {
         $.ajax({
             type: 'post',
