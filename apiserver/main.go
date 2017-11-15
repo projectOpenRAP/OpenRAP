@@ -18,7 +18,7 @@ var (
 
 func createActiveProfileDirectories(activeProfile config.DeviceInfo) {
 	var pathErr error
-	// Create /var/www/ekstep/config_json dir
+	// Create directories based on profile.json
 	dirpath := []string{
 		activeProfile.ConfigJsonDir,
 		activeProfile.JsonDir,
@@ -28,7 +28,7 @@ func createActiveProfileDirectories(activeProfile config.DeviceInfo) {
 
 	for _, dp := range dirpath {
 		logger.Trace.Printf("Creating dir: %s", dp)
-		pathErr = os.MkdirAll(dp, 0666)
+		pathErr = os.MkdirAll(dp, 0744)
 		if pathErr != nil {
 			logger.Error.Println(pathErr)
 		}
