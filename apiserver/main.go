@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	"github.com/projectOpenRAP/OpenRAP/apiserver/config"
 )
@@ -14,6 +15,25 @@ var (
 	indexDbPath                    string
 	logger                         *config.Tracelog
 )
+
+func createActiveProfileDirectories(activeProfile config.DeviceInfo) {
+	var pathErr error
+	// Create directories based on profile.json
+	dirpath := []string{
+		activeProfile.ConfigJsonDir,
+		activeProfile.JsonDir,
+		activeProfile.ContentRoot,
+		activeProfile.UnzipContent,
+		activeProfile.Telemetry}
+
+	for _, dp := range dirpath {
+		logger.Trace.Printf("Creating dir: %s", dp)
+		pathErr = os.MkdirAll(dp, 0744)
+		if pathErr != nil {
+			logger.Error.Println(pathErr)
+		}
+	}
+}
 
 func main() {
 	flag.StringVar(&httpAddr, "http", "0.0.0.0:9090", "HTTP service ip:port")
@@ -39,6 +59,7 @@ func main() {
 	}
 	logger = dconfig.Logger
 
+	createActiveProfileDirectories(dconfig.ActiveProfile)
 	//logfile := dconfig.ActiveProfile.MediaRoot + "apiserver.log"
 	//LoggerInit(logfile)
 	//logger.Trace.Printf("apiserver log stores into: %s\n", logfile)
