@@ -253,7 +253,7 @@ cd $INSTALL_DIR
 ## backup the existing softlink to opencdn.old and create a new softlink 
 ## If installation succesful, opencdn.old2 will be deleted as part of cleanup process
 ##
-run_cmd "mv $CDNROOT $CDNROOT.old"
+run_cmd mv $CDNROOT $CDNROOT.previous
 run_cmd ln -s $CDNROOT-$NVER $CDNROOT
 cd $CUR_DIR
 
@@ -282,12 +282,11 @@ verify
 
 if [ $verify_failed -eq 1 ]
 then
-	logmsg "Installation verification failed, rolling back..."
+	logmsg "Installation verification failed, rolling back..." 
 	run_cmd rm $MOUNT_PATH$TARGET/$CDNROOT
 	run_cmd rm -rf $MOUNT_PATH$TARGET/$CDNROOT-$NVER
 	## Note no mount path for ln command, since we do not want mount path
-	run_cmd mv $MOUNT_PATH$TARGET/$CDNROOT.old $TARGET/$CDNROOT
-	run_cmd mv $MOUNT_PATH$TARGET/$CDNROOT.old2 $TARGET/$CDNROOT.old
+	run_cmd mv $MOUNT_PATH$TARGET/$CDNROOT.previous $TARGET/$CDNROOT
 	cleanup
 	exit -3
 fi
@@ -298,13 +297,18 @@ fi
 echo "Running postinstall scripts"
 bash $MOUNT_PATH$TARGET/$POSTINSTALL
 
-# Remove the opencdn.old2 link and directory if present
+# Remove the opencdn.old link and directory if present
 logmsg "Installation successful, cleaning up..."
+
 cd $INSTALL_DIR
-del_dir=`readlink $CDNROOT.old2`
+del_dir=`readlink $CDNROOT.old`
 logmsg "Removing $del_dir ..."
-echo verify-- run_cmd rm -rf ./$del_dir
-echo verify-- run_cmd rm $CDNROOT.old2
+run_cmd rm -rf ./$del_dir
+run_cmd rm $CDNROOT.old
+
+old_dir=`readlink $CDNROOT.previous`
+run_cmd ln -s  $old_dir $CDNROOT.old
+run_cmd rm $CDNROOT.previous
 cd $CUR_DIR
 
 cleanup
