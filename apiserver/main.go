@@ -28,7 +28,7 @@ func createActiveProfileDirectories(activeProfile config.DeviceInfo) {
 
 	for _, dp := range dirpath {
 		logger.Trace.Printf("Creating dir: %s", dp)
-		pathErr = os.MkdirAll(dp, 0744)
+		pathErr = os.MkdirAll(dp, 0755)
 		if pathErr != nil {
 			logger.Error.Println(pathErr)
 		}
