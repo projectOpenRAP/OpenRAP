@@ -26,18 +26,26 @@ var routes map[string]http.HandlerFunc = map[string]http.HandlerFunc{
 	//API for homepage
 	"/api/page/v1/assemble/org.ekstep.genie.content.home":     contentHomeHandler,
 	"/data/v3/pageApi/assemble/org.ekstep.genie.content.home": contentHomeHandler,
+	//QA api
+	"/api/data/v3/pageApi/assemble/org.ekstep.genie.content.home": contentHomeHandler,
 
 	//API for specific ecar
 	"/api/learning/v2/content/{contentID}": contentIdHandler,
 	"/content/v3/read/{contentID}":         contentIdHandler,
+	//QA api
+	"/api/content/v3/read/{contentID}": contentIdHandler,
 
 	//API for different types of search
 	"/api/search/v2/search": searchHandler,
 	"/composite/v3/search":  searchHandler,
+	//QA api
+	"/api/composite/v3/search": searchHandler,
 
 	//API for telemetry
 	"/api/telemetry/v1/telemetry": telemetryHandler,
 	"/data/v3/telemetry":          telemetryHandler,
+	//QA api
+	"/api/data/v3/telemetry": telemetryHandler,
 
 	//Private api
 	//API to add/remove ecar from search index

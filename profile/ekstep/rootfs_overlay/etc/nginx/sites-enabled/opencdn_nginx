@@ -23,7 +23,7 @@ server {
     }
 
 	#
-	#edgeCDN apiserver configuration
+	#openRAP apiserver configuration
 	#
 	location /api {
                 proxy_pass http://127.0.0.1:9000;
@@ -37,6 +37,11 @@ server {
 	location /data {
                 proxy_pass http://127.0.0.1:9000;
 	}
+
+	# Redirect requests for /generate_204 to open the captive portal screen
+    location /generate_204 {
+                return 302 http://download.localnet/index.html;
+    }
 }
 
 #
@@ -44,7 +49,7 @@ server {
 #
 server {
 	listen 80;
-	server_name admin.edgecdn.com;
+	server_name admin.openrap.com;
 
 	index index.php index.html;
 
