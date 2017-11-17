@@ -23,8 +23,8 @@ def write_to_file(filename, data):
 	file_to_write.write(data)
 	file_to_write.close()
 	if filename.endswith(".png"):
-		#command = 'ffmpeg -i /opt/opencdn/rootfs_overlay/var/www/html/public/CaptivePortalLogo.png -vf scale=90:31 /opt/opencdn/rootfs_overlay/var/www/html/public/images/CaptivePortalLogo.png -y'
-		command = 'mv /opt/opencdn/rootfs_overlay/var/www/html/public/CaptivePortalLogo.png /opt/opencdn/rootfs_overlay/var/www/html/public/images/CaptivePortalLogo.png'
+		command = 'avconv -i /opt/opencdn/rootfs_overlay/var/www/html/public/CaptivePortalLogo.png -vf scale=200:-1 /opt/opencdn/rootfs_overlay/var/www/html/public/images/CaptivePortalLogo.png -y'
+		#command = 'mv /opt/opencdn/rootfs_overlay/var/www/html/public/CaptivePortalLogo.png /opt/opencdn/rootfs_overlay/var/www/html/public/images/CaptivePortalLogo.png'
 		process = subprocess.Popen(command, shell=True)
 		process.communicate()[0]
 		result = process.returncode

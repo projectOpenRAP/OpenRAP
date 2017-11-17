@@ -48,10 +48,7 @@ def version_suffix(profile, version):
 
 
 def hostname_get(profile):
-    if profile == "openrap":
-        hostname = "openRAP"
-    else:
-        hostname = profile + "ORAP"
+    hostname = "openRAP"
     return hostname
 
 def file_hostname_update(vf, hostname):
