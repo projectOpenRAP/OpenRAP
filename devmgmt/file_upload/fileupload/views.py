@@ -220,7 +220,6 @@ def serve_extensions(requests):
     return JSONResponse({"exts":allowed_exts})
 
 def download_to_USBx(request):
-    print 'Hooray I have been called'
     usb_name = get_usb_name()
     remount = "mount -o remount, rw "+usb_name
     os.system(remount)
@@ -256,7 +255,6 @@ def split_dirs(text): #Splits the entire path to get the file name
     return value
 
 def transferx(request):
-    print 'Thank you for calling me'
     global filesx
     result = 'ok'
     for subject_file in filesx:

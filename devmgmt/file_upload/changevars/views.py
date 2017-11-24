@@ -41,7 +41,9 @@ def update_data(request):
             new_val = request.POST.get("textinput-" + key, None)
             print 'Should be %s' %(new_val)
             if (new_val is not None and (len(new_val) > 0)):
-                varlist_full[key] = new_val
+				if len((new_val).split(',')) > 1:
+					new_val = new_val.split(',')
+				varlist_full[key] = new_val
         print varlist
         print varlist_full
         update_vars(varlist_full)

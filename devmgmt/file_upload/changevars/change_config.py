@@ -85,6 +85,8 @@ def update_vars(new_var_list):
 
     with open(config_file, 'w') as res:
         try:
+            print 'Wilkommen auf Deustchland'
+            print 'Updating file %s with active profile %s ' %(config_file, get_active_profile())
             res.write(json.dumps(json_data, sort_keys=True,indent=4))
             return True
         except:
