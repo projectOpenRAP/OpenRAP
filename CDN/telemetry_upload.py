@@ -37,7 +37,7 @@ def logging_init():
     global log
     global logfd
     log = logging.getLogger('TELEMETRY')
-    log.setLevel(logging.DEBUG)
+    log.setLevel(logging.INFO)
 
     # create formatter and add it to the handlers
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -54,7 +54,7 @@ def logging_init():
     
     # create console handler with a higher log level
     ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
+    ch.setLevel(logging.ERROR)
     ch.setFormatter(formatter)
     log.addHandler(ch)
     # Keep a global reference of the logger
@@ -78,7 +78,7 @@ def jwt_generate(key, secret):
     return token 
 
 def check_netconnectivity():
-    cmd = "ping -c 2 -W 5 8.8.8.9"
+    cmd = "ping -c 2 -W 5 8.8.8.8"
     status = run_cmd(cmd)
     if status == 0:
         return True
@@ -124,7 +124,6 @@ def telemetry_upload_file(filename, jwt, endpoint=tmURL):
     headers = {'Content-Type': 'application/json', 'Content-Encoding': 'gzip', 'Authorization': auth_text}
 
     fin = open(filename, 'rb')
-    files = {'file': fin}
     try:
           r  = requests.post(url=endpoint, data=fin, headers=headers)
           print(r.text)
@@ -138,8 +137,8 @@ def telemetry_upload_file(filename, jwt, endpoint=tmURL):
     return (r.status_code, es_resp_status, es_resp_err, es_resp_errmsg)
 
 
-# Generate log only for 100th error from timer 
-log_optimization_limit = 100
+# Generate log sparingly
+log_optimization_limit = 25
 log_current_value = 0 
 
 def telemetry_upload_dir():
@@ -196,6 +195,7 @@ def telemetry_upload_dir():
                         (filename, status, es_resp_status, es_resp_err, es_resp_errmsg))
                 # TODO: If failed due to token expiry, we need to regenerate the token
                 # For now, we are generating the token on every reboot anyway
+                break
 
             # Ensure we are not rate limited by server
             if ratelimit_count < 1:
@@ -213,7 +213,7 @@ def telemetry_upload_dir():
             log_current_value  = 0
             
     # The below line required for next timer fire
-    threading.Timer(60, telemetry_upload_dir).start()
+    threading.Timer(240, telemetry_upload_dir).start()
 
 ##########################################
 #           MAIN
