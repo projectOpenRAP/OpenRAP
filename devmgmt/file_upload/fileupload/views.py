@@ -239,10 +239,19 @@ def download_to_USBx(request):
         command = "cp -r "+ local_files_dir+" "+usb_name
         t = subprocess.Popen(command, shell=True)
         t.communicate()[0]
+        os.system("/bin/sync") # one for my master
+        os.system("/bin/sync") # one for my'dam
+        os.system("/bin/sync") #  and one for the li'l boy who lives down the lane
+        romount = "/bin/mount -o remount,ro " + usb_name
+        os.system(romount)
+        time.sleep(1)  ## And additional saftey..
         result = t.returncode
         if result != 0:
             return JsonResponse ({'res': 'Copy aborted! [USB Unplugged/Insufficient Space?]'})
         return JsonResponse({'res': 'Copy successful'})
+
+    romount = "/bin/mount -o remount,ro " + usb_name
+    os.system(romount)
     return JsonResponse({'res':'Reinsert USB'})
 
 def split_dirs(text): #Splits the entire path to get the file name
