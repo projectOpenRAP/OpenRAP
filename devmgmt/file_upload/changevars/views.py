@@ -41,7 +41,10 @@ def update_data(request):
             new_val = request.POST.get("textinput-" + key, None)
             print 'Should be %s' %(new_val)
             if (new_val is not None and (len(new_val) > 0)):
-                varlist_full[key] = new_val
+				if key == 'accepted_extensions':
+					new_val = [t.strip() for t in new_val.split(',')]
+					print 'Bonjour %s' %(new_val)
+				varlist_full[key] = new_val
         print varlist
         print varlist_full
         update_vars(varlist_full)
