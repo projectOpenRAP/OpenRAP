@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import os
-
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .change_config import iter_vars, update_vars
 from django.http import JsonResponse, HttpResponseRedirect
@@ -28,6 +28,7 @@ def load_vars():
 	print varlist
 	return {'var_dict' : varlist, 'message' : message}
 
+@login_required(login_url="/backadmin/")
 def load_page(request):
 	context = load_vars()
 	return render(request, 'changevars/varchange.html', context)

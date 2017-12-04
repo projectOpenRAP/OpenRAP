@@ -5,13 +5,14 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect
 from .ssid_modifier import return_value
 from django.conf import settings
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 cdn_scripts_dir = settings.CDN_SCRIPTS_DIR
 
 ssid = return_value('ssid')
 
+@login_required(login_url="/backadmin/")
 def modify_ssid(request):
     global ssid, password
     result = None
@@ -33,5 +34,6 @@ def modify_ssid(request):
         return render(request, 'ssidmod/mod_ssid.html', {'result_text':'SSID modification is complete! Please refresh the page', 'ssid_name': new_ssid})
     return render(request, 'ssidmod/mod_ssid.html', {'result_text':None, 'ssid_name': ssid})
 
+@login_required(login_url="/backadmin/")
 def index(request):
     return HttpResponseRedirect('modify_ssid/')

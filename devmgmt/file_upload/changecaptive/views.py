@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 import subprocess, json, os
 
 # Create your views here.
 status_text = None
 fail_text = None
+
+@login_required(login_url="/backadmin/")
 def index(request):
 	return render(request, 'changecaptive/change_captive.html', {'status_text': status_text, 'fail_text' : fail_text})
 

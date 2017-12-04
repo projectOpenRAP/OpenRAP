@@ -17,6 +17,7 @@ from .extract import extractit
 from .deleteExtract import deleteit
 from distutils.dir_util import copy_tree
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -55,6 +56,7 @@ def user_logout(request):
     logout(request)
     return HttpResponseRedirect('../../upload/')
 
+@login_required(login_url="/backadmin/")
 def index(request):
     return render(request,'fileupload/LOGIN.html')
 

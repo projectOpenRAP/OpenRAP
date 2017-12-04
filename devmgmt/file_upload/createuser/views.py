@@ -8,11 +8,12 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
 from django.views.generic.edit import DeleteView
 from django.urls import reverse_lazy
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 message = None
 
+@login_required(login_url="/backadmin/")
 def index(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -27,10 +28,12 @@ def index(request):
         form = UserCreationForm()
         return render(request, 'createuser/user_create.html', {'form' : form, 'users' : users})
 
+@login_required(login_url="/backadmin/")
 def delete_user(request):
     users = [user for user in User.objects.all() if not user.is_superuser]
     return render(request, 'createuser/user_delete.html', {'users': users})
 
+@login_required(login_url="/backadmin/")
 def delete(request):
     if request.method == 'POST':
         primary = int(request.POST.get("delete_me", ""))
