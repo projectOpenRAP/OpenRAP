@@ -138,14 +138,15 @@
             	}
             var y = document.getElementById("files_table");
             if (y != null) {
-              table_rows = y.getElementsByTagName("tr");
+              t_r = y.getElementsByTagName("tr");
+              table_rows = Array.from(t_r);
               for (row in table_rows) {
                 cells = table_rows[row].getElementsByTagName("td");
-                for (cell in cells) {
-                  if (cells[cell].getAttribute("name") == 'delete_cell') {
-                    cells[cell].style.display = "None";
+                Array.from(cells).forEach(function(element) {
+                  if (element.getAttribute('name') == 'delete_cell') {
+                      element.style.display = "none";
                   }
-                }
+                });
               }
             }
           }
@@ -159,8 +160,12 @@
         	}
         	if (!(obj.superuser_tasks)) {
         		document.getElementById("user_create_bar").style.display="None";
-                document.getElementById("user_create").style.display="None";
+            document.getElementById("user_create").style.display="None";
         	}
+          if(!(obj.global_vars_mod)) {
+            document.getElementById('change_vars_bar').style.display="None";
+            document.getElementById('change_vars').style.display="None";
+          }
         });
         var t = window.location.pathname;
         switch(t) {

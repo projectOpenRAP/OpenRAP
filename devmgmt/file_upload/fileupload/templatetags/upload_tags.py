@@ -59,7 +59,7 @@ def upload_js():
             <span class="size">{%=o.formatFileSize(file.size)%}</span>
         </td>
         <td name="delete_cell">
-            <button class="btn btn-danger delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %} name="up_table">
+            <button class="btn btn-danger delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %} name="delete_button">
                 <i class="glyphicon glyphicon-trash"></i>
                 <span>{%=locale.fileupload.destroy%}</span>
             </button>
