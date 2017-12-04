@@ -20,17 +20,17 @@
 				<span class = "glyphicon glyphicon-menu-hamburger"></span>
 			</a>
 			<ul class = "dropdown-menu" id="dropdown">
-                <li id = "file_upload"><a href="{% url 'fileupload:upload-new' %}">File Upload</a></li>
+                <li id = "file_upload" ><a href="{% url 'fileupload:upload-new' %}">File Upload</a></li>
                 <li id = "file_upload_bar" class="divider"></li>
-                <li id = "ssid_mod"><a href="{% url 'ssidmod:index' %}">SSID Modification</a></li>
-                <li id = "ssid_mod_bar" class="divider"></li>
-                <li id = "captive_mod"><a href="{% url 'changecaptive:index' %}">Captive Portal Modification</a></li>
-                <li id = "captive_mod_bar" class="divider"></li>
-                <li id = "change_vars"><a href="{% url 'changevars:loadpage' %}">Change Global Variables</a></li>
-                <li id = "change_vars_bar" class = "divider"></li>
-                <li id = "user_create"><a href="{% url 'createuser:index' %}">Superuser Tasks</a></li>
-                <li id = "user_create_bar" class="divider"></li>
-                <li id = "change_pass"><a href = "{% url 'backadmin:user_changepass' %}">Change password</a></li>
+                <li id = "ssid_mod" style="display:none;"><a href="{% url 'ssidmod:index' %}">SSID Modification</a></li>
+                <li id = "ssid_mod_bar" class="divider" style="display:none;"></li>
+                <li id = "captive_mod" style="display:none;"><a href="{% url 'changecaptive:index' %}">Captive Portal Modification</a></li>
+                <li id = "captive_mod_bar" class="divider" style="display:none;"></li>
+                <li id = "change_vars" style="display:none;"><a href="{% url 'changevars:loadpage' %}">Change Global Variables</a></li>
+                <li id = "change_vars_bar" class = "divider" style="display:none;"></li>
+                <li id = "user_create" style="display:none;"><a href="{% url 'createuser:index' %}">Superuser Tasks</a></li>
+                <li id = "user_create_bar" class="divider" style="display:none;"></li>
+                <li id = "change_pass" style="display:none;"><a href = "{% url 'backadmin:user_changepass' %}">Change password</a></li>
 			</ul>
 		</li>
 	</ul>
@@ -109,32 +109,36 @@
                 window.location.href = "/backadmin/";
             }
             document.getElementById("username").innerHTML = obj.user_name;
-        	if (!(obj.down_to_usb)) {
+        	if (obj.down_to_usb) {
         		var x = document.getElementById("usb_down");
         		if (x != null) {
-            		x.style.display="None";
+            		x.style.display="table-cell";
             	}
         	}
-        	if (!(obj.up_from_usb)) {
+        	if (obj.up_from_usb) {
         		var x = document.getElementById("usb");
         		if (x != null) {
-            		x.style.display="None";
-                y = document.getElementById("apply_changes");
+            		x.style.display="inline-table";
+                var y = document.getElementById("apply_changes");
                 if (y != null) {
-                  y.style.display="None";
+                  y.style.display="inline-table";
+                }
+                var z = document.getElementById("usb_span");
+                if (z != null) {
+                  z.style.display="inline-table";
                 }
             	}
         	}
-        	if (!(obj.up_from_dev)) {
+        	if (obj.up_from_dev) {
         		var x = document.getElementById("dev_up");
         		if (x != null) {
-            		x.style.display="None";
+            		x.style.display="inline-table";
             	}
         	}
-        	if (!(obj.delete_files)) {
+        	if (obj.delete_files) {
         		var x = document.getElementById("delete_all");
         		if (x != null) {
-            		x.style.display="None";
+            		x.style.display="inline-table";
             	}
             var y = document.getElementById("files_table");
             if (y != null) {
@@ -144,27 +148,27 @@
                 cells = table_rows[row].getElementsByTagName("td");
                 Array.from(cells).forEach(function(element) {
                   if (element.getAttribute('name') == 'delete_cell') {
-                      element.style.display = "none";
+                      element.style.display = "inline";
                   }
                 });
               }
             }
           }
-        	if (!(obj.ssid_mod)) {
-        		document.getElementById("ssid_mod_bar").style.display="None";
-            	document.getElementById("ssid_mod").style.display="None";
+        	if (obj.ssid_mod) {
+        		document.getElementById("ssid_mod_bar").style.display="block";
+            	document.getElementById("ssid_mod").style.display="initial";
         	}
-        	if (!(obj.captive_mod)) {
-        		document.getElementById("captive_mod_bar").style.display="None";
-        		document.getElementById("captive_mod").style.display="None";
+        	if (obj.captive_mod) {
+        		document.getElementById("captive_mod_bar").style.display="block";
+        		document.getElementById("captive_mod").style.display="initial";
         	}
-        	if (!(obj.superuser_tasks)) {
-        		document.getElementById("user_create_bar").style.display="None";
-            document.getElementById("user_create").style.display="None";
+        	if (obj.superuser_tasks) {
+        		document.getElementById("user_create_bar").style.display="block";
+            document.getElementById("user_create").style.display="initial";
         	}
-          if(!(obj.global_vars_mod)) {
-            document.getElementById('change_vars_bar').style.display="None";
-            document.getElementById('change_vars').style.display="None";
+          if(obj.global_vars_mod) {
+            document.getElementById('change_vars_bar').style.display="block";
+            document.getElementById('change_vars').style.display="initial";
           }
         });
         var t = window.location.pathname;
