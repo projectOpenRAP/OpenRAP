@@ -25,7 +25,9 @@ def load_vars():
 	varlist={}
 	for var in changeable_vars:
 		varlist[var] = varlist_full[var]
-	print varlist
+		if type(varlist[var]) == list:
+			varlist[var] = ', '.join(varlist[var])
+	#print varlist
 	return {'var_dict' : varlist, 'message' : message}
 
 def load_page(request):
@@ -37,16 +39,16 @@ def update_data(request):
         print 'GOT POST'
         global varlist, varlist_full
         for key in varlist:
-            print "textinput-%s" %(key)
+            #print "textinput-%s" %(key)
             new_val = request.POST.get("textinput-" + key, None)
-            print 'Should be %s' %(new_val)
+            #print 'Should be %s' %(new_val)
             if (new_val is not None and (len(new_val) > 0)):
 				if key == 'accepted_extensions':
 					new_val = [t.strip() for t in new_val.split(',')]
-					print 'Bonjour %s' %(new_val)
+				#	print 'Bonjour %s' %(new_val)
 				varlist_full[key] = new_val
-        print varlist
-        print varlist_full
+        #print varlist
+        #print varlist_full
         update_vars(varlist_full)
         print "Restarting API server"
         os.system("killall -9 apiserver")

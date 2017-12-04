@@ -7,7 +7,7 @@
 		{% csrf_token %}
 		{% for var, value in var_dict.items %}
 			<label for="textinput-{{ var }}">{{ var }}</label><br />
-			<input type="text" id="textinput-{{ var }}" name="textinput-{{ var }}" placeholder = "Currently:{{ value }}" class = "form-control"><br />
+			<input type="text" id="textinput-{{ var }}" name="textinput-{{ var }}" placeholder = "Currently: {{ value }}" class = "form-control"><br />
 		{% endfor %}
 	</form>
 	<button onclick="update()" class = "btn btn-primary">Update Variables</button>
@@ -19,6 +19,7 @@ $(function() {
 		alert('{{ message }}');
 	}
 	document.getElementById('textinput-profile_name').setAttribute("disabled", true);
+
 });
 function update () {
 	document.getElementById("submit_form").submit();
