@@ -3,7 +3,12 @@
 
 {% block content %}
 <div class="container">	
+
 	<h1 align='CENTER'>Customize Captive Portal</h1>
+	<div class="alert alert-success" id="pinut-successAlert">
+    		<strong>Success!</strong> Uploads are successful.
+  	</div>
+
 	<input type="file" accept=".png" class="filestuff" id="name" form="formdata">
 	<input type="file" accept=".apk" class="filestuff" id="name_apk" form="formdata">
 	<button class = "btn btn-success" id="files_add" onclick="openFiles()">
@@ -25,6 +30,9 @@
        	<span>Select APK for user to download</span>
 	</button>
 	<p id="logo_name_apk">No file chosen</p>
+	<div class="alert alert-info" id="pinut-infoAlert">
+    		<strong>Uploading...!!</strong> Upload in progress.
+  	</div>
 	<hr/>
 	<div align="CENTER">
 		<button class = "btn btn-info" id="upload_creds" onclick="sendstuff()">
@@ -77,6 +85,8 @@
 
 </script>
 <script>
+$('#pinut-successAlert').hide();
+$('#pinut-infoAlert').hide();
 $.ajaxSetup({ 
      beforeSend: function(xhr, settings) {
          function getCookie(name) {
@@ -101,7 +111,7 @@ $.ajaxSetup({
      } 
 });
 
-	function sendfile(file, destination) {
+	function sendfile(file, destination,cb) {
 		$.ajax({
 			type: 'post',
 			url: destination,
@@ -109,7 +119,8 @@ $.ajaxSetup({
 			processData: false,
 			contentType: false,
 			success: function(data) {
-				alert('Uploaded!');
+				//alert('Uploaded!');
+				cb();
 			} 
 		});
 	};
@@ -118,15 +129,33 @@ $.ajaxSetup({
 	//	var logofile = document.getElementById('name').files[0];
 	//	alert(logofile);
 	//	sendfile(logofile, 'change_logo/');
+		$('#pinut-infoAlert').show();
 		if (document.getElementById("logo_name").innerHTML != 'No file chosen') {
 			var logofile = document.getElementById('name').files[0];
-			sendfile(logofile, 'change_logo/');
+			console.log("logo:", logofile);
+			sendfile(logofile, 'change_logo/',function(){
+				if (document.getElementById("logo_name_apk").innerHTML != 'No file chosen') {
+					var apkfile = document.getElementById('name_apk').files[0];
+					sendfile(apkfile, 'change_apk/',function(){
+						document.getElementById('formdata').submit();
+						
+					});
+				}else{
+					document.getElementById('formdata').submit();
+				}					
+			});
 		}
-		if (document.getElementById("logo_name_apk").innerHTML != 'No file chosen') {
+		else if (document.getElementById("logo_name_apk").innerHTML != 'No file chosen') {
 			var apkfile = document.getElementById('name_apk').files[0];
-			sendfile(apkfile, 'change_apk/');
-		}
+			sendfile(apkfile, 'change_apk/',function(){
+				document.getElementById('formdata').submit();
+			
+			});
+		}else{
 		document.getElementById('formdata').submit();
+			
+		}
+		//document.getElementById('formdata').submit();
 	};
 
 $('form').submit(function(e){
@@ -142,6 +171,8 @@ $('form').submit(function(e){
         processData: false,
         success: function(answ){
             var data = JSON.parse(JSON.stringify(answ));
+	    $('#pinut-successAlert').show();
+		$('#pinut-infoAlert').hide();
             alert(data.ok);
         }
     });
