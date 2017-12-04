@@ -35,8 +35,8 @@ server {
 #
 server {
 	listen 80;
-	server_name admin.edgecdn.com;
-
+	server_name admin.openrap.com;
+	client_max_body_size 0;
 	index index.php index.html;
 
 	location / {

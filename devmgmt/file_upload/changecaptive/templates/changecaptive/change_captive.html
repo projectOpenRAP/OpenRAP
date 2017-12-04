@@ -130,6 +130,10 @@ $.ajaxSetup({
 	//	alert(logofile);
 	//	sendfile(logofile, 'change_logo/');
 		$('#pinut-infoAlert').show();
+	/* 
+		Added chaining to handle async stuff.
+		TODO: add way to provide user feedback
+	*/
 		if (document.getElementById("logo_name").innerHTML != 'No file chosen') {
 			var logofile = document.getElementById('name').files[0];
 			console.log("logo:", logofile);
