@@ -101,7 +101,7 @@ $.ajaxSetup({
      } 
 });
 
-	function sendfile(file, destination) {
+	function sendfile(file, destination,cb) {
 		$.ajax({
 			type: 'post',
 			url: destination,
@@ -110,6 +110,7 @@ $.ajaxSetup({
 			contentType: false,
 			success: function(data) {
 				alert('Uploaded!');
+				cb();
 			} 
 		});
 	};
@@ -118,15 +119,36 @@ $.ajaxSetup({
 	//	var logofile = document.getElementById('name').files[0];
 	//	alert(logofile);
 	//	sendfile(logofile, 'change_logo/');
+	/* 
+		Added chaining to handle async stuff.
+		TODO: add way to provide user feedback
+	*/
 		if (document.getElementById("logo_name").innerHTML != 'No file chosen') {
 			var logofile = document.getElementById('name').files[0];
-			sendfile(logofile, 'change_logo/');
+			console.log("logo:", logofile);
+			sendfile(logofile, 'change_logo/',function(){
+				if (document.getElementById("logo_name_apk").innerHTML != 'No file chosen') {
+					var apkfile = document.getElementById('name_apk').files[0];
+					sendfile(apkfile, 'change_apk/',function(){
+						document.getElementById('formdata').submit();
+						
+					});
+				}else{
+					document.getElementById('formdata').submit();
+				}					
+			});
 		}
-		if (document.getElementById("logo_name_apk").innerHTML != 'No file chosen') {
+		else if (document.getElementById("logo_name_apk").innerHTML != 'No file chosen') {
 			var apkfile = document.getElementById('name_apk').files[0];
-			sendfile(apkfile, 'change_apk/');
-		}
+			sendfile(apkfile, 'change_apk/',function(){
+				document.getElementById('formdata').submit();
+			
+			});
+		}else{
 		document.getElementById('formdata').submit();
+			
+		}
+		//document.getElementById('formdata').submit();
 	};
 
 $('form').submit(function(e){
