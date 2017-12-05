@@ -26,6 +26,7 @@ device_secret=""
 tm_jwt=""
 
 tmDir = "/var/www/ekstep/telemetry"
+tm_timer_interval=300 # 5 minutes
 
 #################
 class BreakoutException(Exception):
@@ -182,19 +183,29 @@ def telemetry_upload_dir():
         # If we get unauthorized/rate limited error
         # Handle that
         #
-        ratelimit_count = 100
+        # We have telemetry ratelimit(in cloud server) 10000/hour
+        # and the timer expires in every 5 minutes
+        ratelimit_count = 1000
         for filename in tmfile_timesorted_list:
             status, es_resp_status, es_resp_err, es_resp_errmsg = telemetry_upload_file(filename, tm_jwt, tmURL)
             if es_resp_status == "successful" or es_resp_err == "INVALID_DATA_ERROR":
-                log.info("telemetry upload(%s) status: %s %s" % 
+                log.info("telemetry upload(%s) status: %s %s" %
                         (filename, es_resp_status, es_resp_errmsg))
                 # delete this file
                 os.remove(filename)
-            else:
+            elif status == 401:
                 log.info("telemetry upload(%s) status: %d es_status: %s es_err: %s es_errmsg: %s" %
                         (filename, status, es_resp_status, es_resp_err, es_resp_errmsg))
-                # TODO: If failed due to token expiry, we need to regenerate the token
-                # For now, we are generating the token on every reboot anyway
+                log.info("Unauthorized: Regenerating token...")
+                token_generate()
+                break
+            elif status == 429:
+                log.info("telemetry upload(%s) status: %d es_status: %s es_err: %s es_errmsg: %s" %
+                        (filename, status, es_resp_status, es_resp_err, es_resp_errmsg))
+                log.info("Ratelimit: API rate limit exceeded...")
+                break
+            else:
+                # some other error; take a break for now
                 break
 
             # Ensure we are not rate limited by server
@@ -213,7 +224,8 @@ def telemetry_upload_dir():
             log_current_value  = 0
             
     # The below line required for next timer fire
-    threading.Timer(240, telemetry_upload_dir).start()
+    global tm_timer_interval
+    threading.Timer(tm_timer_interval, telemetry_upload_dir).start()
 
 ##########################################
 #           MAIN
