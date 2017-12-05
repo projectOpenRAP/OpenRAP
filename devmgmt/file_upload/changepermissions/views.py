@@ -8,6 +8,7 @@ from fileupload.models import Permission
 from django.core import serializers
 from pprint import pprint
 from django.forms.models import model_to_dict
+from django.contrib.auth.decorators import login_required
 from collections import OrderedDict
 
 # Create your views here.
@@ -29,9 +30,11 @@ def update_data(request):
                 #print (getattr(newser.permission, p))
     return HttpResponseRedirect('/createuser/new/')
 
+@login_required(login_url="/backadmin/")
 def index(request):
     return HttpResponseRedirect('/')
 
+@login_required(login_url="/backadmin/")
 def display(request):
     if request.method == 'POST':
         global permission_strings
