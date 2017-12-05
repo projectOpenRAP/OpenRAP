@@ -351,7 +351,7 @@
                         $('a').click(function (e) {
                             e.preventDefault();  //stop the browser from following
                             window.location.href = 'http://captive.openrap.com/public/app.apk';
-                            $('#head').html("<small>If the download was not successful, please open http://captive.openrap.com in chrome</small>")
+                            $('#head').html("<small>If the download was not successful, please open http://openrap.io in chrome</small>")
                         });
                         $.getJSON("text.json", function (response) {
                             var obj = JSON.parse(JSON.stringify(response));
