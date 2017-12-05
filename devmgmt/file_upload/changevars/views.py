@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import os
-from django.contrib.auth.decorators import login_required
+
 from django.shortcuts import render
 from .change_config import iter_vars, update_vars
 from django.http import JsonResponse, HttpResponseRedirect
@@ -25,10 +25,11 @@ def load_vars():
 	varlist={}
 	for var in changeable_vars:
 		varlist[var] = varlist_full[var]
-	print varlist
+		if type(varlist[var]) == list:
+			varlist[var] = ', '.join(varlist[var])
+	#print varlist
 	return {'var_dict' : varlist, 'message' : message}
 
-@login_required(login_url="/backadmin/")
 def load_page(request):
 	context = load_vars()
 	return render(request, 'changevars/varchange.html', context)
@@ -38,13 +39,16 @@ def update_data(request):
         print 'GOT POST'
         global varlist, varlist_full
         for key in varlist:
-            print "textinput-%s" %(key)
+            #print "textinput-%s" %(key)
             new_val = request.POST.get("textinput-" + key, None)
-            print 'Should be %s' %(new_val)
+            #print 'Should be %s' %(new_val)
             if (new_val is not None and (len(new_val) > 0)):
-                varlist_full[key] = new_val
-        print varlist
-        print varlist_full
+				if key == 'accepted_extensions':
+					new_val = [t.strip() for t in new_val.split(',')]
+				#	print 'Bonjour %s' %(new_val)
+				varlist_full[key] = new_val
+        #print varlist
+        #print varlist_full
         update_vars(varlist_full)
         print "Restarting API server"
         os.system("killall -9 apiserver")

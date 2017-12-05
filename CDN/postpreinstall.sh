@@ -2,6 +2,7 @@
 
 files_saved="
 /opt/opencdn/rootfs_overlay/etc/hostapd/hostapd.conf
+/opt/opencdn/rootfs_overlay/var/www/ekstep/config_json/config.json
 "
 save_files()
 {
