@@ -15,30 +15,35 @@
         <div class="row fileupload-buttonbar">
             <div class="col-lg-7">
                 <!-- The fileinput-button span is used to style the file input field as button -->
-                <span class="btn btn-success fileinput-button" id="dev_up" hidden="true">
+                <span class="btn btn-success fileinput-button" id="dev_up" hidden="true" style="display:none;" onclick='activate()'>
                     <i class="glyphicon glyphicon-plus"></i>
                     <span>Add files...</span>
-                    <input type="file" name="file_upload" multiple id="file_in">
                 </span>
-               
-                <button type="button" class="btn btn-danger delete" id="delete_all">
+                <input type="file" name="file_upload" multiple id="file_in" style='display:none;'/>
+                <span>
+                  <button type="button" class="btn btn-danger delete" id="delete_all" style="display:none;">
                     <i class="glyphicon glyphicon-trash"></i>
                     <span>Delete all</span>
-                </button>
-                <span data-toggle="tooltip" title="" id="usb_span" data-placement="right">
-                <button type="button" class="btn btn-primay start" id="usb" onclick="usbUpload()">
-                    <i class="glyphicon glyphicon-upload"></i>
-                    <span>USB upload</span>
-                </button>
-              </span>
-                <button type="button" class="btn btn-primay start" id="usb_down" onClick="telemetry_transfer()">
+                  </button>
+                </span>
+
+                <span data-toggle="tooltip" title="" id="usb_span" data-placement="right" style="display:none;">
+                  <button type="button" class="btn btn-primay start" id="usb" onclick="usbUpload()" style="display:none;">
+                      <i class="glyphicon glyphicon-upload"></i>
+                      <span>USB upload</span>
+                    </button>
+                </span>
+
+                <button type="button" class="btn btn-primay start" id="usb_down" onClick="telemetry_transfer()" style="display:none;">
                     <i class="glyphicon glyphicon-download"></i>
                     <span>USB download</span>
                 </button>
-                <button type="button" class="btn btn-primary start" id="apply_changes">
+
+                <button type="button" class="btn btn-primary start" id="apply_changes" style="display:none;">
                     <i class="glyphicon glyphicon-ok"></i>
                     <span>Apply Changes</span>
                 </button>
+
                 <!--input type="checkbox" class="toggle"-->
                 <!-- The loading indicator is shown during file processing -->
                 <span class="fileupload-loading"></span>
@@ -173,6 +178,9 @@ function usbUpload() {
   });
 }
 
+function activate() {
+  $('#file_in').focus().trigger('click');
+}
 $('#apply_changes').click(function() {
   $.getJSON('/upload/apply_changes', function(response) {
     var ob = JSON.parse(JSON.stringify(response));
