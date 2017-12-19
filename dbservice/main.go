@@ -15,30 +15,33 @@ type KeyValue struct{
     Value string `json:"value,omitempty"`
 }
 
+var db *bolt.DB
+
 func main(){
+    db = DbInit()
     router := mux.NewRouter()
     registerRoutes(router)
     log.Fatal(http.ListenAndServe(":9001",router))
 }
 
+func DbInit() *bolt.DB {
+    db,err := bolt.Open("my.db",0600,nil)
+    if err != nil {
+        log.Fatal(err)
+    }
+    return db
+    //defer db.Close()
+
+}
+
 func registerRoutes(r *mux.Router){
-    r.HandleFunc("/welcome",Welcome).Methods("GET")
     r.HandleFunc("/create/bucket",AddBucket).Methods("POST")
     r.HandleFunc("/add/entry",AddKeyValue).Methods("POST")
     r.HandleFunc("/get/{bucket}/{key}",GetKeyValue).Methods("GET")
 }
 
-func Welcome(w http.ResponseWriter, r *http.Request){
-    fmt.Fprintln(w,"Welcome")
-}
-
 func AddBucket(w http.ResponseWriter, r *http.Request){
-    db,err := bolt.Open("my.db",0600,nil)
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer db.Close()
-    err = db.Update(func(tx *bolt.Tx) error {
+    err := db.Update(func(tx *bolt.Tx) error {
         _,err := tx.CreateBucketIfNotExists([]byte("MyBucket"))
         if err != nil {
             return err
@@ -56,12 +59,7 @@ func AddKeyValue(w http.ResponseWriter, r *http.Request){
     var keyValue KeyValue
     json.NewDecoder(r.Body).Decode(&keyValue)
     fmt.Println(keyValue)
-    db,err := bolt.Open("my.db",0600,nil)
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer db.Close()
-    err = db.Update(func(tx *bolt.Tx) error {
+    err := db.Update(func(tx *bolt.Tx) error {
         b,err := tx.CreateBucketIfNotExists([]byte(keyValue.Bucket))
         if err != nil {
             //log.Fatal(err)
@@ -79,13 +77,6 @@ func AddKeyValue(w http.ResponseWriter, r *http.Request){
 }
 func GetKeyValue(w http.ResponseWriter, r *http.Request){
     vars := mux.Vars(r)
-    db,err := bolt.Open("my.db",0600,nil)
-    if err != nil {
-        log.Fatal(err)
-        http.Error(w,"Internal DB Error", http.StatusInternalServerError)
-        return
-    }
-    defer db.Close()
     db.View(func(tx *bolt.Tx) error {
         bucket := tx.Bucket([]byte(vars["bucket"]))
         if bucket == nil {
