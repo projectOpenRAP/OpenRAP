@@ -1,6 +1,7 @@
 package main
 
 import (
+    "flag"
     "fmt"
     "encoding/json"
     "log"
@@ -16,16 +17,19 @@ type KeyValue struct{
 }
 
 var db *bolt.DB
+var DB_PATH = "/home/stuart/openRap/my.db"
 
 func main(){
+    httpPort := flag.String("port", "9001", "The port for http to run")
+    flag.Parse()
     db = DbInit()
     router := mux.NewRouter()
     registerRoutes(router)
-    log.Fatal(http.ListenAndServe(":9001",router))
+    log.Fatal(http.ListenAndServe(":"+*httpPort,router))
 }
 
 func DbInit() *bolt.DB {
-    db,err := bolt.Open("my.db",0600,nil)
+    db,err := bolt.Open(DB_PATH, 0600,nil)
     if err != nil {
         log.Fatal(err)
     }
@@ -35,11 +39,12 @@ func DbInit() *bolt.DB {
 }
 
 func registerRoutes(r *mux.Router){
-    r.HandleFunc("/create/bucket",AddBucket).Methods("POST")
-    r.HandleFunc("/add/entry",AddKeyValue).Methods("POST")
-    r.HandleFunc("/get/{bucket}/{key}",GetKeyValue).Methods("GET")
+    r.HandleFunc("/bucket",AddBucket).Methods("POST")
+    r.HandleFunc("/entry",AddKeyValue).Methods("POST")
+    r.HandleFunc("/{bucket}/{key}",GetKeyValue).Methods("GET")
 }
 
+// Unused, to be used in future
 func AddBucket(w http.ResponseWriter, r *http.Request){
     err := db.Update(func(tx *bolt.Tx) error {
         _,err := tx.CreateBucketIfNotExists([]byte("MyBucket"))
