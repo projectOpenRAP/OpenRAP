@@ -3,6 +3,7 @@ package auth
 import (
     "encoding/json"
     "fmt"
+    "bytes"
     "io/ioutil"
     "github.com/gorilla/mux"
     "net/http"
@@ -13,14 +14,18 @@ type User struct{
     Password string `json:"password,omitempty"`
 }
 
+type DBObject struct{
+    Bucket string `json:"bucket,omitempty"`
+    Key string `json:"key,omitempty"`
+    Value string `json:"value,omitempty"`
+}
+
 func AuthInit(router *mux.Router){
-    
     registerRoutes(router)
 }
 
 func registerRoutes(r *mux.Router){
-    r.HandleFunc("/auth/login", Login).Methods("POST")
-    r.HandleFunc("/auth/welcome",Welcome).Methods("GET")
+    r.HandleFunc("/auth/login", Login).Methods("POST","OPTIONS")
     r.HandleFunc("/auth/user", CreateUser).Methods("POST")
     r.HandleFunc("/auth/user", UpdateUser).Methods("PUT")
 }
@@ -46,15 +51,9 @@ func getUserPassword(u string) string {
 }
 
 func Login(w http.ResponseWriter, r *http.Request){
-    //Create User Struct
     var user User
     json.NewDecoder(r.Body).Decode(&user)
-    fmt.Println(user)
     userPassword := getUserPassword(user.User)
-    // call get value for that user
-    fmt.Println(userPassword)
-    // check for equality if true, return the structure
-    // if false return error
     if user.Password == userPassword {
        w.Header().Set("Content-Type","text/plain")
        w.Write([]byte("success"))
@@ -66,6 +65,29 @@ func CreateUser(w http.ResponseWriter, r *http.Request){
     //Parse the body
     //create structure
     // save to db
+    var user User
+    var dbObj DBObject
+    json.NewDecoder(r.Body).Decode(&user)
+    fmt.Println(user)
+    dbObj.Bucket = "DEV_MGMT_USER"
+    dbObj.Key = user.User
+    dbObj.Value = user.Password
+    b,err := json.Marshal(dbObj)
+    if err != nil {
+        fmt.Println(err)
+    }
+    fmt.Println(string(b))
+    body := []byte(string(b))
+    rs,err := http.Post("http://localhost:9001/entry","application/json",bytes.NewBuffer(body))
+    if err != nil {
+        fmt.Println(err)
+    }
+    defer rs.Body.Close()
+    bodyBytes,err := ioutil.ReadAll(rs.Body)
+    if err!=nil{
+        fmt.Println(err)
+    }
+    fmt.Println(string(bodyBytes))
 }
 func UpdateUser(w http.ResponseWriter, r *http.Request){
     // parse body
