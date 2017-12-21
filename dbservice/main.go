@@ -85,16 +85,15 @@ func GetKeyValue(w http.ResponseWriter, r *http.Request){
     vars := mux.Vars(r)
     db.View(func(tx *bolt.Tx) error {
         bucket := tx.Bucket([]byte(vars["bucket"]))
-        if bucket == nil {
-            w.Header().Set("Content-Type", "text/plain")
-            w.Write([]byte("No buckets found"))
+        w.Header().Set("Content-Type", "text/plain")
+        if bucket != nil {
+            val := bucket.Get([]byte(vars["key"]))
+            fmt.Println(val)
+            fmt.Println(string(val))
+            w.Write([]byte(string(val)))
             return nil
         }
-        val := bucket.Get([]byte(vars["key"]))
-        fmt.Println(val)
-        fmt.Println(string(val))
-        w.Header().Set("Content-Type", "text/plain")
-        w.Write([]byte(string(val)))
+        w.Write([]byte("No buckets found"))
         return nil
     })
 }
