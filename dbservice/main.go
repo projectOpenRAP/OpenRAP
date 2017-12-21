@@ -74,7 +74,8 @@ func AddKeyValue(w http.ResponseWriter, r *http.Request){
         return err
     })
     if err != nil {
-        log.Fatal(err)
+        //log.Fatal(err)
+        fmt.Println(err)
     }
     w.Header().Set("Content-Type", "text/plain")
     w.Write([]byte("Value Created Successfully!!!"))
