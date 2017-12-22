@@ -1,0 +1,3 @@
+ENV{ID_FS_USAGE}=="filesystem|other|crypto", ENV{UDISKS_FILESYSTEM_SHARED}="1"
+ACTION=="add",    KERNEL=="sd[a-z][1-9]*", RUN+="/opt/opencdn/CDN/usb_handler.sh %k"
+ACTION=="remove", KERNEL=="sd[a-z][1-9]*", RUN+="/opt/opencdn/CDN/usb_handler.sh %k"

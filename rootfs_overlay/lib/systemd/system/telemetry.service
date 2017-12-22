@@ -1,0 +1,12 @@
+[Unit]
+Description=telemetry cloudsync server 
+After=apiserver.service
+
+[Service]
+Type=simple
+ExecStart=/opt/opencdn/CDN/telemetry_upload.py
+PIDFile=/tmp/opencdn/telemetry.pid 
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

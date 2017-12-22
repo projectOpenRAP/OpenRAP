@@ -1,0 +1,16 @@
+UT test case for upgrade
+
+a. Verify upgrade with standard package, version grater than current one
+--> Expect new package is installed correctly
+--> old paclage is removed
+--> link created to new package in /opt/opencdn
+--> all the files in rootfs_overlay are linked to / dir correctly
+
+===> Passed
+
+
+b. Verify upgrade with older version
+--> Installed package must not be installed
+--> /opt/opencdn lilnk is intact with older package
+
+===> Passed
