@@ -41,6 +41,7 @@ func DbInit() *bolt.DB {
 func registerRoutes(r *mux.Router){
     r.HandleFunc("/bucket",AddBucket).Methods("POST")
     r.HandleFunc("/entry",AddKeyValue).Methods("POST")
+    r.HandleFunc("/{bucket}/{key}",DeleteKey).Methods("DELETE")
     r.HandleFunc("/{bucket}/{key}",GetKeyValue).Methods("GET")
 }
 
@@ -97,4 +98,17 @@ func GetKeyValue(w http.ResponseWriter, r *http.Request){
         return nil
     })
 }
+func DeleteKey(w http.ResponseWriter, r *http.Request){
 
+    vars := mux.Vars(r)
+    db.Update(func(tx *bolt.Tx) error{
+        bucket := tx.Bucket([]byte(vars["bucket"]))
+        if bucket != nil {
+            bucket.Delete([]byte(vars["key"]))
+
+        }
+        w.Header().Set("Content-Type", "text/plain")
+        w.Write([]byte("Key Deleted"))
+        return nil
+    })
+}
