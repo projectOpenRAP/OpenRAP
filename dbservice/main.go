@@ -43,6 +43,7 @@ func registerRoutes(r *mux.Router){
     r.HandleFunc("/entry",AddKeyValue).Methods("POST")
     r.HandleFunc("/{bucket}/{key}",DeleteKey).Methods("DELETE")
     r.HandleFunc("/{bucket}/{key}",GetKeyValue).Methods("GET")
+    r.HandleFunc("/all/keys/{bucket}",GetAllKeys).Methods("GET")
 }
 
 // Unused, to be used in future
@@ -109,6 +110,24 @@ func DeleteKey(w http.ResponseWriter, r *http.Request){
         }
         w.Header().Set("Content-Type", "text/plain")
         w.Write([]byte("Key Deleted"))
+        return nil
+    })
+}
+func GetAllKeys(w http.ResponseWriter, r *http.Request){
+    var keys []KeyValue
+    vars := mux.Vars(r)
+    db.View(func(tx *bolt.Tx) error{
+        b := tx.Bucket([]byte(vars["bucket"]))
+        if b != nil {
+            b.ForEach(func(k,v []byte) error {
+                keys = append(keys, KeyValue{vars["bucket"],string(k),string(v)})
+                return nil
+            })
+            fmt.Println(keys)
+        }
+        //w.Header().Set("Content-Type", "text/plain")
+        //w.Write([]byte("Key Iterated"))
+        json.NewEncoder(w).Encode(keys)
         return nil
     })
 }
