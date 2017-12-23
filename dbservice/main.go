@@ -102,7 +102,8 @@ func GetKeyValue(w http.ResponseWriter, r *http.Request){
     })
 }
 func DeleteKey(w http.ResponseWriter, r *http.Request){
-
+    
+    fmt.Println("DEleting key")
     vars := mux.Vars(r)
     db.Update(func(tx *bolt.Tx) error{
         bucket := tx.Bucket([]byte(vars["bucket"]))
@@ -125,7 +126,6 @@ func GetAllKeys(w http.ResponseWriter, r *http.Request){
                 keys = append(keys, KeyValue{vars["bucket"],string(k),string(v)})
                 return nil
             })
-            fmt.Println(keys)
         }
         //w.Header().Set("Content-Type", "text/plain")
         //w.Write([]byte("Key Iterated"))

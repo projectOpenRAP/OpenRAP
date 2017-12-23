@@ -1,31 +1,46 @@
-import React,{ Component } from 'react'
-import {connect} from 'react-redux'
-import * as actions from '../../actions/auth'
-class UserList extends Component{
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import {Link} from 'react-router-dom'
 
-    renderUserList(){
-        return this.props.user.list.map((item,index)=> {
+import * as actions from '../../actions/user'
+class UserList extends Component {
+
+
+    componentWillMount() {
+        this.props.getAllUser();
+    }
+
+    handleDelete(key){
+        console.log("calling");
+        this.props.deleteUser(key)
+    }
+    renderUserList() {
+        return this.props.user.list.map((item, index) => {
             return (
-                <div></div>
+                <div key={index}>
+                    <div >
+                        <div>{item.key}</div>
+                        <button onClick={() => this.handleDelete(item.key)}>Delete</button>
+                    </div>
+                </div>
             )
         })
     }
 
-    render(){
+    render() {
         return (
             <div>
-                {this.props.auth && <div>Auth</div>}
-                <input type="text" onChange={this.handleUserChange.bind(this)} value={this.state.user} />
-                <input type="text" onChange={this.handlePasswordChange.bind(this)} value={this.state.password} />
-                <button onClick={this.handleSubmit.bind(this)} >create user</button>
+                UserList
+                {this.props.user.list && this.renderUserList()}
+                <Link to={"/create/user"}>Add User</Link>
             </div>
         )
     }
 
 }
 
-function mapStateToProps({auth}){
-    return {auth}
+function mapStateToProps({ user }) {
+    return { user }
 }
 
-export default connect(mapStateToProps,actions)(UserList);
+export default connect(mapStateToProps, actions)(UserList);

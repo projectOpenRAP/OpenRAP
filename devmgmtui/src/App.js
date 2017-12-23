@@ -11,7 +11,7 @@ class App extends Component {
         <BrowserRouter >
             <div>
                 <Route exact path={"/"} component={Login} />
-                <Route exact path={"/CreateUser"} component={CreateUser} />
+                <Route exact path={"/create/user"} component={CreateUser} />
                 <Route exact path={"/users"} component={UserList} />
             </div>
         </BrowserRouter>
