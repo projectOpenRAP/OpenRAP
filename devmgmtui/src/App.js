@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Route } from 'react-router-dom'
 import Login from './components/auth/Login'
-import CreateUser from './components/createUser/CreateUser'
-
-const Home = () => <div>Home</div>
-const Ssid = () => <div>Ssid</div>
+import CreateUser from './components/user/CreateUser'
+import UserList from './components/user/UserList'
 
 class App extends Component {
   render() {
@@ -14,8 +12,7 @@ class App extends Component {
             <div>
                 <Route exact path={"/"} component={Login} />
                 <Route exact path={"/CreateUser"} component={CreateUser} />
-                <Route exact path={"/home"} component={Home} />
-                <Route exact path={"/ssid"} component={Ssid} />
+                <Route exact path={"/users"} component={UserList} />
             </div>
         </BrowserRouter>
       </div>

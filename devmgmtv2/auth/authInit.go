@@ -28,10 +28,8 @@ func registerRoutes(r *mux.Router){
     r.HandleFunc("/auth/login", Login).Methods("POST","OPTIONS")
     r.HandleFunc("/auth/user", CreateUser).Methods("POST")
     r.HandleFunc("/auth/user", UpdateUser).Methods("PUT")
-}
-
-func Welcome(w http.ResponseWriter, r *http.Request){
-    fmt.Fprintln(w,"Welcome")
+    r.HandleFunc("/auth/user",DeleteUser).Methods("DELETE")
+    r.HandleFunc("/auth/user/list",GetUserList).Methods("GET")
 }
 
 func getUserPassword(u string) string {
@@ -50,13 +48,52 @@ func getUserPassword(u string) string {
     return string(bodyBytes)
 }
 
+func DeleteUser(w http.ResponseWriter, r *http.Request){
+
+    var user User
+    json.NewDecoder(r.Body).Decode(&user)
+    req,err := http.NewRequest("DELETE",url,,nil)
+    if err != nil{
+        fmt.Println(err)
+    }
+    res,err := http.DefaultClient.Do(req)
+    if err != nil{
+        fmt.Println(err)
+    }
+    bodyBytes, err := ioutil.ReadAll(res.Body)
+    if err != nil{
+        fmt.Println(err)
+    }
+    w.Header().Set("Content-Type", "text/plain")
+    w.Write(bodyBytes)
+
+}
+
+func GetUserList(w http.ResponseWriter, r *http.Request){
+    res,err := http.Get("http://localhost:9001/DEV_MGMT_USER/"+u)
+    if err != nil {
+        fmt.Println(err)
+        return ""
+    }
+    defer res.Body.Close()
+    bodyBytes,err := ioutil.ReadAll(res.Body)
+    if err != nil {
+        fmt.Println(err)
+        return ""
+    }
+    w.Header().Set("Content-Type", "text/plain")
+    w.Write(bodyBytes)
+    //fmt.Println(string(bodyBytes))
+    //return string(bodyBytes)
+}
+
 func Login(w http.ResponseWriter, r *http.Request){
     var user User
     json.NewDecoder(r.Body).Decode(&user)
     userPassword := getUserPassword(user.User)
     if user.Password == userPassword {
-       w.Header().Set("Content-Type","text/plain")
-       w.Write([]byte("success"))
+        w.Header().Set("Content-Type","text/plain")
+        w.Write([]byte("success"))
     }else{
         http.Error(w,"Forbidden",http.StatusForbidden)
     }

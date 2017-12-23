@@ -1,7 +1,7 @@
 import React,{ Component } from 'react'
 import {connect} from 'react-redux'
 import * as actions from '../../actions/auth'
-class Login extends Component{
+class CreateUser extends Component{
 
     constructor(props){
         super(props)
@@ -40,4 +40,4 @@ function mapStateToProps({auth}){
     return {auth}
 }
 
-export default connect(mapStateToProps,actions)(Login);
+export default connect(mapStateToProps,actions)(CreateUser);
