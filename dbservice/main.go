@@ -17,6 +17,8 @@ type KeyValue struct{
 }
 
 var db *bolt.DB
+//TODO change to flag
+//TODO change all fmt to debuuging
 var DB_PATH = "/home/stuart/openRap/my.db"
 
 func main(){
@@ -43,7 +45,7 @@ func registerRoutes(r *mux.Router){
     r.HandleFunc("/entry",AddKeyValue).Methods("POST")
     r.HandleFunc("/{bucket}/{key}",DeleteKey).Methods("DELETE")
     r.HandleFunc("/{bucket}/{key}",GetKeyValue).Methods("GET")
-    r.HandleFunc("/all/keys/{bucket}",GetAllKeys).Methods("GET")
+    r.HandleFunc("/all/keyValue/{bucket}",GetAllKeys).Methods("GET")
 }
 
 // Unused, to be used in future
