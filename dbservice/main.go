@@ -17,6 +17,8 @@ type KeyValue struct{
 }
 
 var db *bolt.DB
+//TODO change to flag
+//TODO change all fmt to debuuging
 var DB_PATH = "/home/stuart/openRap/my.db"
 
 func main(){
@@ -41,7 +43,9 @@ func DbInit() *bolt.DB {
 func registerRoutes(r *mux.Router){
     r.HandleFunc("/bucket",AddBucket).Methods("POST")
     r.HandleFunc("/entry",AddKeyValue).Methods("POST")
+    r.HandleFunc("/{bucket}/{key}",DeleteKey).Methods("DELETE")
     r.HandleFunc("/{bucket}/{key}",GetKeyValue).Methods("GET")
+    r.HandleFunc("/all/keyValue/{bucket}",GetAllKeys).Methods("GET")
 }
 
 // Unused, to be used in future
@@ -97,4 +101,35 @@ func GetKeyValue(w http.ResponseWriter, r *http.Request){
         return nil
     })
 }
+func DeleteKey(w http.ResponseWriter, r *http.Request){
 
+    vars := mux.Vars(r)
+    db.Update(func(tx *bolt.Tx) error{
+        bucket := tx.Bucket([]byte(vars["bucket"]))
+        if bucket != nil {
+            bucket.Delete([]byte(vars["key"]))
+
+        }
+        w.Header().Set("Content-Type", "text/plain")
+        w.Write([]byte("Key Deleted"))
+        return nil
+    })
+}
+func GetAllKeys(w http.ResponseWriter, r *http.Request){
+    var keys []KeyValue
+    vars := mux.Vars(r)
+    db.View(func(tx *bolt.Tx) error{
+        b := tx.Bucket([]byte(vars["bucket"]))
+        if b != nil {
+            b.ForEach(func(k,v []byte) error {
+                keys = append(keys, KeyValue{vars["bucket"],string(k),string(v)})
+                return nil
+            })
+            fmt.Println(keys)
+        }
+        //w.Header().Set("Content-Type", "text/plain")
+        //w.Write([]byte("Key Iterated"))
+        json.NewEncoder(w).Encode(keys)
+        return nil
+    })
+}
