@@ -1,43 +1,101 @@
-import React,{ Component } from 'react'
-import {connect} from 'react-redux'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import * as actions from '../../actions/auth'
-class CreateUser extends Component{
+import SideNav from '../common/Sidebar'
+import { Container,Grid, Segment, Input, Header, Button, Icon } from 'semantic-ui-react';
+const styles = {
+    loginForm: {
+        height: '100%'
+    },
+    segment: {
+        maxWidth: '450px',
+        marginTop: '150px'
+    },
+    container: {
+        marginTop: '10px'
+    },
+    
+}
+class CreateUser extends Component {
 
-    constructor(props){
+    constructor(props) {
         super(props)
         this.state = {
-            user:"",
-            password:""
+            user: "",
+            password: ""
         }
     }
-    handleUserChange(e){
+    handleUserChange(e) {
         this.setState({
-            user : e.target.value
+            user: e.target.value
         })
     }
-    handlePasswordChange(e){
+    handlePasswordChange(e) {
         this.setState({
-            password : e.target.value
+            password: e.target.value
         })
     }
-    handleSubmit(){
-        this.props.createUser(this.state.user,this.state.password);
+    handleSubmit() {
+        this.props.createUser(this.state.user, this.state.password);
     }
-    render(){
+    renderCreateUser() {
         return (
-            <div>
-                {this.props.auth && <div>Auth</div>}
+                <Grid textAlign='center' style={{ height: '100%' }}>
+                    <Grid.Column style={styles.segment}>
+                        {/* <h1>Hello</h1> */}
+                        <Segment raised >
+                            <Header as='h2' color='teal' textAlign='center'>
+                                {/* <Image src='/logo.png' /> */}
+                                {' '}Create a new User
+                            </Header>
+                            <Input
+                                onChange={this.handleUserChange.bind(this)}
+                                value={this.state.user}
+                                fluid
+                                icon='users'
+                                iconPosition='left'
+                                placeholder='Enter new username' />
+                            <br />
+                            <Input
+                                onChange={this.handlePasswordChange.bind(this)}
+                                value={this.state.password}
+                                fluid
+                                type='password'
+                                icon='lock'
+                                iconPosition='left'
+                                placeholder='Enter new password' />
+
+                            <Container textAlign='right' style={styles.container}>
+                                <Button animated color='teal' onClick={this.handleSubmit.bind(this)}>
+                                    <Button.Content visible>Create User</Button.Content>
+                                    <Button.Content hidden>
+                                        <Icon name='user' />
+                                    </Button.Content>
+                                </Button>
+                            </Container>
+                        </Segment>
+                    </Grid.Column>
+                </Grid>
+        )
+    }
+    render() {
+        return (
+            <SideNav >
+                {this.renderCreateUser()}
+                {/* <div>
+                
                 <input type="text" onChange={this.handleUserChange.bind(this)} value={this.state.user} />
                 <input type="text" onChange={this.handlePasswordChange.bind(this)} value={this.state.password} />
                 <button onClick={this.handleSubmit.bind(this)} >create user</button>
-            </div>
+            </div> */}
+            </SideNav>
         )
     }
 
 }
 
-function mapStateToProps({auth}){
-    return {auth}
+function mapStateToProps({ auth }) {
+    return { auth }
 }
 
-export default connect(mapStateToProps,actions)(CreateUser);
+export default connect(mapStateToProps, actions)(CreateUser);
