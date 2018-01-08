@@ -15,8 +15,8 @@ func main(){
     ssid.SsidInit(router)
     headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
     originsOk := handlers.AllowedOrigins([]string{"*"})
-    methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+    methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST","DELETE", "PUT", "OPTIONS"})
 
     log.Fatal(http.ListenAndServe(":8000",handlers.CORS(headersOk,originsOk,methodsOk)(router)))
-    //log.Fatal(http.ListenAndServe(":8000",router))
+    //log.Fatal(http.ListenAndServe(":8000",handlers.CORS()(router)))
 }
