@@ -9,7 +9,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^1.0.3",
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.18.2",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.0",
+    "mysql": "^2.15.0",
+    "mysql2": "^1.5.1"
   }
 }

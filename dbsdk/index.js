@@ -7,7 +7,7 @@ let returnConfig = (dbname = 'test') => {
     return {
         host:'localhost',
         user: 'root',
-        password : 'root',
+        password : '',
         database : dbname
     }
 }
@@ -17,9 +17,9 @@ let createDBIfNotExists = (tableName) => {
     let defer = q.defer();
     var connection = mysql.createConnection(returnConfig());
     connection.connect();
-    let query = 'create database if not exists ' + connection.escapeId(tableName); 
+    let query = 'create database if not exists ' + connection.escapeId(tableName);
     connection.query(query, function (error, results, fields) {
-        if (error) return defer.reject(err);
+        if (error) return defer.reject(error);
         return defer.resolve();
     });
     connection.end();
@@ -33,7 +33,7 @@ let createDBIfNotExists = (tableName) => {
    dbName : <database name >, // required
    tableName : <table Name>, // required
    fields : [list of fields] // optional if allFields is true
-   orderBy :[{field: <field name>,sort:<ASC or DESC>}] // optional 
+   orderBy :[{field: <field name>,sort:<ASC or DESC>}] // optional
    where : "where query"
    }
  */
@@ -48,7 +48,7 @@ let selectFields = (dbObj) => {
         for(let i = 0;i<dbObj.fields.length;i++){
             fields = fields + dbObj.fields[i] ;
             if( i+1 != dbObj.fields.length)
-                fields = fields + "," 
+                fields = fields + ","
         }
     }
 
@@ -180,4 +180,10 @@ updateFields({dbName:'test',tableName:"test",where : "where id = 1", fields:[{ke
 },err => {
     console.log(err);
 })
+
+module.exports = {
+  selectFields,
+  updateFields,
+  deleteFields
+}
 //createTableIfNotExists('test4');
