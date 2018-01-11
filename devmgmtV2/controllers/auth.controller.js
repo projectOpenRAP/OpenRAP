@@ -1,9 +1,8 @@
 "use strict"
-let {selectFields, updateFields, deleteFields} = require('dbsdk');
+let {selectFields, updateFields, deleteFields, insertFields} = require('dbsdk');
 
 let defaultDbName = 'device_mgmt';
 let defaultTableName = 'users';
-let defaultPassword = '';
 
 
 function getColumnFromDB(name, column) {
@@ -27,6 +26,7 @@ function writeColumnToDB(name, column, newValue) {
 }
 
 function verifyIfUserExists(name) {
+
   let queryObject = {
     dbName : defaultDbName,
     tableName : defaultTableName,
@@ -35,42 +35,29 @@ function verifyIfUserExists(name) {
   return selectFields(queryObject);
 }
 
-/*
- * Custom method to convert a stringified list into a normal one, because JSON.parse is throwing a fit
- */
-
-function listify(string) {
-  let lst = [];
-  string = string.slice(1,-1);
-  lst = string.split(',');
-  for (var i in lst) {
-    lst[i] = lst[i].trim().slice(1, -1);
-  }
-  return lst;
-}
-
-/*
- * The authLogin and updatePW return three values:
- *     1. true if the operation is successful
- *     2. false if the user does not exist
- *     3. null if there is a MYSQL error [happens during SQL Injection attacks]
- * The getPerms function returns either the list of permission [if a valid user exists],
- * null otherwise.
- */
+//SQL injection attempts lead to syntax errors in the SQL statements, and are handled with 500s,
 
 let authLogin = (req,res) => {
   let userName = req.body['uname'];
   let password = req.body['pword'];
-  let result = true;
   verifyIfUserExists(userName).then(response => {
-    if (typeof response[0] === "undefined" || response[0]['password'] != password) {
-      result = false;
-    }
-    res.json({'isSuccessful' : result});
-    }, error => {
-      console.log(error);
-      res.json({'isSuccessful' : null});
+    return new Promise((resolve, reject) => {
+      if (response[0] === "undefined" || response[0]['password'] != password) {
+        reject(false);
+      }
+      else {
+        resolve(getColumnFromDB(userName, 'permission'));
+      }
     });
+  }, reject => {
+    console.log(reject);
+    res.status(500).json({authSuccessful : false, authMessage : "Internal server error! Possible SQL Injection attempt"});
+  }).then(response => {
+    let permissionList = JSON.parse(response[0]['permission']);
+    res.status(200).json({authSuccessful : true, permissions : permissionList, authMessage : "Login Success"});
+  }, reject => {
+    res.status(401).json({authSuccessful : false, authMessage : "Invalid Username/Password"});
+  });
 }
 
 let updatePW = (req, res) => {
@@ -78,42 +65,24 @@ let updatePW = (req, res) => {
   let newPassword = req.body['pword'];
   let success = null;
   verifyIfUserExists(userName).then(response => {
-    if (typeof response[0] === "undefined") {
-      res.json({'isSuccessful' : false});
-    }
-    else {
-      writeColumnToDB(userName, 'password', newPassword).then(response => {
-        success = true;
-        res.json({'isSuccessful' : true});
-      }, error => {
-        console.log(error);
-        res.json({'isSuccessful' : null});
-      });
-    }
-  });
-}
-
-
-let getPerms = (req, res) => {
-  let userName = req.get('uname');
-  verifyIfUserExists(userName).then(response => {
-    if (typeof response[0] != "undefined") {
-      getColumnFromDB(userName, 'permission').then(response => {
-        let permissionList = listify(response[0]['permission']);
-        res.json({permissions:permissionList});
-      }, error => {
-        console.log(error);
-        res.json({permissions : null});
-      });
-    }
-    else {
-      res.json({permissions : null});
-    }
+    return new Promise((resolve, reject) => {
+      if (typeof response[0] === "undefined") {
+        reject(false);
+      }
+      else {
+        resolve(true);
+      }
+    });
+  }, reject => {
+    res.status(500).json({updateSuccessful : false, updateMessage : "Internal server error! Possible SQL Injection attempt"});
+  }).then(response => {
+    res.status(200).json({updateSuccessful : true, updateMessage : "Password successfully updated"});
+  }, reject => {
+    res.status(404).json({updateSuccessful : false, updateMessage : "No such user exists!"});
   });
 }
 
 module.exports = {
     authLogin,
-    updatePW,
-    getPerms
+    updatePW
 }

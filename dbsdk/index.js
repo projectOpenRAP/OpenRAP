@@ -7,7 +7,7 @@ let returnConfig = (dbname = 'test') => {
     return {
         host:'localhost',
         user: 'root',
-        password : '',
+        password : 'root',
         database : dbname
     }
 }
@@ -184,6 +184,7 @@ updateFields({dbName:'test',tableName:"test",where : "where id = 1", fields:[{ke
 module.exports = {
   selectFields,
   updateFields,
-  deleteFields
+  deleteFields,
+  insertFields
 }
 //createTableIfNotExists('test4');
