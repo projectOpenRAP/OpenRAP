@@ -1,5 +1,6 @@
 "use strict"
 let {selectFields, updateFields, deleteFields, insertFields} = require('dbsdk');
+let q = require('q');
 
 let defaultDbName = 'device_mgmt';
 let defaultTableName = 'users';
@@ -35,54 +36,92 @@ function verifyIfUserExists(name) {
   return selectFields(queryObject);
 }
 
-//SQL injection attempts lead to syntax errors in the SQL statements, and are handled with 500s,
 
 let authLogin = (req,res) => {
-  let userName = req.body['uname'];
-  let password = req.body['pword'];
-  verifyIfUserExists(userName).then(response => {
-    return new Promise((resolve, reject) => {
-      if (response[0] === "undefined" || response[0]['password'] != password) {
-        reject(false);
+
+  let userName = req.body['username'];
+  let password = req.body['password'];
+
+  let responseStructure = {
+    successful : false,
+    msg : "",
+    permissions: {}
+  };
+
+  verifyIfUserExists(userName)
+  .then( response => {
+    if(typeof response[0] === "undefined" || response[0].password != password) {
+      return {
+        msg : "Invalid username or password",
       }
-      else {
-        resolve(getColumnFromDB(userName, 'permission'));
+    }else{
+      return {
+        successful :true,
+        data : response[0]['permission']
       }
-    });
-  }, reject => {
-    console.log(reject);
-    res.status(500).json({authSuccessful : false, authMessage : "Internal server error! Possible SQL Injection attempt"});
-  }).then(response => {
-    let permissionList = JSON.parse(response[0]['permission']);
-    res.status(200).json({authSuccessful : true, permissions : permissionList, authMessage : "Login Success"});
-  }, reject => {
-    res.status(401).json({authSuccessful : false, authMessage : "Invalid Username/Password"});
+    }
+  }).then(data => {
+    if(data.successful){
+      responseStructure.msg = "Login successful!";
+      responseStructure.successful = data.successful;
+    }
+    if(data.msg){
+      responseStructure.msg = data.msg;
+    }
+    if(data.data){
+      responseStructure.username = userName;
+      responseStructure.permissions = data.data;
+    }
+    return res.status(200).send(responseStructure);
+  }, err => {
+    responseStructure.msg = "Check your input for any illegal characters!";
+    return res.status(500).send(responseStructure);
   });
 }
 
-let updatePW = (req, res) => {
-  let userName = req.body['uname'];
-  let newPassword = req.body['pword'];
-  let success = null;
+
+let updatePassword = (req, res) => {
+  let userName = req.body['username'];
+  let newPassword = req.body['password'];
+  let responseStructure = {
+    successful : false,
+    msg : ""
+  }
   verifyIfUserExists(userName).then(response => {
-    return new Promise((resolve, reject) => {
       if (typeof response[0] === "undefined") {
-        reject(false);
+        return {
+          msg : "User does not exist"
+        }
       }
       else {
-        resolve(true);
+        return {
+          successful : true
+        }
       }
-    });
   }, reject => {
-    res.status(500).json({updateSuccessful : false, updateMessage : "Internal server error! Possible SQL Injection attempt"});
+      return {
+        msg : "Check your input for illegal characters!"
+      }
   }).then(response => {
-    res.status(200).json({updateSuccessful : true, updateMessage : "Password successfully updated"});
+    if (response.successful) {
+      return writeColumnToDB(userName, 'password', newPassword);
+    }
+    else {
+      responseStructure.msg = response.msg;
+      let resStatus = response.msg.search("SQL") ? res.status(500) : res.status(404);
+      return resStatus.json(responseStructure);
+    }
+  }).then(response => {
+    responseStructure.msg = "Modification successful";
+    responseStructure.successful = true;
+    return res.status(200).json(responseStructure);
   }, reject => {
-    res.status(404).json({updateSuccessful : false, updateMessage : "No such user exists!"});
+    responseStructure.msg = "Unanticipated SQL error!";
+    return res.status(500).json(responseStructure);
   });
 }
 
 module.exports = {
     authLogin,
-    updatePW
+    updatePassword
 }

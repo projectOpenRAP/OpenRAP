@@ -10,5 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.2",
+    "q": "^1.5.1"
   }
 }
