@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Route } from 'react-router-dom'
+
 import Login from './components/auth/Login'
 import CreateUser from './components/user/CreateUser'
+import UpdatePassword from './components/user/UpdatePassword'
 import UserList from './components/user/UserList'
 import SetSSID from './components/ssid/SetSSID'
-import UpdatePassword from './components/password/UpdatePassword'
 
 class App extends Component {
   render() {
