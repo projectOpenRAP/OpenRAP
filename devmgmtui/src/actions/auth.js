@@ -1,20 +1,24 @@
 import axios from 'axios'
 import { BASE_URL } from '../config/config'
 
-export const login = (user, password,cb) => (dispatch) => {
+export const login = (user, password, cb) => (dispatch) => {
     let data = {
-        "user": user,
+        "username": user,
         "password": password
     }
     axios.post(`${BASE_URL}/auth/login`, data)
         .then((response) => {
-            console.log(response)
-            cb(null);
-            dispatch({tyoe : "ENABLE_AUTH", payload: response});
+            // console.log(response.data)
+            if (response.data.successful) {
+                dispatch({ type: "ENABLE_AUTH", payload: response.data });
+                cb(null);
+
+            }else{
+                cb("error", response.data);
+            }
         })
         .catch(e => {
-            console.log(e);
-            cb(e);
+            cb(e,{msg:"some server error"});
         })
 
 }

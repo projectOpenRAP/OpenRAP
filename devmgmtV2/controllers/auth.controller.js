@@ -74,7 +74,7 @@ let authLogin = (req,res) => {
     }
     return res.status(200).send(responseStructure);
   }, err => {
-    responseStructure.msg = "Check your input for any illegal characters!";
+    responseStructure.msg = "Some server Error!!!";
     return res.status(500).send(responseStructure);
   });
 }

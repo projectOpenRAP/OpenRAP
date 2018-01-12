@@ -26,6 +26,9 @@ class CreateUser extends Component {
             password: ""
         }
     }
+
+    
+
     handleUserChange(e) {
         this.setState({
             user: e.target.value

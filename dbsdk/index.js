@@ -56,7 +56,7 @@ let selectFields = (dbObj) => {
     if(dbObj.where){
         query = query +" "+ dbObj.where;
     }
-
+    console.log(query);
     connection.query(query, function (error, results, fields) {
         if (error) return defer.reject(error);
         console.log(results)
@@ -175,11 +175,11 @@ let insertFields = (dbObj) => {
 };
 
 
-updateFields({dbName:'test',tableName:"test",where : "where id = 1", fields:[{key:"id", value:22}]}).then((result) => {
-    console.log(result);
-},err => {
-    console.log(err);
-})
+// updateFields({dbName:'test',tableName:"test",where : "where id = 1", fields:[{key:"id", value:22}]}).then((result) => {
+//     console.log(result);
+// },err => {
+//     console.log(err);
+// })
 
 module.exports = {
   selectFields,

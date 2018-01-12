@@ -38,16 +38,13 @@ class Login extends Component {
         })
     }
     handleSubmit() {
-        // this.props.login(this.state.user, this.state.password,(err)=>{
-        //     if(err){
-        //         alert("Login failure");
-        //     }else{
-        //         alert("Login success");
-        //     }
-        // });
-        console.log("Called")
-        this.props.history.push("/users");
-        //  return <Redirect to="/users" push />
+        this.props.login(this.state.user, this.state.password,(err,data)=>{
+            if(err){
+                alert(data.msg);
+            }else{
+                this.props.history.push("/users");
+            }
+        });
     }
     renderLogin() {
         return (
