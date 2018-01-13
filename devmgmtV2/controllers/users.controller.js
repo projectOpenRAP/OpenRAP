@@ -49,20 +49,16 @@ let selectAllUsers = () => {
   return selectFields(queryObject);
 }
 
-let clean = (string) => {
-  return string.replace(/'|"/, '');
-}
-
 let createUser = (req, res) => {
-  let userName = clean(req.body['username']).trim();
-  let password = clean(req.body['password']).trim();
+  let userName = req.body['username'].trim();
+  let password = req.body['password'].trim();
   let responseStructure = {
     createSuccessful : true,
     msg : ""
   };
   if (typeof userName === "undefined" || typeof password === "undefined" || userName.length < 1 || password.length < 1) {
-    responseStructure.msg = "Invalid User Credentials";
-    return res.status(400).json(responseStructure);
+    responseStructure.msg = "Empty username/password not allowed!";
+    return res.status(200).json(responseStructure);
   }
   addUserToDB(userName, password).then(response => {
     return {
@@ -81,29 +77,29 @@ let createUser = (req, res) => {
       responseStructure.createSuccessful =  response.createSuccessful;
       responseStructure.msg = response.msg;
     }
-    (response.createSuccessful ? res.status(201) : res.status(403)).json(responseStructure);
+    (response.createSuccessful ? res.status(200) : res.status(200)).json(responseStructure);
   });
 }
 
 let updateUser = (req, res) => {
-  userName = clean(req.body['username']).trim();
-  field = clean(req.body['field']).trim();
-  value = clean(req.body['value']).trim();
+  userName = req.body['username'].trim();
+  field = req.body['field'].trim();
+  value = req.body['value'].trim();
   let responseStructure  = {
     updateSuccessful : false,
     msg : ""
   };
   if (typeof value === "undefined" || typeof userName === "undefined" || typeof field === "undefined" ||
   value.length < 1 || userName.length < 1 || field.length < 1) {
-    responseStructure.msg = "Invalid Input Data";
-    return res.status(400).json(responseStructure);
+    responseStructure.msg = "Empty input values are not allowed!";
+    return res.status(200).json(responseStructure);
   }
   verifyIfUserExists(userName).then(response => {
     if (typeof response[0] != 'undefined') {
       return updateUserInDB(userName, field, value);
     } else {
       responseStructure.msg = "User does not exist!";
-      return res.status(404).json(responseStructure);
+      return res.status(200).json(responseStructure);
     }
   }).then(response => {
     responseStructure.updateSuccessful = true;
@@ -126,7 +122,7 @@ let deleteUser = (req, res) => {
       return deleteUserFromDB(userName);
     } else {
       responseStructure.msg = "User does not exist!";
-      return res.status(404).json(responseStructure);
+      return res.status(200).json(responseStructure);
     }
   }).then(response => {
     responseStructure.deleteSuccessful = true;
