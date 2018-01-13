@@ -15,7 +15,7 @@ const styles = {
 
 }
 
-class EditPermissions extends Component {
+class EditUser extends Component {
 
     constructor(props) {
         super(props)
@@ -53,12 +53,12 @@ class EditPermissions extends Component {
     }
 
     handleSubmit() {
-        console.log("Permissions update requested.");
+        console.log("User edit requested.");
 
         /*Handler code goes here*/
     }
 
-    renderPermissionsUpdateForm() {
+    renderUserUpdateForm() {
 
         var permissionsList = Object.entries(this.state.permissions).map(([permLabel, set]) => {
             return (
@@ -125,11 +125,11 @@ class EditPermissions extends Component {
     render() {
         return (
             <div style={styles.form}>
-                {this.renderPermissionsUpdateForm()}
+                {this.renderUserUpdateForm()}
             </div>
         )
     }
 
 }
 
-export default EditPermissions;
+export default EditUser;
