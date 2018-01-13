@@ -163,7 +163,8 @@ let insertFields = (dbObj) => {
     query = query + " );";
     console.log(query);
     connection.query(query,val, function (error, results, fields) {
-        if (error) return defer.reject(error);
+        if (error)
+          return defer.reject(error);
         console.log(results)
             return defer.resolve(results)
     });
