@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import * as actions from '../../actions/auth'
 import SideNav from '../common/Sidebar'
 import { Container,Grid, Segment, Input, Header, Button, Icon } from 'semantic-ui-react';
+
 const styles = {
     loginForm: {
         height: '100%'
@@ -13,9 +14,9 @@ const styles = {
     },
     container: {
         marginTop: '10px'
-    },
-    
+    },    
 }
+
 class CreateUser extends Component {
 
     constructor(props) {
@@ -25,6 +26,9 @@ class CreateUser extends Component {
             password: ""
         }
     }
+
+    
+
     handleUserChange(e) {
         this.setState({
             user: e.target.value

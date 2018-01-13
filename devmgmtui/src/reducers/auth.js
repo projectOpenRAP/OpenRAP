@@ -1,9 +1,10 @@
-export default function (state=null, action){
+export default function (state={authenticated:false}, action){
     switch(action.type){
         case 'ENABLE_AUTH':
-            return true;
+            console.log("Calling you");
+            return {...state, authenticated : true, user : action.payload}
         case 'DISABLE_AUTH':
-            return false
+        return {...state, authenticated : false}
         default:
             return state
     }

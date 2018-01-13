@@ -1,8 +1,8 @@
 "use strict";
 
-let {init} = require("../controllers/auth.controller.js");
+let {authLogin, updatePassword} = require("../controllers/auth.controller.js");
 
 module.exports = app => {
-    app.get("/",init); 
-
+    app.post("/auth/login",authLogin);
+    app.put("/auth/password", updatePassword);
 }

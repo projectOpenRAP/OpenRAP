@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import {Redirect } from 'react-router-dom'
 import * as actions from '../../actions/auth'
 import './login.css'
 import { Container,Grid, Segment, Input, Header, Button, Icon } from 'semantic-ui-react';
@@ -26,9 +27,6 @@ class Login extends Component {
             password: ""
         }
     }
-    login() {
-        this.props.login()
-    }
     handleUserChange(e) {
         this.setState({
             user: e.target.value
@@ -40,7 +38,13 @@ class Login extends Component {
         })
     }
     handleSubmit() {
-        this.props.login(this.state.user, this.state.password);
+        this.props.login(this.state.user, this.state.password,(err,data)=>{
+            if(err){
+                alert(data.msg);
+            }else{
+                this.props.history.push("/users");
+            }
+        });
     }
     renderLogin() {
         return (
