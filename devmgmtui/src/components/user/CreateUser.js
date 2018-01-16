@@ -40,7 +40,14 @@ class CreateUser extends Component {
         })
     }
     handleSubmit() {
-        this.props.createUser(this.state.user, this.state.password);
+        this.props.createUser(this.state.user, this.state.password, (err,msg)=>{
+            if(err){
+                alert(msg);
+            }else{
+                alert("Success");
+                this.props.history.push("/users");
+            }
+        });
     }
     renderCreateUser() {
         return (

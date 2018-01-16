@@ -112,7 +112,7 @@ let updateUser = (req, res) => {
 }
 
 let deleteUser = (req, res) => {
-  userName = req.body['username'];
+  userName = req.params['username'];
   let responseStructure = {
     deleteSuccessful : false,
     msg : ""
