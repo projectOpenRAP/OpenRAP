@@ -13,15 +13,15 @@ class UserList extends Component {
 
 
     componentWillMount() {
-        // if (this.props.auth && !this.props.auth.authenticated) {
-        //     this.props.history.push("/");
-        // }
+        if (this.props.auth && !this.props.auth.authenticated) {
+            this.props.history.push("/");
+        }
         this.props.getAllUser();
     }
     componentWillReceiveProps(nextProps) {
-        // if (nextProps.auth && !nextProps.auth.authenticated) {
-        //     this.props.history.push("/");
-        // }
+        if (nextProps.auth && !nextProps.auth.authenticated) {
+            this.props.history.push("/");
+        }
     }
 
     handleDelete(key) {
