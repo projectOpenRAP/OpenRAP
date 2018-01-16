@@ -46,3 +46,27 @@ export const createUser = (user, password, cb) => (dispatch) => {
         })
 
 }
+
+export const editUserPermissions = (user, permissions, cb) => (dispatch) => {
+  console.log("We shall edit permissions now");
+  console.log(user);
+  console.log(permissions);
+  let data = {
+    "username" : user,
+    "field" : "permission",
+    "value" : permissions
+  }
+  axios.put(`${BASE_URL}/user/update`, data)
+    .then((response) => {
+      console.log(response);
+      if (response.data.updateSuccessful){
+        cb(null, "Success");
+      }else{
+        cb("error", "Such a user does not exist");
+      }
+      })
+      .catch(e => {
+        console.log(e);
+        cb("error", "some server error");
+      });
+}

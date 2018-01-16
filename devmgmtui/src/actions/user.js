@@ -4,8 +4,7 @@ import { BASE_URL } from '../config/config'
 export const getAllUser = () => (dispatch) => {
     axios.get(`${BASE_URL}/user/list`)
         .then((response) => {
-            console.log(response.data)
-            dispatch({type: 'USER_LIST', payload : response.data});  
+            dispatch({type: 'USER_LIST', payload : response.data});
 
         })
         .catch(e => {
