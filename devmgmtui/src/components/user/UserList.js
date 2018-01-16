@@ -53,7 +53,7 @@ class UserList extends Component {
                     </Button>
                 </List.Content>
                 <List.Content floated='right'>
-                    <Button animated color='blue'>
+                    <Button animated color='blue' as={Link} to={'/users/edit/' + item.username + '/' + item.permission}>
                         <Button.Content visible>Edit Permission</Button.Content>
                         <Button.Content hidden>
                             <Icon name='edit' />
@@ -77,7 +77,7 @@ class UserList extends Component {
                         <div>
                             <List animated divided verticalAlign='middle' size={'big'}>
                                 {this.props.user.list && this.renderUserList()}
-                                
+
                             </List>
                         </div>
                         <Container textAlign='center' style={{ marginTop: '10px' }}>
