@@ -8,8 +8,8 @@ let {
 } = require("../controllers/dashboard.controller")
 
 module.exports = app => {
-    app.get("/dashboard/memory", getSystemMemory);
-    app.get("/dashboard/space", getSystemSpace);
-    app.get("/dashboard/cpu", getSystemCpu);
-    app.get("/dashboard/version", getSystemVersion);
+    app.get("/dashboard/system/memory", getSystemMemory);
+    app.get("/dashboard/system/space", getSystemSpace);
+    app.get("/dashboard/system/cpu", getSystemCpu);
+    app.get("/dashboard/system/version", getSystemVersion);
 }
