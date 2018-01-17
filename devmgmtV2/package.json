@@ -11,7 +11,9 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
+    "diskspace": "^2.0.0",
     "express": "^4.16.2",
+    "os-utils": "0.0.14",
     "q": "^1.5.1"
   }
 }
