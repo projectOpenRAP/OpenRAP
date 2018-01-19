@@ -14,8 +14,9 @@ app.use(bodyParser.json());
 
 require('./routes/auth.routes.js')(app);
 require('./routes/users.routes.js')(app);
+require('./routes/upgrade.routes.js')(app);
 require('./routes/dashboard.routes.js')(app);
-  
+
 app.listen(8080, err => {
     if (err)
         console.log(err);
