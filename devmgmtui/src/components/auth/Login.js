@@ -15,7 +15,7 @@ const styles = {
     container: {
         marginTop: '10px'
     },
-    
+
 }
 
 class Login extends Component {
@@ -57,23 +57,23 @@ class Login extends Component {
                                 {/* <Image src='/logo.png' /> */}
                                 {' '}Log-in to your account
                             </Header>
-                            <Input 
-                                onChange={this.handleUserChange.bind(this)} 
-                                value={this.state.user} 
-                                fluid 
-                                icon='users' 
-                                iconPosition='left' 
+                            <Input
+                                onChange={this.handleUserChange.bind(this)}
+                                value={this.state.user}
+                                fluid
+                                icon='users'
+                                iconPosition='left'
                                 placeholder='Enter your username' />
                             <br />
-                            <Input 
-                                onChange={this.handlePasswordChange.bind(this)} 
-                                value={this.state.password} 
-                                fluid 
-                                type='password' 
-                                icon='lock' 
-                                iconPosition='left' 
+                            <Input
+                                onChange={this.handlePasswordChange.bind(this)}
+                                value={this.state.password}
+                                fluid
+                                type='password'
+                                icon='lock'
+                                iconPosition='left'
                                 placeholder='Enter your password' />
-                            
+
                             <Container textAlign='right' style={styles.container}>
                                 <Button animated color='teal' onClick={this.handleSubmit.bind(this)}>
                                     <Button.Content visible>Login</Button.Content>

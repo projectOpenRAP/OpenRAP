@@ -72,7 +72,7 @@ class UserList extends Component {
         console.log(this.props.user.list);
         return (
             <SideNav>
-                <Container style={styles.conatiner}>
+                <Container style={styles.container}>
                     <Segment raised >
                         <div>
                             <List animated divided verticalAlign='middle' size={'big'}>

@@ -27,7 +27,11 @@ class SideNav extends Component {
                     </Menu.Item>
                     <Menu.Item name='camera'>
                         <Icon name='sign out' />
-                        Lgout
+                        Logout
+                    </Menu.Item>
+                    <Menu.Item name='upgrade' as={Link} to={'/upgrade'}>
+                      <Icon name='arrow up' />
+                      Upgrade
                     </Menu.Item>
                 </Sidebar>
                 <Sidebar.Pusher>
