@@ -10,9 +10,8 @@ import ChartSegment from './ChartSegment';
 
 const styles = {
     container: {
-        marginTop: '3%',
-        marginBottom: '1%',
-        width: '700px'
+        marginTop: '2.8%',
+        width: '650px'
     }
 }
 
