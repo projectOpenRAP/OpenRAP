@@ -15,11 +15,15 @@ class SideNav extends Component {
     }
     render() {
         return (
-            <Sidebar.Pushable>
+            <Sidebar.Pushable style={{ height: '100%' }}>
                 <Sidebar as={Menu} animation='scale down' width='thin' visible={this.state.sideBarVisible} icon='labeled' vertical inverted>
                     <Menu.Item name='home'>
                         <Icon name='home' color='teal' />
                         Home
+                    </Menu.Item>
+                    <Menu.Item as={Link} name='dashboard' to={'/dashboard'}>
+                        <Icon name='dashboard' />
+                        Dashboard
                     </Menu.Item>
                     <Menu.Item as={Link} name='users' to={'/users'}>
                         <Icon name='users' />
@@ -35,7 +39,6 @@ class SideNav extends Component {
                         <Menu.Item name='bars' onClick={this.toggleSideBarVisibility.bind(this)}>
                             <Icon name='bars' />
                         </Menu.Item>
-
                     </Menu>
                     {this.props.children}
                 </Sidebar.Pusher>
