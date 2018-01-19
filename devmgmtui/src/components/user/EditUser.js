@@ -40,7 +40,7 @@ class EditUser extends Component {
             }
         }
         for (var key in this.state.permissionsAsStrings) {
-            if (this.state.permissionList.indexOf(this.state.permissionsAsStrings[key]) != -1) {
+            if (this.state.permissionList.indexOf(this.state.permissionsAsStrings[key]) !== -1) {
               this.state.permissions[key] = true;
             }
         }

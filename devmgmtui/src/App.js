@@ -8,6 +8,7 @@ import UpdatePassword from './components/user/UpdatePassword'
 import UserList from './components/user/UserList'
 import SetSSID from './components/ssid/SetSSID'
 import Dashboard from './components/dashboard/Dashboard'
+import Upgrade from './components/upgrade/Upgrade'
 
 class App extends Component {
   render() {
