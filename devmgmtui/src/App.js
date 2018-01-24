@@ -8,6 +8,7 @@ import UpdatePassword from './components/user/UpdatePassword'
 import UserList from './components/user/UserList'
 import SetSSID from './components/ssid/SetSSID'
 import Upgrade from './components/upgrade/Upgrade'
+import FileMgmt from './components/filemgmt/FileMgmt'
 
 class App extends Component {
   render() {
@@ -22,6 +23,7 @@ class App extends Component {
                 <Route exact path={"/set/ssid"} component={SetSSID} />
                 <Route exact path={"/update/password"} component={UpdatePassword} />
                 <Route exact path={"/upgrade"} component={Upgrade} />
+                <Route exact path={"/filemgmt"} component={FileMgmt} />
             </div>
         </BrowserRouter>
       </div>
