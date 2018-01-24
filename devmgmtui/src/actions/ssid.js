@@ -7,11 +7,17 @@ export const setSSID = (ssid) => (dispatch) => {
         "ssid": ssid
     }
 
-    axios.put(`${BASE_URL}/ssid/set`, data)
+    axios.put(`${BASE_URL}/ssid/set`, data, cb)
         .then((response) => {
-            dispatch({type: 'SET_SSID', payload: response.data});
+            if(response.data.ssidSetSuccessful) {
+                dispatch({type: 'SET_SSID', payload: response.data});
+                cb(null);
+            }
+            else {
+                cb("error", response.data)
+            }
         })
         .catch((e) => {
-            console.log(e);
+            cb(e, { msg: "Internal server error" });
         })
 }
