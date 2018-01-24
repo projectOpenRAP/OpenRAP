@@ -5,7 +5,7 @@ import SideNav from '../common/Sidebar'
 import * as actions from '../../actions/user'
 import { Segment, Container, List, Button, Icon } from 'semantic-ui-react'
 const styles = {
-    conatiner: {
+    container: {
         marginTop: '4%'
     },
 }
@@ -72,7 +72,7 @@ class UserList extends Component {
         console.log(this.props.user.list);
         return (
             <SideNav>
-                <Container style={styles.conatiner}>
+                <Container style={styles.container}>
                     <Segment raised >
                         <div>
                             <List animated divided verticalAlign='middle' size={'big'}>

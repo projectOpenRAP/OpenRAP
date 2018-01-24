@@ -16,6 +16,7 @@ require('./routes/auth.routes.js')(app);
 require('./routes/users.routes.js')(app);
 require('./routes/upgrade.routes.js')(app);
 require('./routes/dashboard.routes.js')(app);
+require('./routes/filemgmt.routes.js')(app);
 
 app.listen(8080, err => {
     if (err)

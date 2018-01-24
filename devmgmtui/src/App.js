@@ -7,6 +7,7 @@ import EditUser from './components/user/EditUser'
 import UpdatePassword from './components/user/UpdatePassword'
 import UserList from './components/user/UserList'
 import SetSSID from './components/ssid/SetSSID'
+import Dashboard from './components/dashboard/Dashboard'
 import Upgrade from './components/upgrade/Upgrade'
 import FileMgmt from './components/filemgmt/FileMgmt'
 
@@ -24,6 +25,8 @@ class App extends Component {
                 <Route exact path={"/update/password"} component={UpdatePassword} />
                 <Route exact path={"/upgrade"} component={Upgrade} />
                 <Route exact path={"/filemgmt"} component={FileMgmt} />
+                <Route exact path={"/dashboard"} component={Dashboard} />
+
             </div>
         </BrowserRouter>
       </div>
