@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { BASE_URL } from '../config/config';
 
-export const setSSID = (ssid) => (dispatch) => {
+export const setSSID = (ssid, cb) => (dispatch) => {
 
     let data = {
         "ssid": ssid
     }
 
-    axios.put(`${BASE_URL}/ssid/set`, data, cb)
+    axios.put(`${BASE_URL}/ssid/set`, data)
         .then((response) => {
             if(response.data.ssidSetSuccessful) {
                 dispatch({type: 'SET_SSID', payload: response.data});

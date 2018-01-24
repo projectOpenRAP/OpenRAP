@@ -52,6 +52,7 @@ class SetSSID extends Component {
                 alert(data.msg);
             }
             else {
+                alert("SSID set successfully!");
                 this.props.history.push('/dashboard');
             }
         });
