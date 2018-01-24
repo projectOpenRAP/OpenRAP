@@ -20,7 +20,7 @@ class App extends Component {
                 <Route exact path={"/users/edit/:username/:permissions"} component={EditUser} />
                 <Route exact path={"/create/user"} component={CreateUser} />
                 <Route exact path={"/users"} component={UserList} />
-                <Route exact path={"/set/ssid"} component={SetSSID} />
+                <Route exact path={"/ssid/set"} component={SetSSID} />
                 <Route exact path={"/update/password"} component={UpdatePassword} />
                 <Route exact path={"/dashboard"} component={Dashboard} />
             </div>

@@ -1,5 +1,8 @@
 import React, { Component } from 'react'
 
+import { connect } from 'react-redux'
+import * as actions from '../../actions/ssid'
+
 import { Container, Grid, Segment, Input, Header, Button, Icon } from 'semantic-ui-react';
 
 const styles = {
@@ -24,6 +27,17 @@ class SetSSID extends Component {
         }
     }
 
+    componentWillMount() {
+        if (this.props.auth && !this.props.auth.authenticated) {
+            this.props.history.push("/");
+        }
+    }
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.auth && !nextProps.auth.authenticated) {
+            this.props.history.push("/");
+        }
+    }
+
     handleSSIDChange(e) {
         this.setState({
             ssid: e.target.value
@@ -32,7 +46,7 @@ class SetSSID extends Component {
 
     handleSubmit() {
         console.log("SSID set to: " + this.state.ssid);
-        /* Handler code goes here */
+        this.props.setSSID(this.state.ssid);
     }
 
     renderSSIDForm() {
@@ -42,7 +56,7 @@ class SetSSID extends Component {
                     <Grid.Column style={styles.segment}>
                         <Segment raised >
                             <Header as='h2' color='teal' textAlign='center'>
-                                {' '}Set a name for your hotspot
+                                Set a name for your hotspot
                              </Header>
                             <Input
                                 onChange={this.handleSSIDChange.bind(this)}
@@ -76,7 +90,10 @@ class SetSSID extends Component {
             </div>
         )
     }
-
 }
 
-export default SetSSID;
+function mapStateToProps({ ssid, auth }) {
+    return { ssid, auth }
+}
+
+export default connect(mapStateToProps, actions)(SetSSID);
