@@ -17,7 +17,7 @@ const setSSID = (req, res) => {
         responseData.ssidSetSuccessful = false;
         responseData.msg = "Empty ssid not allowed!";
 
-        res.status(200).json(responseData);
+        return res.status(200).json(responseData);
     }
 
     const cmd = path.join(__dirname, '../../CDN/modeChange.sh') + ' apmode ' + ssid
