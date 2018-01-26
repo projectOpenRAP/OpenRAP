@@ -75,3 +75,16 @@ export const deleteFile = (prefix, folderName, cb) =>  (dispatch) => {
     cb("error", "Server Error");
   });
 }
+
+export const transferFolderToUSB = (folderName, cb) => {
+  let path = encodeURIComponent(folderName);
+  axios.post(`${BASE_URL}/file/transfer`, {path}).then(response => {
+    if (response.data.success) {
+      cb (null, "success");
+    } else {
+      cb("Error", "Coming Soon!");
+    }
+  }, reject => {
+    cb("Error", "Coming Soon!");
+  });
+}

@@ -43,6 +43,17 @@ class FileDisplayComponent extends Component {
     }
   }
 
+  transferToUSB() {
+  /*  this.props.transferFolderToUSB(this.props.filemgmt.currentDir, (err, msg) => {
+      if (err) {
+        alert(msg);
+      } else {
+        alert("k");
+      }
+    }); */
+    alert('Coming soon!');
+  }
+
   createNewFolder() {
     if (this.state.newFolderName.length < 1) {
       alert('A folder needs a name.');
@@ -96,11 +107,11 @@ class FileDisplayComponent extends Component {
             <Button.Content hidden><Icon name='left arrow' /></Button.Content>
           </Button>
         </span>
-        <span>
+        { this.props.auth.user.permissions.search(/UPLOAD_FILES|ALL/) >= 0 ? <span>
           <Input action={{ color: 'teal', labelPosition: 'right', icon: 'plus', content: 'Make New Folder', onClick : this.createNewFolder.bind(this)}} placeholder='Type name here...' onChange={this.handleFolderNameChange.bind(this)} />
-        </span>
+        </span> : null}
         <span style ={{'float' : 'right'}}>
-          <Button animated color='violet' onClick={this.goBack.bind(this)}>
+          <Button animated color='violet' onClick={this.transferToUSB.bind(this)}>
             <Button.Content visible>Transfer to USB</Button.Content>
             <Button.Content hidden><Icon name='usb' /></Button.Content>
           </Button>
@@ -120,8 +131,8 @@ class FileDisplayComponent extends Component {
   }
 }
 
-function mapStateToProps({ filemgmt }) {
-  return { filemgmt }
+function mapStateToProps({ filemgmt, auth }) {
+  return { filemgmt, auth }
 }
 
 export default connect(mapStateToProps, actions)(FileDisplayComponent);

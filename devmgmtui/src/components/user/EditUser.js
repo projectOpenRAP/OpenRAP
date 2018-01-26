@@ -29,36 +29,65 @@ class EditUser extends Component {
                 perm1: false,
                 perm2: false,
                 perm3: false,
-                perm4: false
+                perm4: false,
+                perm5 : false,
+                perm6 : false,
+                perm7 : false,
+                perm8 : false,
             },
             permissionsAsStrings: {
                 perm0 : "VIEW_DASHBOARD",
                 perm1 : "VIEW_USERS",
                 perm2 : "DELETE_USERS",
                 perm3 : "EDIT_USERS",
-                perm4 : "ADD_USERS"
-            }
+                perm4 : "ADD_USERS",
+                perm5 : "VIEW_FILES",
+                perm6 : "UPLOAD_FILES",
+                perm7 : "DELETE_FILES",
+                perm8 : "UPGRADE_DEVICE"
+            },
+            isAllEnabled : true
         }
         for (var key in this.state.permissionsAsStrings) {
             if (this.state.permissionList.indexOf(this.state.permissionsAsStrings[key]) !== -1) {
               this.state.permissions[key] = true;
+            } else {
+              this.state.isAllEnabled = false;
             }
+        }
+    }
+
+    componentWillMount() {
+        if (this.props.auth && !this.props.auth.authenticated) {
+            this.props.history.push("/");
+        }
+        if (this.state.permissionList.indexOf('ALL') >= 0) {
+          let permissions = this.state.permissions;
+          for (let i in permissions) {
+            permissions[i] = true;
+          }
+          this.setState({permissions});
         }
     }
 
     handlePermissionsChange = permLabel => e => {
         var permissions = this.state.permissions
         permissions[permLabel] = !permissions[permLabel]
-
         this.setState({permissions})
-
-        console.log(permissions)
     }
 
     handleUserChange(e) {
         this.setState({
             user: e.target.value
         })
+    }
+
+    handleAllPermissionsGrant() {
+      var permissions = this.state.permissions
+      for (let i in permissions) {
+        permissions[i] = true;
+      }
+      this.setState({permissions, isAllEnabled : true});
     }
 
     handleSubmit() {
@@ -69,7 +98,11 @@ class EditUser extends Component {
             checkedPermissions.push(this.state.permissionsAsStrings[key]);
           }
         }
-        checkedPermissions = JSON.stringify(checkedPermissions);
+        if (!this.state.isAllEnabled){
+          checkedPermissions = JSON.stringify(checkedPermissions);
+        } else {
+          checkedPermissions = JSON.stringify(["ALL"]);
+        }
         this.props.editUserPermissions(this.state.user, checkedPermissions, (err, res) => {
           if (err) {
             alert(res);
@@ -118,9 +151,14 @@ class EditUser extends Component {
                                 </Header>
                                     {permissionsList}
                             </Segment>
-
-                            <Container textAlign='right' style={styles.container}>
-                                <Button animated color='teal' onClick={this.handleSubmit.bind(this)}>
+                            <Container textAlign='left' style={styles.container}>
+                                <Button animated color='red' onClick={this.handleAllPermissionsGrant.bind(this)}>
+                                    <Button.Content visible>Grant All Permissions</Button.Content>
+                                    <Button.Content hidden>
+                                        <Icon name='warning' />
+                                    </Button.Content>
+                                </Button>
+                                <Button animated color='teal' onClick={this.handleSubmit.bind(this)} style={{'float' : 'right'}}>
                                     <Button.Content visible>Update</Button.Content>
                                     <Button.Content hidden>
                                         <Icon name='right arrow' />
@@ -134,11 +172,15 @@ class EditUser extends Component {
         )
     }
     render() {
+      if (typeof this.props.auth.user !== `undefined` && (this.props.auth.user.permissions.search(/VIEW_USERS|ALL/) >= 0)) {
         return (
             <div style={styles.form}>
                 {this.renderUserUpdateForm()}
             </div>
-        )
+        )} else {
+          this.props.history.push("/");
+          return null;
+        }
     }
 
 }

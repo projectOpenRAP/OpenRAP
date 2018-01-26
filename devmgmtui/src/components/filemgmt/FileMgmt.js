@@ -26,23 +26,28 @@ class FileMgmt extends Component {
     this.state = {};
   }
 
+  componentWillMount() {
+      if (this.props.auth && !this.props.auth.authenticated) {
+        this.props.history.push(`/`);
+      }
+  }
+
   renderFileMgmt() {
-    const { contextRef } = this.state;
     return (
       <SideNav>
-          <Grid columns={2} divided style={fileMgmtStyles.gridGap}>
+         <Grid columns={2} divided style={fileMgmtStyles.gridGap}>
             <Grid.Row>
             <Grid.Column>
-            <Segment>
+             <Segment>
               <FileDisplayComponent />
             </Segment>
             </Grid.Column>
             <Grid.Column>
-              <div style={fileMgmtStyles.fileUpload}>
+              { this.props.auth.user.permissions.search(/UPLOAD_FILES|ALL/) >= 0 ? <div style={fileMgmtStyles.fileUpload}>
                 <Segment raised>
                   <FileUploadComponent />
                 </Segment>
-              </div>
+              </div> : null}
             </Grid.Column>
             </Grid.Row>
           </Grid>
@@ -51,16 +56,23 @@ class FileMgmt extends Component {
   }
 
   render() {
-    return (
-      <div>
-        {this.renderFileMgmt()}
-      </div>
+    if (typeof this.props.auth.user !== `undefined` && (this.props.auth.user.permissions.search(/VIEW_FILES|ALL/) >= 0)) {
+      return (
+        <div>
+          {this.renderFileMgmt()}
+        </div>
     )
+  } else {
+      this.props.history.push("/");
+      return (
+        null
+      )
+  }
   }
 }
 
-function mapStateToProps({ filemgmt }) {
-  return { filemgmt }
+function mapStateToProps({ filemgmt, auth }) {
+  return { filemgmt, auth }
 }
 
 export default connect(mapStateToProps, actions)(FileMgmt);

@@ -19,7 +19,7 @@ class UserList extends Component {
         this.props.getAllUser();
     }
     componentWillReceiveProps(nextProps) {
-        if (nextProps.auth && !nextProps.auth.authenticated) {
+       if (nextProps.auth && !nextProps.auth.authenticated) {
             this.props.history.push("/");
         }
     }
@@ -43,33 +43,33 @@ class UserList extends Component {
                 //         <button onClick={() => this.handleDelete(item.key)}>Delete</button>
                 //     </div>
                 // </div>
-                <List.Item key={index}>
-                <List.Content floated='right'>
+                ( item.username !== 'root' ? <List.Item key={index}>
+                { this.props.auth.user.permissions.search(/DELETE_USERS|ALL/) >= 0 ? <List.Content floated='right'>
                     <Button animated color='red' onClick={() => this.handleDelete(item.username)} >
                         <Button.Content visible> Delete</Button.Content>
                         <Button.Content hidden>
                             <Icon name='trash' />
                         </Button.Content>
                     </Button>
-                </List.Content>
-                <List.Content floated='right'>
+                </List.Content> :  null}
+                { this.props.auth.user.permissions.search(/EDIT_USER|ALL/) >= 0 ? <List.Content floated='right'>
                     <Button animated color='blue' as={Link} to={'/users/edit/' + item.username + '/' + item.permission}>
                         <Button.Content visible>Edit Permission</Button.Content>
                         <Button.Content hidden>
                             <Icon name='edit' />
                         </Button.Content>
                     </Button>
-                </List.Content>
+                </List.Content> : null}
                 <List.Content>
                     <List.Header>{item.username}</List.Header>
                 </List.Content>
-            </List.Item>
+            </List.Item> : null)
             )
         })
     }
 
     render() {
-        console.log(this.props.user.list);
+      if (typeof this.props.auth.user !== `undefined` && (this.props.auth.user.permissions.search(/VIEW_USERS|ALL/) >= 0)) {
         return (
             <SideNav>
                 <Container style={styles.container}>
@@ -80,14 +80,14 @@ class UserList extends Component {
 
                             </List>
                         </div>
-                        <Container textAlign='center' style={{ marginTop: '10px' }}>
+                        { this.props.auth.user.permissions.search(/ADD_USERS|ALL/) >= 0 ? <Container textAlign='center' style={{ marginTop: '10px' }}>
                             <Button as={Link} to={'/create/user'} animated color='teal'>
                                 <Button.Content visible>Add User</Button.Content>
                                 <Button.Content hidden>
-                                    <Icon name='add' />
+                                    <Icon name='add user' />
                                 </Button.Content>
                             </Button>
-                        </Container>
+                        </Container> : null }
 
                     </Segment>
                 </Container>
@@ -96,8 +96,11 @@ class UserList extends Component {
                 <Link to={"/create/user"}>Add User</Link> */}
             </SideNav>
         )
+    } else {
+      this.props.history.push("/");
+      return (null);
     }
-
+  }
 }
 
 function mapStateToProps({ user, auth }) {

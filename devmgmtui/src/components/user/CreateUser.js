@@ -14,7 +14,7 @@ const styles = {
     },
     container: {
         marginTop: '10px'
-    },    
+    },
 }
 
 class CreateUser extends Component {
@@ -27,7 +27,11 @@ class CreateUser extends Component {
         }
     }
 
-    
+    componentWillMount() {
+      if (this.props.auth.user.permissions.indexOf("ADD_USER") < 0) {
+        this.props.history.push('/');
+      }
+    }
 
     handleUserChange(e) {
         this.setState({
@@ -90,18 +94,22 @@ class CreateUser extends Component {
         )
     }
     render() {
+      if (typeof this.props.auth.user !== `undefined` && (this.props.auth.user.permissions.search(/VIEW_USERS|ALL/) >= 0)) {
         return (
             <SideNav >
                 {this.renderCreateUser()}
                 {/* <div>
-                
+
                 <input type="text" onChange={this.handleUserChange.bind(this)} value={this.state.user} />
                 <input type="text" onChange={this.handlePasswordChange.bind(this)} value={this.state.password} />
                 <button onClick={this.handleSubmit.bind(this)} >create user</button>
             </div> */}
             </SideNav>
-        )
-    }
+        )} else {
+          this.props.history.push("/");
+          return null;
+        }
+  }
 
 }
 

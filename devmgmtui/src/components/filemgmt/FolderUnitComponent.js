@@ -45,11 +45,11 @@ class FolderUnitComponent extends Component {
               {this.shortenString(this.props.name)}
           </span>
         </a>
-        <a href='javascript:void(0);' onClick={this.handleDelete.bind(this)}>
+        { this.props.auth.user.permissions.search(/DELETE_FILES|ALL/) >= 0 ? <a href='javascript:void(0);' onClick={this.handleDelete.bind(this)}>
           <span style={{float:'right'}}>
             <Icon name='trash outline' color='red' size='big' />
           </span>
-        </a>
+        </a> : null}
         <Divider></Divider>
       </div>
     )
@@ -62,8 +62,8 @@ class FolderUnitComponent extends Component {
     )
   }
 }
-function mapStateToProps({ filemgmt }) {
-  return { filemgmt }
+function mapStateToProps({ filemgmt, auth }) {
+  return { filemgmt, auth }
 }
 
 export default connect(mapStateToProps, actions)(FolderUnitComponent);
