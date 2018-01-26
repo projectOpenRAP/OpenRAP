@@ -9,6 +9,7 @@ import UserList from './components/user/UserList'
 import SetSSID from './components/ssid/SetSSID'
 import Dashboard from './components/dashboard/Dashboard'
 import Upgrade from './components/upgrade/Upgrade'
+import Captive from './components/captive/Captive'
 
 class App extends Component {
   render() {
@@ -23,6 +24,8 @@ class App extends Component {
                 <Route exact path={"/set/ssid"} component={SetSSID} />
                 <Route exact path={"/update/password"} component={UpdatePassword} />
                 <Route exact path={"/dashboard"} component={Dashboard} />
+                <Route exact path={"/upgrade"} component={Upgrade} />
+                <Route exact path={"/captive"} component={Captive} />
             </div>
         </BrowserRouter>
       </div>
