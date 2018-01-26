@@ -36,6 +36,7 @@ class Dashboard extends Component {
     }
 
     render() {
+      if  (typeof this.props.auth.user !== 'undefined') {
         return (
             <SideNav>
                 <Container style={styles.container}>
@@ -65,7 +66,11 @@ class Dashboard extends Component {
                 </Container>
             </SideNav>
         );
+    }  else {
+      this.props.history.push("/");
+      return (null);
     }
+  }
 }
 
 function mapStateToProps({ dashboard, auth }) {

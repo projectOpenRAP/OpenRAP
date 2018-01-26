@@ -1,41 +1,48 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
+import * as actions from '../../actions/filemgmt'
 import { Sidebar, Segment, Menu, Icon, Header } from 'semantic-ui-react'
 class SideNav extends Component {
     constructor(props){
         super(props);
         this.state= {
-            sideBarVisible:false
+            sideBarVisible:false,
+            permissions : this.props.auth.user.permissions
         }
     }
+
     toggleSideBarVisibility(){
         this.setState({
             sideBarVisible : !this.state.sideBarVisible
         })
     }
+
     render() {
         return (
             <Sidebar.Pushable style={{ height: '100%' }}>
                 <Sidebar as={Menu} animation='scale down' width='thin' visible={this.state.sideBarVisible} icon='labeled' vertical inverted>
-                    <Menu.Item name='home'>
+                    {this.state.permissions.search(/VIEW_DASHBOARD|ALL/) >= 0 ? <Menu.Item name='home' as={Link} to={'/dashboard'}>
                         <Icon name='home' color='teal' />
                         Home
-                    </Menu.Item>
-                    <Menu.Item as={Link} name='dashboard' to={'/dashboard'}>
-                        <Icon name='dashboard' />
-                        Dashboard
-                    </Menu.Item>
-                    <Menu.Item as={Link} name='users' to={'/users'}>
+                    </Menu.Item> : null }
+                    {this.state.permissions.search(/VIEW_USERS|ALL/) >= 0 ? <Menu.Item as={Link} name='users' to={'/users'}>
                         <Icon name='users' />
                         Users
-                    </Menu.Item>
-                    <Menu.Item name='camera'>
-                        <Icon name='sign out' />
-                        Lgout
-                    </Menu.Item>
-                    <Menu.Item name='upgrade' as={Link} to={'/upgrade'}>
+                    </Menu.Item> : null }
+                    {this.state.permissions.search(/UPGRADE_DEVICE|ALL/) >= 0 ? <Menu.Item name='upgrade' as={Link} to={'/upgrade'}>
                       <Icon name='up arrow' />
                       Upgrade
+                    </Menu.Item> : null}
+                    { this.state.permissions.search(/VIEW_FILES|ALL/) >= 0 ? <Menu.Item name='fielmgmt' as={Link} to={'/filemgmt'}>
+                      <Icon name='disk outline' />
+                      File Management
+                    </Menu.Item> : null }
+
+
+                    <Menu.Item name='logout' as={Link} to={'/'}>
+                        <Icon name='log out' />
+                        Logout
                     </Menu.Item>
                 </Sidebar>
                 <Sidebar.Pusher>
@@ -51,4 +58,8 @@ class SideNav extends Component {
     }
 }
 
-export default SideNav;
+function mapStateToProps({ auth }) {
+  return { auth }
+}
+
+export default connect(mapStateToProps, actions)(SideNav);

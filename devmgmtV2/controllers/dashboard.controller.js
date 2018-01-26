@@ -28,16 +28,16 @@ let getSystemSpace = (req, res) => {
 
 let getSystemCpu = (req,res) => {
     os.cpuUsage(function(v){
-        console.log( 'CPU Usage (%): ' + v );
+      //  console.log( 'CPU Usage (%): ' + v );
         v = v * 100;
         res.send({v})
     });
 }
 
 let getSystemVersion = (req,res) => {
-    let cdn = path.join(__dirname,"../../CDN/version.txt"); // change to opencdn 
+    let cdn = path.join(__dirname,"../../CDN/version.txt"); // change to opencdn
     fs.readFile(cdn, 'utf-8', (err,data)=>{
-        console.log(err);
+      //  console.log(err);
         res.send({data});
     })
 }
