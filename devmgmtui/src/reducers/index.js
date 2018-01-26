@@ -9,5 +9,5 @@ export default combineReducers({
     user,
     filemgmt,
     dashboard,
-    ssid
+    ssid,
 })
