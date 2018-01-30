@@ -37,7 +37,9 @@ server {
 	location /data {
                 proxy_pass http://127.0.0.1:9000;
 	}
-
+	location /devmgmt/api {
+                proxy_pass http://127.0.0.1:8080;
+	}
 	# Redirect requests for /generate_204 to open the captive portal screen
     location /generate_204 {
                 return 302 http://download.localnet/index.html;
@@ -50,10 +52,22 @@ server {
 server {
 	listen 80;
 	server_name admin.openrap.com;
-	client_max_body_size 0;
+	root /var/www/html/admin;
 	index index.php index.html;
 
 	location / {
-                proxy_pass http://127.0.0.1:8008;
+                #proxy_pass http://127.0.0.1:8008;
+				try_files $uri $uri/ @ekstep;
+	}
+}
+server {
+	listen 80;
+	server_name devmgmt.openrap.com;
+	#root /var/www/html/admin;
+	index index.php index.html;
+
+	location / {
+            proxy_pass http://127.0.0.1:8080;
+			#try_files $uri $uri/ @ekstep;
 	}
 }
