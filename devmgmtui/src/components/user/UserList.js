@@ -25,7 +25,6 @@ class UserList extends Component {
     }
 
     handleDelete(key) {
-        console.log("called with " , key)
         this.props.deleteUser(key, (err,msg) => {
             if(!err){
                 this.props.getAllUser();

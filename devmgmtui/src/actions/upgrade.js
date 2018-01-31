@@ -19,6 +19,7 @@ export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
     }
   })
   .catch(e => {
+    console.log(e);
     cb("Error", "Server error")
   })
 }

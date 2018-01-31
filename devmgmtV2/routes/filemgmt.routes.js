@@ -1,6 +1,6 @@
 "use strict";
 
-let {writeFileToDisk, deleteFileFromDisk, createNewFolder, openDirectory, deleteFolder, copyFile, moveFile, transferToUSB} = require("../controllers/filemgmt.controller.js")
+let {writeFileToDisk, deleteFileFromDisk, createNewFolder, openDirectory, deleteFolder, copyFile, moveFile} = require("../controllers/filemgmt.controller.js")
 let multiparty = require('connect-multiparty')
 let multipartMiddle = multiparty()
 
@@ -12,5 +12,4 @@ module.exports = app => {
   app.delete('/file/deleteFolder', deleteFolder);
   app.put('/file/copy', copyFile);
   app.put('/file/move',moveFile);
-  app.post('/file/transfer', transferToUSB);
 }

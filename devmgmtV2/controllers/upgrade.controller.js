@@ -10,7 +10,6 @@ let writeUpdateFile = (req, res) => {
   fs.rename(temporaryPath, updateFileLocation, (err) => {
     if (err) {
       console.log(err);
-      console.log("ohno");
       res.status(500).json({success : false});
     } else {
       exec('sh ../CDN/upgrade.sh ' + updateFileLocation, (err, stdout, stderr) => {
@@ -20,7 +19,7 @@ let writeUpdateFile = (req, res) => {
         } else if (stdout){
           return res.status(200).json({success : true, msg : 'Success!'})
         } else {
-          console.log("help");
+          console.log(stderr);
           return res.status(200).json({success : false, msg : 'Script Error!'})
         }
       })

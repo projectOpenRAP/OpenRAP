@@ -91,6 +91,9 @@ class SelectedFileShowComponent extends Component {
           break;
 
       case 'UPLOADED':
+          let uploadableFiles = this.props.filemgmt.uploadableFiles;
+          uploadableFiles.splice(uploadableFiles.indexOf(this.props.file), 1);
+          this.props.updateUploadableFiles(uploadableFiles);
           window.setTimeout(this.hide(), 3000);
           break;
 
@@ -121,7 +124,6 @@ class SelectedFileShowComponent extends Component {
   }
 
   render() {
-    console.log(this.state.uploadStatus);
     return (
       <div>
         {this.renderSelectedFileShowComponent()}

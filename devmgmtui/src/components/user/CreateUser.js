@@ -28,7 +28,7 @@ class CreateUser extends Component {
     }
 
     componentWillMount() {
-      if (this.props.auth.user.permissions.indexOf("ADD_USER") < 0) {
+      if (this.props.auth.user.permissions.search(/ADD_USER|ALL/) < 0) {
         this.props.history.push('/');
       }
     }

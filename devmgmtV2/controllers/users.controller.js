@@ -66,6 +66,7 @@ let createUser = (req, res) => {
       msg : "Successfully added to database"
     }
   }, reject => {
+    console.log(reject);
     return {
       createSuccessful : false,
       msg : "Cannot add user to database!"
@@ -77,7 +78,7 @@ let createUser = (req, res) => {
       responseStructure.createSuccessful =  response.createSuccessful;
       responseStructure.msg = response.msg;
     }
-    (response.createSuccessful ? res.status(200) : res.status(200)).json(responseStructure);
+    return res.status(200).json(responseStructure);
   });
 }
 
@@ -106,6 +107,7 @@ let updateUser = (req, res) => {
     responseStructure.msg = "Successfully updated user " + field;
     return res.status(200).json(responseStructure);
   }, reject => {
+    console.log(reject);
     responseStructure.msg = "Server error!";
     return res.status(500).json(responseStructure);
   });
@@ -154,6 +156,7 @@ let getAllUsers = (req, res) => {
     responseStructure.msg = "Successfully retrieved user list";
     return res.status(200).json(responseStructure);
   }, reject => {
+    console.log(reject);
     responseStructure.msg = "Server error!";
     return res.status(500).json(responseStructure);
   });

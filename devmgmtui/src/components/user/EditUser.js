@@ -20,7 +20,6 @@ class EditUser extends Component {
 
     constructor(props) {
         super(props)
-        console.log(props.match.params)
         this.state = {
             user: props.match.params.username,
             permissionList : JSON.parse(props.match.params.permissions),
@@ -91,7 +90,6 @@ class EditUser extends Component {
     }
 
     handleSubmit() {
-        console.log("User edit requested.");
         let checkedPermissions = [];
         for (var key in this.state.permissions) {
           if (this.state.permissions[key]) {

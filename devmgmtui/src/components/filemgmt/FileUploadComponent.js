@@ -10,7 +10,7 @@ class FileUploadComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      files : [],
+      files : this.props.filemgmt.uploadableFiles,
       fileNames : [],
       autoUpload : false
     }
@@ -24,6 +24,7 @@ class FileUploadComponent extends Component {
       files.push(fileList[i]);
       fileNames.push(fileList[i].name);
     }
+    this.props.updateUploadableFiles(files);
     this.setState({files, fileNames});
   }
 
