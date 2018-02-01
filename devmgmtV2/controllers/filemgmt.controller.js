@@ -1,6 +1,6 @@
 let q = require('q')
 let fs = require('fs')
-let usb = require('usb-detection')
+// let usb = require('usb-detection')
 
 let classify = (dir, file) => {
   let defer = q.defer();
@@ -188,20 +188,20 @@ let writeFileToDisk = (req, res) => {
   })
 }
 
-let transferToUSB = (req, res) => {
-  usb.startMonitoring();
-  usb.find(function (err, devices) {
-    if (err) {
-      console.log(err);
-    }
-    else  {
-      console.log(devices);
-    }
-  })
-  return res.status(200).json({success : false, msg : 'Coming soon!'})
-  usb.stopMonitoring();
-}
+// let transferToUSB = (req, res) => {
+//   usb.startMonitoring();
+//   usb.find(function (err, devices) {
+//     if (err) {
+//       console.log(err);
+//     }
+//     else  {
+//       console.log(devices);
+//     }
+//   })
+//   return res.status(200).json({success : false, msg : 'Coming soon!'})
+//   usb.stopMonitoring();
+// }
 
 module.exports = {
-  openDirectory, deleteFolder, deleteFileFromDisk, createNewFolder, copyFile, moveFile, writeFileToDisk, transferToUSB
+  openDirectory, deleteFolder, deleteFileFromDisk, createNewFolder, copyFile, moveFile, writeFileToDisk
 }
