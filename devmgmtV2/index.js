@@ -21,14 +21,17 @@ require('./routes/filemgmt.routes.js')(app);
 require('./routes/ssid.routes.js')(app);
 require('./routes/captive.routes.js')(app);
 
-exec('mysql -u root -p < ./init.sql', (err, stdout, stderr) => {
-  console.log("System errors: " + err);
-  console.log("System output: " + stdout);
-  console.log("Script errors: " + stderr);
-});
 app.listen(8080, err => {
     if (err)
         console.log(err);
-    else
+    else {
         console.log("server running on port 8080");
+        exec('mysql -u root -p < ./init.sql', (err, stdout, stderr) => {
+          if (err) {
+            console.log("error in init script");
+          } else {
+            console.log("init script success");
+          }
+        });
+    }
 });
