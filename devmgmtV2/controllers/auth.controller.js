@@ -74,6 +74,7 @@ let authLogin = (req,res) => {
     }
     return res.status(200).send(responseStructure);
   }, err => {
+    console.lg(err);
     responseStructure.msg = "Some server Error!!!";
     return res.status(500).send(responseStructure);
   });

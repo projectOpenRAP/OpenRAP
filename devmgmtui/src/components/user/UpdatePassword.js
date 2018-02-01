@@ -31,7 +31,6 @@ class UpdatePassword extends Component {
     }
 
     handleSubmit() {
-        console.log("Update password requested.");
         /* Handler code goes here */
     }
 

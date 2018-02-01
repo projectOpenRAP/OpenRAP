@@ -56,11 +56,9 @@ let selectFields = (dbObj) => {
     if(dbObj.where){
         query = query +" "+ dbObj.where;
     }
-    console.log(query);
     connection.query(query, function (error, results, fields) {
         if (error) return defer.reject(error);
-        console.log(results)
-            return defer.resolve(results)
+        return defer.resolve(results)
     });
 
 
@@ -94,8 +92,7 @@ let updateFields = (dbObj) => {
     }
     connection.query(query,val, function (error, results, fields) {
         if (error) return defer.reject(error);
-        console.log(results)
-            return defer.resolve(results)
+        return defer.resolve(results)
     });
 
 
@@ -121,8 +118,7 @@ let deleteFields = (dbObj) => {
     }
     connection.query(query, function (error, results, fields) {
         if (error) return defer.reject(error);
-        console.log(results)
-            return defer.resolve(results)
+        return defer.resolve(results)
     });
 
 
@@ -161,12 +157,10 @@ let insertFields = (dbObj) => {
         }
     }
     query = query + " );";
-    console.log(query);
     connection.query(query,val, function (error, results, fields) {
         if (error)
           return defer.reject(error);
-        console.log(results)
-            return defer.resolve(results)
+        return defer.resolve(results)
     });
 
 

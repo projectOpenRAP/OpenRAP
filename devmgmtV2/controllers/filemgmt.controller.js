@@ -1,6 +1,5 @@
 let q = require('q')
 let fs = require('fs')
-// let usb = require('usb-detection')
 
 let classify = (dir, file) => {
   let defer = q.defer();
@@ -21,7 +20,7 @@ let getFilesFromFolder = (dir) => {
   let defer = q.defer();
   fs.readdir(dir, (err, files) => {
     if (err) {
-      console.log(err)
+      console.log(err);
       return defer.reject(err);
     } else {
       files = files.filter(item => !(/(^|\/)\.[^\/\.]/g).test(item));
@@ -35,23 +34,23 @@ let checkIfIsFolder = (dir) => {
   let defer = q.defer();
   fs.stat(dir, (err, stats) => {
     if (err || !(stats.isDirectory())) {
+      console.log(err);
       return defer.reject({success : false});
     } else {
-      return defer.resolve({success : true})
+      return defer.resolve({success : true});
     }
   });
   return defer.promise;
 }
 
 let openDirectory = (req, res) => {
-  let currentPath = decodeURIComponent(req.query.path)
-  console.log("Current path: " + currentPath)
+  let currentPath = decodeURIComponent(req.query.path);
   let responseStructure = {
     success : false,
     msg : '',
     fileList : [],
     folderList : []
-  }
+  };
   checkIfIsFolder(currentPath).then(response => {
     if (response.success) {
       return getFilesFromFolder(currentPath);
@@ -71,10 +70,9 @@ let openDirectory = (req, res) => {
     for (let i = 0; i < response.length; i++) {
       responseStructure.children.push({'name' : response[i].value.name, 'type' : response[i].value.type, 'size' : response[i].value.size});
     }
-    console.log(responseStructure.children)
     return res.status(200).json(responseStructure);
   }).catch(e => {
-    console.log(e + ' OHNO');
+    console.log(e);
     responseStructure.msg = 'Server side error';
     return res.status(500).json(responseStructure);
   })
@@ -99,14 +97,14 @@ let deleteFolder = (req, res) => {
 }
 
 let deleteFileFromDisk = (req, res) => {
-  let fileToDelete = decodeURIComponent(req.query.path)
-  console.log("We got " + fileToDelete);
+  let fileToDelete = decodeURIComponent(req.query.path);
   let responseStructure = {
     success : false,
     msg : ''
   }
   fs.unlink(fileToDelete, (err) => {
     if (err) {
+      console.log(err);
       responseStructure.msg = `File doesn't exist`
       return res.status(500).json(responseStructure);
     } else {
@@ -118,13 +116,13 @@ let deleteFileFromDisk = (req, res) => {
 
 let createNewFolder = (req, res) => {
   let newFolder = decodeURIComponent(req.body.path);
-  console.log("We got " + newFolder);
   let responseStructure = {
     success : false,
     msg : ''
   }
   fs.mkdir(newFolder, (err) => {
     if (err) {
+      console.log(err);
       responseStructure.msg = `Failed to create folder!`;
       return res.status(500).json(responseStructure);
     } else {
@@ -137,13 +135,13 @@ let createNewFolder = (req, res) => {
 let copyFile = (req, res) => {
   let oldFile = req.body.old;
   let newFile = req.body.new;
-  console.log("Copying " + oldFile + " to " + newFile)
   let responseStructure = {
     success : false,
     msg : ''
   }
   fs.copyFile(oldFile, newFile, (err) => {
     if (err) {
+      console.log(err);
       responseStructure.msg = `Copying failed`;
       return res.status(500).json(responseStructure);
     } else {
@@ -156,13 +154,13 @@ let copyFile = (req, res) => {
 let moveFile = (req, res) => {
   let oldFile = req.body.old;
   let newFile = req.body.new;
-  console.log("Copying " + oldFile + " to " + newFile)
   let responseStructure = {
     success : false,
     msg : ''
   }
   fs.rename(oldFile, newFile, (err) => {
     if (err) {
+      console.log(err);
       responseStructure.msg = `Moving failed`;
       return res.status(500).json(responseStructure);
     } else {
@@ -179,28 +177,12 @@ let writeFileToDisk = (req, res) => {
   fs.rename(temporaryPath, actualPathPrefix + actualFileName, (err) => {
     if (err) {
       console.log(err);
-      console.log("ohno");
       res.status(500).json({success : false});
     } else {
-      console.log("Ok");
       res.status(200).json({success : true});
     }
   })
 }
-
-// let transferToUSB = (req, res) => {
-//   usb.startMonitoring();
-//   usb.find(function (err, devices) {
-//     if (err) {
-//       console.log(err);
-//     }
-//     else  {
-//       console.log(devices);
-//     }
-//   })
-//   return res.status(200).json({success : false, msg : 'Coming soon!'})
-//   usb.stopMonitoring();
-// }
 
 module.exports = {
   openDirectory, deleteFolder, deleteFileFromDisk, createNewFolder, copyFile, moveFile, writeFileToDisk

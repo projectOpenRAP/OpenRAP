@@ -45,7 +45,6 @@ class SetSSID extends Component {
     }
 
     handleSubmit() {
-        console.log("SSID set to: " + this.state.ssid);
 
         this.props.setSSID(this.state.ssid, (err, data) => {
             if(err) {

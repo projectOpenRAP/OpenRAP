@@ -33,6 +33,7 @@ export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
       cb("Error", "Could not save file!");
     }
   }, reject => {
+    console.log(reject);
     cb('Error', 'Server Error');
   })
 }
@@ -59,6 +60,7 @@ export const deleteFolder = (prefix, folderName, cb) =>  (dispatch) => {
       cb("Error", "Cannot delete folder!");
     }
   }, reject => {
+    console.log(reject);
     cb("error", "Server Error");
   });
 }
@@ -72,19 +74,11 @@ export const deleteFile = (prefix, folderName, cb) =>  (dispatch) => {
       cb("Error", "Cannot delete folder!");
     }
   }, reject => {
+    console.log(reject);
     cb("error", "Server Error");
   });
 }
 
-export const transferFolderToUSB = (folderName, cb) => {
-  let path = encodeURIComponent(folderName);
-  axios.post(`${BASE_URL}/file/transfer`, {path}).then(response => {
-    if (response.data.success) {
-      cb (null, "success");
-    } else {
-      cb("Error", "Coming Soon!");
-    }
-  }, reject => {
-    cb("Error", "Coming Soon!");
-  });
+export const updateUploadableFiles = (files) => (dispatch) => {
+  dispatch({type : 'UPLOAD_FILES' , payload : files});
 }

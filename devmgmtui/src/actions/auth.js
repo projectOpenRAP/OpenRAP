@@ -33,7 +33,6 @@ export const createUser = (user, password, cb) => (dispatch) => {
     }
     axios.post(`${BASE_URL}/user/create`, data)
         .then((response) => {
-            console.log(response)
             if(response.data.createSuccessful){
                 cb(null,"success");
             }else{
@@ -48,9 +47,6 @@ export const createUser = (user, password, cb) => (dispatch) => {
 }
 
 export const editUserPermissions = (user, permissions, cb) => (dispatch) => {
-  console.log("We shall edit permissions now");
-  console.log(user);
-  console.log(permissions);
   let data = {
     "username" : user,
     "field" : "permission",
@@ -58,7 +54,6 @@ export const editUserPermissions = (user, permissions, cb) => (dispatch) => {
   }
   axios.put(`${BASE_URL}/user/update`, data)
     .then((response) => {
-      console.log(response);
       if (response.data.updateSuccessful){
         cb(null, "Success");
       }else{
