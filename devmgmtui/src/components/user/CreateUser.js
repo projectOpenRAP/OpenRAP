@@ -56,13 +56,14 @@ class CreateUser extends Component {
                 <Grid.Column style={styles.segment}>
                     <Segment raised >
                         <Header as='h2' color='teal' textAlign='center'>
+                            <Icon name='add user' />
                             Create a new User
                         </Header>
                         <Input
                             onChange={this.handleUserChange.bind(this)}
                             value={this.state.user}
                             fluid
-                            icon='users'
+                            icon='user'
                             iconPosition='left'
                             placeholder='Enter new username' />
                         <br />
@@ -79,7 +80,7 @@ class CreateUser extends Component {
                             <Button animated color='teal' onClick={this.handleSubmit.bind(this)}>
                                 <Button.Content visible>Create User</Button.Content>
                                 <Button.Content hidden>
-                                    <Icon name='user' />
+                                    <Icon name='plus' />
                                 </Button.Content>
                             </Button>
                         </Container>

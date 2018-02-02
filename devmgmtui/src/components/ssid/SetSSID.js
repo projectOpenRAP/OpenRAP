@@ -75,7 +75,7 @@ class SetSSID extends Component {
                             <Button animated color='teal' onClick={this.handleSubmit.bind(this)}>
                                 <Button.Content visible>Update</Button.Content>
                                 <Button.Content hidden>
-                                    <Icon name='right arrow' />
+                                    <Icon name='check' />
                                 </Button.Content>
                             </Button>
                         </Container>
