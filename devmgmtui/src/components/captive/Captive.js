@@ -89,11 +89,6 @@ class Captive extends Component {
                 </div>
                 <input type='file' id='apkinput' style = {{display : 'None'}}
                 onChange={(e) => this.uploadApkCallBack(e.target.files[0])} accept='.apk'/>
-                <textarea
-                    disabled
-                    className="rdw-storybook-textarea"
-                    value={draftToHtml(convertToRaw(editorState.getCurrentContent()))}
-                />
                 <Container style = {captiveStyles.container}>
                   <Button color = 'violet' onClick={this.writeToHtmlFile.bind(this)}>
                     <Button.Content visible>

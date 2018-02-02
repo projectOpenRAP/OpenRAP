@@ -286,7 +286,6 @@ let writeFileToDisk = (req, res) => {
   let actualPathPrefix = req.body.prefix;
   let actualFileName = req.files.file.originalFilename;
   let actualFileType = actualFileName.slice(actualFileName.lastIndexOf('.')+1);
-  console.log(actualFileType);
   fs.rename(temporaryPath, actualPathPrefix + actualFileName, (err) => {
     if (err) {
       console.log(err);
