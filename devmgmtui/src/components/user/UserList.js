@@ -17,6 +17,7 @@ class UserList extends Component {
             this.props.history.push("/");
         }
         this.props.getAllUser();
+        document.title = "User List";
     }
     componentWillReceiveProps(nextProps) {
        if (nextProps.auth && !nextProps.auth.authenticated) {

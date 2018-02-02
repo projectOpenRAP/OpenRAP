@@ -15,7 +15,9 @@ import * as actions from '../../actions/captive.js';
 const captiveStyles = {
   container : {
     "paddingTop" : "10px",
-    "textAlign" : "center"
+    "textAlign" : "center",
+    "marginLeft" : "25px",
+    "marginRight" : "25px"
   }
 }
 class Captive extends Component {
@@ -28,6 +30,9 @@ class Captive extends Component {
         this.uploadImageCallBack = this.uploadImageCallBack.bind(this);
     }
 
+    componentWillMount()  {
+      document.title="Captive Portal";
+    }
 
     onEditorStateChange(editorState) {
         this.setState({
@@ -71,7 +76,8 @@ class Captive extends Component {
             <SideNav>
                 <br />
                 <br />
-                <div className="rdw-storybook-root">
+                <div style={captiveStyles.container}>
+                <div>
                     <Editor
                         editorState = {editorState}
                         toolbarClassName="rdw-storybook-toolbar"
@@ -96,6 +102,7 @@ class Captive extends Component {
                     </Button.Content>
                   </Button>
                 </Container>
+                </div>
             </SideNav>
         )
     }
