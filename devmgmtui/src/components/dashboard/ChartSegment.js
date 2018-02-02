@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../../actions/dashboard';
 
-import { Segment, Container, Grid, Icon, Header, List, Divider, Message } from 'semantic-ui-react';
+import { Segment, Container, Grid, Icon, Header, List, Divider, Message, Loader, Dimmer } from 'semantic-ui-react';
 
 import PieChart from 'react-svg-piechart';
 
@@ -43,7 +43,7 @@ class ChartSegment extends Component {
 
                 header = {
                     title: 'Memory Usage',
-                    total: totalMemory.toFixed(2) + ' Gb',
+                    used: usedMemory.toFixed(2) + ' Gb',
                     free: freeMemory.toFixed(2) + ' Gb'
                 }
             }
@@ -66,8 +66,8 @@ class ChartSegment extends Component {
 
                 header = {
                     title: 'Disk Usage',
-                    total: totalSpace.toFixed() + ' Mb',
-                    free: usedSpace.toFixed() + ' Mb'
+                    used: usedSpace.toFixed() + ' Mb',
+                    free: freeSpace.toFixed() + ' Mb'
                 }
             }
 
@@ -75,17 +75,18 @@ class ChartSegment extends Component {
 
             // CPU Usage chart
             case 'cpu': {
-                let cpuUsage = cpuData.v;
+                let cpuUsed = cpuData.v;
+                let cpuFree = 100-cpuUsed;
 
                 data = [
-                    { title: "CPU Free: " + (100-cpuUsage).toFixed(2) + "%", value: (100-cpuUsage), color: color[2][1] },
-                    { title: "CPU Used: " + cpuUsage.toFixed(2) + "%", value: cpuUsage, color: color[2][0] },
+                    { title: "CPU Free: " + cpuFree.toFixed(2) + "%", value: cpuFree, color: color[2][1] },
+                    { title: "CPU Used: " + cpuUsed.toFixed(2) + "%", value: cpuUsed, color: color[2][0] },
                 ]
 
                 header = {
                     title: 'CPU Usage',
-                    total: '',
-                    free: (100-cpuUsage).toFixed(2) + "%"
+                    used: cpuUsed.toFixed(2) + '%',
+                    free: cpuFree.toFixed(2) + '%'
                 }
             }
 
@@ -93,7 +94,6 @@ class ChartSegment extends Component {
 
             // Segment showing system version and uptime returned directly
             default: {
-
                 let sysUpTimeInSeconds = memoryData.sysUpTime;
 
                 const secondsToDDHHMMSS = (totalSeconds) => {
@@ -143,7 +143,8 @@ class ChartSegment extends Component {
                             </List.Item>
                         </List>
                     </Segment>
-                )}
+                )
+            }
         }
 
         return (
@@ -155,7 +156,7 @@ class ChartSegment extends Component {
                 <br />
 
                 <Message>
-                    <b>{header.total ? 'Total: ' + header.total : 'Used: ' + (100-parseFloat(header.free)).toFixed(2) + '%'}</b>
+                    <b>{'Used: ' + header.used}</b>
                     <br />
                     <b>{'Free: ' + header.free}</b>
                 </Message>
@@ -180,12 +181,20 @@ class ChartSegment extends Component {
         )
     }
 
+    renderLoader() {
+        return (
+            <Segment>
+                Loading...
+            </Segment>
+        )
+    }
+
     render() {
         let dashboard = this.props.dashboard;
 
         return (
             <div>
-                { dashboard.memoryData && dashboard.spaceData && dashboard.cpuData && this.renderData() }
+                { dashboard.memoryData && dashboard.spaceData && dashboard.cpuData ? this.renderData() : this.renderLoader() }
             </div>
         );
     }
