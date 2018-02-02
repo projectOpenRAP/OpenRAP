@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/upgrade'
-import {Button, Icon, Segment} from 'semantic-ui-react'
+import {Button, Icon, Segment, Loader, Dimmer} from 'semantic-ui-react'
 
 const upgradeStyle = {
   outside : {
@@ -24,7 +24,7 @@ class UpgradeDisplayComponent extends Component {
     this.state = {
       fileToAdd : null,
       fileName : '',
-      fileUploadedStatus : false,
+      fileUploadedStatus : "INACTIVE",
     }
     this.handleFileInputChange = this.handleFileInputChange.bind(this);
   }
@@ -33,19 +33,28 @@ class UpgradeDisplayComponent extends Component {
     this.setState({fileName : selectedFile[0].name, fileToAdd : selectedFile[0]});
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.fileUploadedStatus !== this.state.fileUploadedStatus && this.state.fileUploadedStatus === 'ACTIVE') {
+      console.log(this.state.fileUploadedStatus);
+      this.props.uploadFile(this.state.currentFolder, this.state.fileToAdd, (err, msg) => {
+        if (!err) {
+          alert('Successfully uploaded file!');
+          this.setState({fileUploadedStatus:"DONE"});
+        }
+        else {
+          alert(msg);
+          this.setState({fileUploadedStatus:"ERROR"});
+        }
+      });
+    }
+  }
+
   submitFilesForUpload() {
     if (this.state.fileToAdd == null) {
-      alert('Select some files to upload first');
+      alert('Select a file to upload first');
       return;
     }
-    this.props.uploadFile(this.state.currentFolder, this.state.fileToAdd, (err, msg) => {
-      if (!err) {
-        alert('Successfully uploaded file!');
-      }
-      else {
-        alert(msg);
-      }
-    });
+    this.setState({fileUploadedStatus:"ACTIVE"});
   }
 
 
@@ -53,6 +62,9 @@ class UpgradeDisplayComponent extends Component {
     return(
       <div style = {upgradeStyle.outside}>
         <Segment raised>
+        {this.state.fileUploadedStatus === "ACTIVE" ? <Dimmer active>
+          {this.state.fileUploadedStatus === 'ACTIVE' ? <Loader active/> : null}
+        </Dimmer> : null}
         <span>
           <Button animated color='blue' onClick = {() => {
             document.getElementById("fileinput").click();
@@ -68,7 +80,8 @@ class UpgradeDisplayComponent extends Component {
             onChange={(e) => this.handleFileInputChange(e.target.files)} accept = '.tgz'/>
         </span>
         <span style={{float : 'right'}}>
-          <Button animated color='green' onClick = {this.submitFilesForUpload.bind(this)}>
+
+          <Button animated color={this.state.fileUploadedStatus === 'ERROR' ? 'red': 'green'} onClick = {this.submitFilesForUpload.bind(this)}>
             <Button.Content visible>Begin upload!</Button.Content>
             <Button.Content hidden><Icon name='checkmark'/></Button.Content>
           </Button>
@@ -77,6 +90,7 @@ class UpgradeDisplayComponent extends Component {
         <div>
           <span style = {upgradeStyle.big_head}>Selected file: </span>
             <span style = {upgradeStyle.big_text}>{this.state.fileName}</span>
+            <span style = {{float : 'right'}}>{this.state.fileUploadedStatus === 'ERROR' ? <Icon name = 'warning sign' color='red' size='big'/> : this.state.fileUploadedStatus === "DONE" ? <Icon name = 'checkmark' color='green' size='big'/> : null }</span>
         </div>
         </Segment>
       </div>

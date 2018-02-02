@@ -106,7 +106,7 @@ let uploadImage = (req, res) => {
   }).then((resolve) => {
     responseStructure.size = resolve.size;
     responseStructure.datetime = resolve.birthtimeMs;
-    responseStructure.link = `http://localhost/img/` + fileName;
+    responseStructure.link = `BASE_URL/img/` + fileName;
     return res.status(200).json({data:responseStructure, success : true});
   }, reject => {
     return res.status(500).json({data:responseStructure, success : false});
@@ -126,7 +126,7 @@ let uploadApk = (req, res) => {
   createFolderIfNotExists(captivePrefix).then(resolve => {
     return moveFile(temporaryPath, actualFileName);
   }).then(resolve => {
-    responseStructure.link = `http://localhost/apks/` + fileName;
+    responseStructure.link = `BASE_URL/apks/` + fileName;
     responseStructure.name = fileName;
     responseStructure.success = true;
     return res.status(200).json(responseStructure);

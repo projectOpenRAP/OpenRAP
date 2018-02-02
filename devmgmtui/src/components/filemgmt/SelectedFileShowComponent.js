@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/filemgmt'
-import { Segment, Container, Button, Icon, Divider } from 'semantic-ui-react'
+import { Segment, Container, Button, Icon, Divider, Dimmer, Loader } from 'semantic-ui-react'
 
 let selectedStyles = {
   'upload_wrapper' : {
@@ -52,8 +52,9 @@ class SelectedFileShowComponent extends Component {
     this.props.uploadFile(this.props.filemgmt.currentDir, this.props.file, function(err, res) {
       if (err) {
         alert(res);
+        that.setState({uploadStatus : 'ERROR'});
       } else {
-        that.setState({uploadStatus : 'UPLOADED'})
+        that.setState({uploadStatus : 'UPLOADED'});
       }
       that.props.readFolder(that.props.filemgmt.currentDir)
     });
@@ -110,6 +111,7 @@ class SelectedFileShowComponent extends Component {
     return (
       <div>
         {this.state.hidden ? null :<Segment>
+          {this.state.uploadStatus === "UPLOADING" ? <Dimmer active><Loader active /></Dimmer> : null}
           <span style={selectedStyles.upload_wrapper}>{this.state.fileName}</span>
           <span style={{float : 'right'}}>
             <Button animated color={colors[this.state.uploadStatus]} onClick={this.handleUploadClick.bind(this)} disabled={this.state.uploadStatus !== 'INACTIVE'}>
