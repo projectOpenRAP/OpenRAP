@@ -183,7 +183,7 @@ class ChartSegment extends Component {
 
     renderLoader() {
         return (
-            <Segment>
+            <Segment loading padded>
                 Loading...
             </Segment>
         )
