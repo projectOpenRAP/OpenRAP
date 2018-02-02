@@ -16,7 +16,6 @@ let moveFile = (src, dest) => {
 }
 
 let getImageStats = (file) => {
-  console.log("called");
   let defer = q.defer();
   size(file, (err, res) => {
     if (err) {
@@ -29,6 +28,25 @@ let getImageStats = (file) => {
       return defer.resolve({width, height, type});
     }
   });
+  return defer.promise;
+}
+
+let createFolderIfNotExists = (folderName) => {
+  let defer = q.defer();
+  fs.stat(folderName, (err, stats) => {
+    if (err || !(stats.isDirectory())) {
+      fs.mkdir(folderName, (err) => {
+        if (err) {
+          console.log(err);
+          return defer.reject(err);
+        } else {
+          return defer.resolve();
+        }
+      })
+    } else {
+      return defer.resolve();
+    }
+  })
   return defer.promise;
 }
 
@@ -76,7 +94,9 @@ let uploadImage = (req, res) => {
     size : 0,
     id : fileName
   }
-  moveFile(temporaryPath, actualFileName).then(resolve => {
+  createFolderIfNotExists(captivePrefix).then(resolve => {
+    return moveFile(temporaryPath, actualFileName);
+  }).then(resolve => {
     return getImageStats(actualFileName);
   }).then((resolve) => {
     responseStructure.type = 'type/' + resolve.type;
@@ -103,7 +123,9 @@ let uploadApk = (req, res) => {
     link : '',
     name : '',
   }
-  moveFile(temporaryPath, actualFileName).then(resolve => {
+  createFolderIfNotExists(captivePrefix).then(resolve => {
+    return moveFile(temporaryPath, actualFileName);
+  }).then(resolve => {
     responseStructure.link = `http://localhost/apks/` + fileName;
     responseStructure.name = fileName;
     responseStructure.success = true;
