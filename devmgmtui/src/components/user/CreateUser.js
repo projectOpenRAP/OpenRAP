@@ -5,9 +5,6 @@ import SideNav from '../common/Sidebar'
 import { Container,Grid, Segment, Input, Header, Button, Icon } from 'semantic-ui-react';
 
 const styles = {
-    loginForm: {
-        height: '100%'
-    },
     segment: {
         maxWidth: '450px',
         marginTop: '150px'
@@ -55,55 +52,47 @@ class CreateUser extends Component {
     }
     renderCreateUser() {
         return (
-                <Grid textAlign='center' style={{ height: '100%' }}>
-                    <Grid.Column style={styles.segment}>
-                        {/* <h1>Hello</h1> */}
-                        <Segment raised >
-                            <Header as='h2' color='teal' textAlign='center'>
-                                {/* <Image src='/logo.png' /> */}
-                                {' '}Create a new User
-                            </Header>
-                            <Input
-                                onChange={this.handleUserChange.bind(this)}
-                                value={this.state.user}
-                                fluid
-                                icon='users'
-                                iconPosition='left'
-                                placeholder='Enter new username' />
-                            <br />
-                            <Input
-                                onChange={this.handlePasswordChange.bind(this)}
-                                value={this.state.password}
-                                fluid
-                                type='password'
-                                icon='lock'
-                                iconPosition='left'
-                                placeholder='Enter new password' />
+            <Grid textAlign='center' style={{ height: '100%' }}>
+                <Grid.Column style={styles.segment}>
+                    <Segment raised >
+                        <Header as='h2' color='teal' textAlign='center'>
+                            Create a new User
+                        </Header>
+                        <Input
+                            onChange={this.handleUserChange.bind(this)}
+                            value={this.state.user}
+                            fluid
+                            icon='users'
+                            iconPosition='left'
+                            placeholder='Enter new username' />
+                        <br />
+                        <Input
+                            onChange={this.handlePasswordChange.bind(this)}
+                            value={this.state.password}
+                            fluid
+                            type='password'
+                            icon='lock'
+                            iconPosition='left'
+                            placeholder='Enter new password' />
 
-                            <Container textAlign='right' style={styles.container}>
-                                <Button animated color='teal' onClick={this.handleSubmit.bind(this)}>
-                                    <Button.Content visible>Create User</Button.Content>
-                                    <Button.Content hidden>
-                                        <Icon name='user' />
-                                    </Button.Content>
-                                </Button>
-                            </Container>
-                        </Segment>
-                    </Grid.Column>
-                </Grid>
+                        <Container textAlign='right' style={styles.container}>
+                            <Button animated color='teal' onClick={this.handleSubmit.bind(this)}>
+                                <Button.Content visible>Create User</Button.Content>
+                                <Button.Content hidden>
+                                    <Icon name='user' />
+                                </Button.Content>
+                            </Button>
+                        </Container>
+                    </Segment>
+                </Grid.Column>
+            </Grid>
         )
     }
     render() {
       if (typeof this.props.auth.user !== `undefined` && (this.props.auth.user.permissions.search(/VIEW_USERS|ALL/) >= 0)) {
         return (
-            <SideNav >
+            <SideNav>
                 {this.renderCreateUser()}
-                {/* <div>
-
-                <input type="text" onChange={this.handleUserChange.bind(this)} value={this.state.user} />
-                <input type="text" onChange={this.handlePasswordChange.bind(this)} value={this.state.password} />
-                <button onClick={this.handleSubmit.bind(this)} >create user</button>
-            </div> */}
             </SideNav>
         )} else {
           this.props.history.push("/");
