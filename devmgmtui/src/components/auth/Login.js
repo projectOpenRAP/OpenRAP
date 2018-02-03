@@ -23,25 +23,38 @@ class Login extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            user: "",
-            password: ""
+            username: "",
+            password: "",
+            isLoading: false
         }
     }
+
     handleUserChange(e) {
         this.setState({
             user: e.target.value
-        })
+        });
     }
+
     handlePasswordChange(e) {
         this.setState({
             password: e.target.value
-        })
+        });
     }
+
+    toggleLoading() {
+        this.setState({
+            isLoading: !this.state.isLoading
+        });
+    }
+
     handleSubmit() {
+        this.toggleLoading();
+
         this.props.login(this.state.user, this.state.password,(err,data)=>{
-            if(err){
+            if(err) {
+                this.toggleLoading();
                 alert(data.msg);
-            }else{
+            } else {
                 this.props.history.push("/dashboard");
             }
         });
@@ -66,7 +79,7 @@ class Login extends Component {
                                 onChange={this.handleUserChange.bind(this)}
                                 value={this.state.user}
                                 fluid
-                                icon='users'
+                                icon='user'
                                 iconPosition='left'
                                 placeholder='Enter your username' />
                             <br />
@@ -80,10 +93,10 @@ class Login extends Component {
                                 placeholder='Enter your password' />
 
                             <Container textAlign='right' style={styles.container}>
-                                <Button animated color='teal' onClick={this.handleSubmit.bind(this)}>
+                                <Button animated loading={this.state.isLoading} color='teal' onClick={this.handleSubmit.bind(this)}>
                                     <Button.Content visible>Login</Button.Content>
                                     <Button.Content hidden>
-                                        <Icon name='right arrow' />
+                                        <Icon name='right arrow'/>
                                     </Button.Content>
                                 </Button>
                             </Container>

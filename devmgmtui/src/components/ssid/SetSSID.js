@@ -1,20 +1,17 @@
 import React, { Component } from 'react'
-
 import { connect } from 'react-redux'
 import * as actions from '../../actions/ssid'
-
 import { Container, Grid, Segment, Input, Header, Button, Icon } from 'semantic-ui-react';
+import SideNav from '../common/Sidebar'
 
 const styles = {
-    ssidForm: {
-        height: '100%'
-    },
     segment: {
-        maxWidth: '450px'
+        maxWidth: '450px',
+        marginTop: '150px'
     },
     container: {
         marginTop: '10px'
-    }
+    },
 }
 
 class SetSSID extends Component {
@@ -46,7 +43,6 @@ class SetSSID extends Component {
     }
 
     handleSubmit() {
-
         this.props.setSSID(this.state.ssid, (err, data) => {
             if(err) {
                 alert(data.msg);
@@ -60,43 +56,41 @@ class SetSSID extends Component {
 
     renderSSIDForm() {
         return (
-            <div style={styles.ssidForm}>
-                <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle'>
-                    <Grid.Column style={styles.segment}>
-                        <Segment raised >
-                            <Header as='h2' color='teal' textAlign='center'>
-                                Set a name for your hotspot
-                             </Header>
-                            <Input
-                                onChange={this.handleSSIDChange.bind(this)}
-                                value={this.state.ssid}
-                                fluid
-                                icon='wifi'
-                                iconPosition='left'
-                                placeholder='Enter the name' />
+            <Grid textAlign='center' style={{ height: '100%' }}>
+                <Grid.Column style={styles.segment}>
+                    <Segment raised >
+                        <Header as='h2' color='teal' textAlign='center'>
+                            Set a name for your hotspot
+                         </Header>
+                        <Input
+                            onChange={this.handleSSIDChange.bind(this)}
+                            value={this.state.ssid}
+                            fluid
+                            icon='wifi'
+                            iconPosition='left'
+                            placeholder='Enter the name' />
 
-                            <br />
+                        <br />
 
-                            <Container textAlign='right' style={styles.container}>
-                                <Button animated color='teal' onClick={this.handleSubmit.bind(this)}>
-                                    <Button.Content visible>Update</Button.Content>
-                                    <Button.Content hidden>
-                                        <Icon name='right arrow' />
-                                    </Button.Content>
-                                </Button>
-                            </Container>
-                        </Segment>
-                    </Grid.Column>
-                </Grid>
-            </div>
+                        <Container textAlign='right' style={styles.container}>
+                            <Button animated color='teal' onClick={this.handleSubmit.bind(this)}>
+                                <Button.Content visible>Update</Button.Content>
+                                <Button.Content hidden>
+                                    <Icon name='check' />
+                                </Button.Content>
+                            </Button>
+                        </Container>
+                    </Segment>
+                </Grid.Column>
+            </Grid>
         )
     }
 
     render() {
         return (
-            <div style={styles.ssidForm}>
+            <SideNav>
                 {this.renderSSIDForm()}
-            </div>
+            </SideNav>
         )
     }
 }

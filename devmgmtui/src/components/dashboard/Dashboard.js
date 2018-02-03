@@ -8,9 +8,12 @@ import { Segment, Container, Grid, Icon, Header } from 'semantic-ui-react';
 import SideNav from '../common/Sidebar';
 import ChartSegment from './ChartSegment';
 
+
+let timer;
+
 const styles = {
     container: {
-        marginTop: '2.8%',
+        marginTop: '3%',
         width: '650px'
     }
 }
@@ -27,6 +30,11 @@ class Dashboard extends Component {
         setInterval(() => { this.props.fetchSystemData() }, 1000);
         document.title = "Dashboard";
         // this.props.fetchSystemData()
+        timer = setInterval(() => { this.props.fetchSystemData() }, 1000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(timer);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -35,41 +43,59 @@ class Dashboard extends Component {
         }
     }
 
-    render() {
-      if  (typeof this.props.auth.user !== 'undefined') {
-        return (
-            <SideNav>
-                <Container style={styles.container}>
-                    <Segment>
-                        <Grid>
-                            <Grid.Row>
-                                <Grid.Column width={8}>
-                                    <ChartSegment />
-                                </Grid.Column>
+    renderCharts() {
+        const systemInfo = () => { return <ChartSegment /> }
+        const memoryUsage = () => { return <ChartSegment id='mem'/> }
+        const spaceUsage = () => { return <ChartSegment id='space'/> }
+        const cpuUsage = () => { return <ChartSegment id='cpu'/> }
 
-                                <Grid.Column width={8}>
-                                    <ChartSegment id='mem'/>
-                                </Grid.Column>
-                            </Grid.Row>
+        if(systemInfo && memoryUsage && spaceUsage && cpuUsage) {
+            return (
+                <Grid>
+                    <Grid.Row>
+                        <Grid.Column width={8}>
+                            {systemInfo()}
+                        </Grid.Column>
 
-                            <Grid.Row>
-                                <Grid.Column width={8}>
-                                    <ChartSegment id='space'/>
-                                </Grid.Column>
+                        <Grid.Column width={8}>
+                            {memoryUsage()}
+                        </Grid.Column>
+                    </Grid.Row>
 
-                                <Grid.Column width={8}>
-                                    <ChartSegment id='cpu'/>
-                                </Grid.Column>
-                            </Grid.Row>
-                        </Grid>
-                    </Segment>
-                </Container>
-            </SideNav>
-        );
-    }  else {
-      this.props.history.push("/");
-      return (null);
+                    <Grid.Row>
+                        <Grid.Column width={8}>
+                            {spaceUsage()}
+                        </Grid.Column>
+
+                        <Grid.Column width={8}>
+                            {cpuUsage()}
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
+            );
+        }
+        else {
+            return ( <strong>Loading...</strong> );
+        }
     }
+
+    render() {
+        console.log('rendering now');
+
+        if(typeof this.props.auth.user !== 'undefined') {
+            return (
+                <SideNav>
+                    <Container style={styles.container}>
+                        <Segment>
+                            { this.renderCharts() }
+                        </Segment>
+                    </Container>
+                </SideNav>
+            );
+        }  else {
+        this.props.history.push("/");
+        return (null);
+}
   }
 }
 
