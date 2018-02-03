@@ -67,6 +67,7 @@ server {
 	index index.php index.html;
 
 	location / {
+			client_max_body_size 0;
             proxy_pass http://127.0.0.1:8080;
 			#try_files $uri $uri/ @ekstep;
 	}
