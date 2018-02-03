@@ -65,6 +65,7 @@ class EditUser extends Component {
           }
           this.setState({permissions});
         }
+        document.title = "Edit User";
     }
 
     handlePermissionsChange = permLabel => e => {

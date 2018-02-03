@@ -10,6 +10,7 @@ export const uploadImageToCaptive = (file) => (dispatch) => {
       xhr.send(data);
       xhr.addEventListener('load', () => {
         const response = JSON.parse(xhr.responseText);
+        response.data.link = response.data.link.replace("BASE_URL", `${BASE_URL}`.slice(0, BASE_URL.indexOf(":",6)));
         resolve(response);
       })
       xhr.addEventListener('error', () => {
@@ -31,6 +32,7 @@ export const uploadApksToCaptive = (file) => (dispatch) => {
         xhr.send(data);
         xhr.addEventListener('load', () => {
           const response = JSON.parse(xhr.responseText);
+          response.link = response.link.replace("BASE_URL", `${BASE_URL}`.slice(0, BASE_URL.indexOf(":",6)));
           resolve(response);
         })
         xhr.addEventListener('error', () => {

@@ -24,6 +24,10 @@ class UpdatePassword extends Component {
         }
     }
 
+    componentWillMount() {
+      document.title = "Update Password";  
+    }
+
     handlePasswordChange(e) {
         this.setState({
             password: e.target.value

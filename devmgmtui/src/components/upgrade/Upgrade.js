@@ -7,6 +7,7 @@ import SideNav from '../common/Sidebar'
 class Upgrade extends Component {
 
   componentWillMount() {
+    document.title = "Upgrade Device";
   }
 
   renderUpgrade() {

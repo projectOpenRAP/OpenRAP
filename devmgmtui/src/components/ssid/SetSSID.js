@@ -28,6 +28,7 @@ class SetSSID extends Component {
         if (this.props.auth && !this.props.auth.authenticated) {
             this.props.history.push("/");
         }
+        document.title = "Set SSID";
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.auth && !nextProps.auth.authenticated) {
