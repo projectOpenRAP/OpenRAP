@@ -1,19 +1,17 @@
 import React, { Component } from 'react'
 import { Container, Grid, Segment, Input, Header, Button, Icon, Checkbox, Divider } from 'semantic-ui-react';
+import SideNav from '../common/Sidebar'
 import * as actions from '../../actions/auth'
 import { connect } from 'react-redux'
 
 const styles = {
-    form: {
-        height: '100%'
-    },
     segment: {
         maxWidth: '800px',
+        marginTop: '150px'
     },
     container: {
-        marginTop: '20px'
-    }
-
+        marginTop: '10px'
+    },
 }
 
 class EditUser extends Component {
@@ -169,12 +167,13 @@ class EditUser extends Component {
             </div>
         )
     }
+
     render() {
       if (typeof this.props.auth.user !== `undefined` && (this.props.auth.user.permissions.search(/VIEW_USERS|ALL/) >= 0)) {
         return (
-            <div style={styles.form}>
+            <SideNav>
                 {this.renderUserUpdateForm()}
-            </div>
+            </SideNav>
         )} else {
           this.props.history.push("/");
           return null;

@@ -29,7 +29,6 @@ class App extends Component {
                 <Route exact path={"/dashboard"} component={Dashboard} />
                 <Route exact path={"/upgrade"} component={Upgrade} />
                 <Route exact path={"/captive"} component={Captive} />
-
             </div>
         </BrowserRouter>
       </div>
