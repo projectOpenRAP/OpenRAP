@@ -4,7 +4,8 @@ Description=Device management server
 
 [Service]
 Type=simple
-ExecStart=NODE_PATH=$NODE_PATH:"/opt/opencdn" node /opt/opencdn/devmgmt/index.js
+Environment="NODE_PATH=$NODE_PATH:/opt/opencdn/"
+ExecStart=/usr/bin/node /opt/opencdn/devmgmtV2/index.js
 PIDFile=/tmp/opencdn/devmgmt.pid
 Restart=always
 
