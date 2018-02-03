@@ -26,11 +26,20 @@ app.listen(8080, err => {
         console.log(err);
     else {
         console.log("server running on port 8080");
-        exec('mysql -u root -p < ./init.sql', (err, stdout, stderr) => {
+        exec('mysql -u root -proot < ./init.sql', (err, stdout, stderr) => {
           if (err) {
+            console.log(err);
             console.log("error in init script");
           } else {
             console.log("init script success");
+          }
+        });
+        exec('NODE_PATH=$NODE_PATH:"/opt/opencdn/" node writeToDB.js', (err, stdout, stderr) => {
+          if (err) {
+            console.log(err);
+            console.log("DB Initialization error");
+          } else {
+            console.log(stdout);
           }
         });
     }
