@@ -1,4 +1,4 @@
-export default function (state={currentDir : '/var/www/', files : [], uploadableFiles : []}, action){
+export default function (state={currentDir : '/home/admin/', files : [], uploadableFiles : []}, action){
     switch(action.type){
       case 'OPEN_DIR' :
         return {...state, currentDir : action.payload}
