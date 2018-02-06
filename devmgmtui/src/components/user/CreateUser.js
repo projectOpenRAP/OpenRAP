@@ -28,6 +28,7 @@ class CreateUser extends Component {
       if (this.props.auth.user.permissions.search(/ADD_USER|ALL/) < 0) {
         this.props.history.push('/');
       }
+      document.title = "Create User";
     }
 
     handleUserChange(e) {

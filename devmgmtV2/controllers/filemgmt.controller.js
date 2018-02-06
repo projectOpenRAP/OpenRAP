@@ -1,5 +1,7 @@
 let q = require('q')
 let fs = require('fs')
+let unzip = require('unzip')
+let { exec } = require('child_process');
 
 let classify = (dir, file) => {
   let defer = q.defer();
@@ -15,6 +17,115 @@ let classify = (dir, file) => {
   });
   return defer.promise;
 }
+
+//<<<< CUSTOM EXTRACT BEHAVIOR CODE STARTS >>>>\\
+
+let moveFileWithPromise = (source, destination) => {
+  let defer = q.defer();
+  fs.rename(source, destination, (err) => {
+    if (err) {
+      return defer.reject(err);
+    } else {
+      return defer.resolve(destination);
+    }
+  })
+}
+
+let createFolderIfNotExists = (folderName) => {
+  let defer = q.defer();
+  fs.stat(folderName, (err, stats) => {
+    if (err || !(stats.isDirectory())) {
+      fs.mkdir(folderName, (err) => {
+        if (err) {
+          console.log(err);
+          return defer.reject(err);
+        } else {
+          return defer.resolve();
+        }
+      })
+    } else {
+      return defer.resolve();
+    }
+  })
+  return defer.promise;
+}
+
+let doPostExtraction = (dir, file) => {
+  let defer = q.defer();
+  let extension = file.slice(file.lastIndexOf('.') + 1);
+  switch (extension) {
+    case "ecar" :
+      /*
+        1. Transfer the ecar file to ecar_files Directory
+        2. Rename manifest.json to name of ecar file and sent to json_files
+        3. Transfer the do_whatever folder to xcontent
+      */
+      createFolderIfNotExists(dir + 'ecar_files/').then(resolve => {
+        return moveFileWithPromise(dir + file, dir + 'ecar_files/' + file);
+      }).then(resolve => {
+        return createFolderIfNotExists(dir + 'json_files/')
+      }).then(resolve => {
+        let jsonFile = dir + file.slice(0,file.lastIndexOf('.')) + '/manifest.json';
+        return moveFileWithPromise(dir + file, dir + 'json_files/' + file + '.json');
+      }).then(resolve => {
+        return createFolderIfNotExists(dir + 'xcontent/');
+      }).then(resolve => {
+        let folderName = file.match(/do_\d+_/);
+        console.log(folderName);
+        return moveFileWithPromise(dir + folderName, dir + 'xcontent/' + folderName);
+      }, reject => {
+        return defer.reject(reject);
+      });
+  }
+}
+
+let performExtraction = (parentDir, fileName, folderName) => {
+  let defer = q.defer();
+  fs.createReadStream(parentDir + fileName).pipe(unzip.Extract({path : parentDir+folderName}));
+  fs.readdir(parentDir + folderName, (err, files) => {
+    if (err) {
+      return defer.reject(err);
+    } else {
+      return defer.resolve(files);
+    }
+  })
+  return defer.promise;
+}
+
+let extractFile = (dir, file) => {
+  let defer = q.defer();
+  createFolderToExtractFiles(dir, file).then(resolve => {
+    return performExtraction(dir, file, resolve);
+  }).then(resolve => {
+    return doPostExtraction(dir, file);
+  }).then(resolve => {
+    return defer.resolve(resolve);
+  }, reject => {
+    return defer.reject(reject);
+  });
+  return defer.promise;
+}
+
+let createFolderToExtractFiles = (dir, file) => {
+  let defer = q.defer();
+  let newFolderName = file.slice(0, file.lastIndexOf("."));
+  fs.stat(dir + newFolderName, (err, stats) => {
+    if (err) {
+      fs.mkdir(dir + newFolderName, (err, stats) => {
+        if(err) {
+          return defer.reject(err);
+        } else {
+          return defer.resolve(newFolderName);
+        }
+      });
+    } else {
+      return defer.resolve(newFolderName);
+    }
+  })
+  return defer.promise;
+}
+
+//<<<< CUSTOM EXTRACT BEHAVIOR CODE ENDS >>>>\\
 
 let getFilesFromFolder = (dir) => {
   let defer = q.defer();
@@ -84,10 +195,10 @@ let deleteFolder = (req, res) => {
     success : false,
     msg : ''
   }
-  fs.rmdir(dirToDelete, (err) => {
+  exec ("rm -rf '" + dirToDelete + "'", (err, stdout, stderr) => {
     if (err) {
       console.log(err);
-      responseStructure.msg = `Directory doesn't exist`
+      responseStructure.msg = "Cannot delete this folder!";
       return res.status(500).json(responseStructure);
     } else {
       responseStructure.success = true;
@@ -173,15 +284,16 @@ let moveFile = (req, res) => {
 let writeFileToDisk = (req, res) => {
   let temporaryPath = req.files.file.path
   let actualPathPrefix = req.body.prefix;
-  let actualFileName = req.files.file.originalFilename
+  let actualFileName = req.files.file.originalFilename;
+  let actualFileType = actualFileName.slice(actualFileName.lastIndexOf('.')+1);
   fs.rename(temporaryPath, actualPathPrefix + actualFileName, (err) => {
     if (err) {
       console.log(err);
       res.status(500).json({success : false});
     } else {
-      res.status(200).json({success : true});
+      return res.status(200).json({success : true});
     }
-  })
+  });
 }
 
 module.exports = {

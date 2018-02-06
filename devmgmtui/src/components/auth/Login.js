@@ -60,6 +60,10 @@ class Login extends Component {
         });
     }
 
+    componentWillMount() {
+      document.title = "Login";
+    }
+
     renderLogin() {
         return (
             <div style={styles.loginForm}>

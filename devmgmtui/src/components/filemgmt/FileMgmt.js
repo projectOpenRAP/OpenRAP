@@ -30,6 +30,7 @@ class FileMgmt extends Component {
       if (this.props.auth && !this.props.auth.authenticated) {
         this.props.history.push(`/`);
       }
+      document.title = "File Management";
   }
 
   renderFileMgmt() {

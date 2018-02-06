@@ -1,0 +1,13 @@
+[Unit]
+Description=Device management server
+#After=network.target
+
+[Service]
+Type=simple
+Environment="NODE_PATH=$NODE_PATH:/opt/opencdn/"
+ExecStart=/usr/bin/node /opt/opencdn/devmgmtV2/index.js
+PIDFile=/tmp/opencdn/devmgmt.pid
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
