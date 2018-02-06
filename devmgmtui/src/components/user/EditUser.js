@@ -22,15 +22,16 @@ class EditUser extends Component {
             user: props.match.params.username,
             permissionList : JSON.parse(props.match.params.permissions),
             permissions: {
-                perm0: false,
-                perm1: false,
-                perm2: false,
-                perm3: false,
-                perm4: false,
+                perm0 : false,
+                perm1 : false,
+                perm2 : false,
+                perm3 : false,
+                perm4 : false,
                 perm5 : false,
                 perm6 : false,
                 perm7 : false,
                 perm8 : false,
+                perm9 : false,
             },
             permissionsAsStrings: {
                 perm0 : "VIEW_DASHBOARD",
@@ -41,7 +42,8 @@ class EditUser extends Component {
                 perm5 : "VIEW_FILES",
                 perm6 : "UPLOAD_FILES",
                 perm7 : "DELETE_FILES",
-                perm8 : "UPGRADE_DEVICE"
+                perm8 : "MODIFY_SSID",
+                perm9 : "UPGRADE_DEVICE"
             },
             isAllEnabled : true
         }
@@ -110,7 +112,6 @@ class EditUser extends Component {
     }
 
     renderUserUpdateForm() {
-
         var permissionsList = Object.entries(this.state.permissions).map(([permLabel, set]) => {
             return (
                 <div key={permLabel}>

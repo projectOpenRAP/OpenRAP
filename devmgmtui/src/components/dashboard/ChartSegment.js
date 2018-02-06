@@ -112,8 +112,9 @@ class ChartSegment extends Component {
                     return result;
                 }
 
+                let ssid                = this.props.ssid.currentSSID;
+                let sysVersion          = version.data.toString();
                 let sysUpTimeInDDHHMMSS = secondsToDDHHMMSS(sysUpTimeInSeconds);
-                let sysVersion = version.data.toString();
 
                 return (
                     <Segment color='teal'>
@@ -138,6 +139,16 @@ class ChartSegment extends Component {
                                     icon='tag'
                                     header='System Version'
                                     content={sysVersion}
+                                    />
+                                </List.Content>
+                            </List.Item>
+
+                            <List.Item>
+                                <List.Content>
+                                    <Message
+                                    icon='wifi'
+                                    header='SSID'
+                                    content={ssid}
                                     />
                                 </List.Content>
                             </List.Item>
@@ -200,8 +211,8 @@ class ChartSegment extends Component {
     }
 }
 
-function mapStateToProps({ dashboard }) {
-    return { dashboard }
+function mapStateToProps({ dashboard, ssid }) {
+    return { dashboard, ssid }
 }
 
 export default connect(mapStateToProps, actions)(ChartSegment);

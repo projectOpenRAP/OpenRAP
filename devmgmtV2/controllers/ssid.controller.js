@@ -22,6 +22,8 @@ const setSSID = (req, res) => {
 
     const cmd = path.join(__dirname, '../../CDN/modeChange.sh') + ' apmode ' + ssid
 
+    // const cmd = path.join('~/Desktop/test.sh') + ' apmode ' + ssid
+
     // executing the bash script for updating SSID
     exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
 
