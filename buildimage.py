@@ -21,8 +21,8 @@ gopath = base_dir + 'build/go/'
 apiserver_parent_dir = gopath + "src/github.com/projectOpenRAP/OpenRAP/"
 
 # Device management server
-dmserver_dir = base_dir + 'devmgmt'
-
+dmserver_dir = base_dir + 'devmgmtV2'
+dbsdk_dir = base_dir + 'dbsdk'
 #############
 
 def version_get(vf):
@@ -257,18 +257,30 @@ class Device(object):
         run_cmd(cmd)
 
     def do_build(self):
-        # Copy rootfs_overlay first
-        cmd = "cp -r " + rootfs_dir + " " + self.imgdir
-        run_cmd(cmd)
 
         # copy CDN dir
         cmd = "cp -r " + cdn_dir + " " + self.imgdir
+        run_cmd(cmd)
+
+        # copy dbsdk
+        cmd = "cp -r " + dbsdk_dir + " " + self.imgdir
         run_cmd(cmd)
 
         # copy devmgmt/file-upload dir
         cmd = "cp -r " + dmserver_dir + " " + self.imgdir
         run_cmd(cmd)
 
+        #build frontend for device management
+        cmd = "cd devmgmtui && npm run build"
+        run_cmd(cmd)
+
+        # copy devmgmtui build to rootfs overlay
+        cmd = "cp -r devmgmtui/build/* rootfs_overlay/var/www/html/admin/"
+        run_cmd(cmd)
+
+        # Copy rootfs_overlay first
+        cmd = "cp -r " + rootfs_dir + " " + self.imgdir
+        run_cmd(cmd)
 
         # Compile golang apiserver; create the executable in CDN directory
         log.info("go env path " + os.environ['GOPATH'])
