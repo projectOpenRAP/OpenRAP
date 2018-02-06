@@ -79,10 +79,6 @@ export const deleteFile = (prefix, folderName, cb) =>  (dispatch) => {
   });
 }
 
-let promisedDelete = (file) => (dispatch) => {
-  return
-}
-
 export const deleteBunchOfFiles = (prefix, fileList, cb) => (dispatch) => {
   console.log("k " + fileList);
   let promises = [];

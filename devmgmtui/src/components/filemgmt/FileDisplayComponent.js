@@ -55,6 +55,12 @@ class FileDisplayComponent extends Component {
     });
   }
 
+  selectAll() {
+    let currentDirFiles = this.props.filemgmt.files;
+    this.props.updateSelectedFiles(currentDirFiles.map((item, index) => item.name));
+    this.setState(this.state);
+  }
+
   deleteSelected() {
     let consent = window.confirm("All selected files will be deleted! [No Undo]");
     if (!consent) {
@@ -98,6 +104,7 @@ class FileDisplayComponent extends Component {
   }
 
   render() {
+    console.log("One more timee");
     let isDisabled = this.props.filemgmt.currentDir === '/' ? true : false ;
     return (
       <div>
@@ -111,8 +118,11 @@ class FileDisplayComponent extends Component {
         { this.props.auth.user.permissions.search(/UPLOAD_FILES|ALL/) >= 0 ? <span>
           <Input action={{ color: 'teal', labelPosition: 'right', icon: 'plus', content: 'Make New Folder', onClick : this.createNewFolder.bind(this)}} placeholder='Type name here...' onChange={this.handleFolderNameChange.bind(this)} />
         </span> : null}
-
         <span style={{float:'right'}}>
+          <Button animated color='vk' onClick={this.selectAll.bind(this)}>
+            <Button.Content visible>Select All</Button.Content>
+            <Button.Content hidden><Icon name='check circle' /></Button.Content>
+          </Button>
           <Button animated color='red' onClick={this.deleteSelected.bind(this)}>
             <Button.Content visible>Delete Selected</Button.Content>
             <Button.Content hidden><Icon name='remove circle' /></Button.Content>

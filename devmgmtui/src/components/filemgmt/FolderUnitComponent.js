@@ -26,6 +26,10 @@ class FolderUnitComponent extends Component {
     }
   }
 */
+  componentWillReceiveProps(newProps, newState) {
+    this.setState({selected : (newProps.filemgmt.selectedFiles.indexOf(this.props.name) >= 0)})
+  }
+  
   toggleSelected() {
     let currentlySelectedFiles = this.props.filemgmt.selectedFiles;
     if (this.state.selected) {

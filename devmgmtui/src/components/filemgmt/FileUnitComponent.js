@@ -24,7 +24,7 @@ class FileUnitComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected : false
+      selected : (this.props.filemgmt.selectedFiles.indexOf(props.name) >= 0)
     }
     this.toggleSelected = this.toggleSelected.bind(this);
   }
@@ -36,6 +36,9 @@ class FileUnitComponent extends Component {
     }
   }*/
 
+  componentWillReceiveProps(newProps, newState) {
+    this.setState({selected : (newProps.filemgmt.selectedFiles.indexOf(this.props.name) >= 0)})
+  }
   toggleSelected() {
     let currentlySelectedFiles = this.props.filemgmt.selectedFiles;
     if (this.state.selected) {
