@@ -1,13 +1,40 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/filemgmt'
-import { Card, Image, Icon, Divider } from 'semantic-ui-react'
+import { Card, Image, Icon, Divider, Checkbox } from 'semantic-ui-react'
 
+
+let fileDisplayStyles = {
+  rightPadded : {
+    'paddingRight' : '5px',
+  }
+}
 
 class FolderUnitComponent extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      selected : false
+    }
+  }
+/*
+  componentWillMount() {
+    let currentlySelectedFiles = this.props.filemgmt.selectedFiles;
+    if (currentlySelectedFiles.indexOf(this.props.name) >= 0) {
+      this.setState({selected: true});
+    }
+  }
+*/
+  toggleSelected() {
+    let currentlySelectedFiles = this.props.filemgmt.selectedFiles;
+    if (this.state.selected) {
+      currentlySelectedFiles.splice(currentlySelectedFiles.indexOf(this.props.name), 1);
+    } else {
+      currentlySelectedFiles.push(this.props.name);
+    }
+    this.setState({selected : !this.state.selected});
+    this.props.updateSelectedFiles(currentlySelectedFiles);
   }
 
   shortenString(string) {
@@ -39,6 +66,7 @@ class FolderUnitComponent extends Component {
   renderFolderUnitComponent() {
     return (
       <div>
+        { this.props.auth.user.permissions.search(/DELETE_FILES|ALL/) >= 0 ?  <span style={fileDisplayStyles.rightPadded}><Checkbox onClick = {() => this.toggleSelected(this)} checked={this.state.selected}/></span> : null}
         <a href='javascript:void(0);' onClick={this.handleFolderClick.bind(this)} >
           <span>
             <Icon name='folder' color='yellow' size='big'/>

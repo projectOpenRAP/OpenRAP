@@ -213,10 +213,10 @@ let deleteFileFromDisk = (req, res) => {
     success : false,
     msg : ''
   }
-  fs.unlink(fileToDelete, (err) => {
+  exec ("rm -rf '" + fileToDelete + "'", (err, stdout, stderr) => {
     if (err) {
       console.log(err);
-      responseStructure.msg = `File doesn't exist`
+      responseStructure.msg = "Cannot delete this file!";
       return res.status(500).json(responseStructure);
     } else {
       responseStructure.success = true;

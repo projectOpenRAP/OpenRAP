@@ -20,11 +20,19 @@ const captiveStyles = {
     "marginRight" : "25px"
   }
 }
+
+const defaultHtmlCode = `
+  <h1>Default OpenRAP Captive Portal</h1>
+  <p>This is an introduction paragraph. Use this to type something about the captive portal. You are allowed to upload images and APKs for download, which will be appended to the end of the document.</p>
+  <p>Happy customizing!</p>
+`;
 class Captive extends Component {
     constructor(props) {
-        super(props)
+        super(props);
+        let defaultHtmlBlocks = convertFromHTML(defaultHtmlCode);
+        let defaultHtmlContent = ContentState.createFromBlockArray(defaultHtmlBlocks.contentBlocks, defaultHtmlBlocks.entityMap);
         this.state = {
-          editorState: EditorState.createEmpty(),
+          editorState: EditorState.createWithContent(defaultHtmlContent),
         }
         this.onEditorStateChange = this.onEditorStateChange.bind(this);
         this.uploadImageCallBack = this.uploadImageCallBack.bind(this);
@@ -59,8 +67,8 @@ class Captive extends Component {
       let { editorState } = this.state;
       this.props.uploadApksToCaptive(file).then(resolve => {
         let content = draftToHtml(convertToRaw(editorState.getCurrentContent()));
-        let apkItem = "<li key = " + resolve.name  + "><a href=" + resolve.link + ">" + resolve.name + " </a></li>";
-        let newContent = "<ul>" + apkItem + "</ul>";
+        let apkItem = "<p key = " + resolve.name  + "><a href=" + resolve.link + ">" + resolve.name + " </a></p>";
+        let newContent = "<div>" + apkItem + "</div>";
         content += newContent;
         let updatedBlocks = convertFromHTML(content);
         let updatedContent = ContentState.createFromBlockArray(updatedBlocks.contentBlocks, updatedBlocks.entityMap);

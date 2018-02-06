@@ -1,14 +1,14 @@
 import axios from 'axios'
 import { BASE_URL } from '../config/config'
 
-export const writeFile = () => {
-  console.log("Deustchland")
-}
 
-export const readFolder = (folderPath) => (dispatch) => {
+export const readFolder = (folderPath, update=true) => (dispatch) => {
   let encodedPath = encodeURIComponent(folderPath)
   axios.get(`${BASE_URL}/file/open`, {params : {path : encodedPath}})
     .then((response) => {
+      if (update) {
+          dispatch({type : 'SELECT_FILES', payload : []})
+      }
       dispatch({type : 'READ_DIR', payload : response.data.children});
       dispatch({type : 'OPEN_DIR', payload : folderPath});
     })
@@ -71,12 +71,49 @@ export const deleteFile = (prefix, folderName, cb) =>  (dispatch) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
-      cb("Error", "Cannot delete folder!");
+      cb("Error", "Cannot delete!");
     }
   }, reject => {
     console.log(reject);
     cb("error", "Server Error");
   });
+}
+
+let promisedDelete = (file) => (dispatch) => {
+  return
+}
+
+export const deleteBunchOfFiles = (prefix, fileList, cb) => (dispatch) => {
+  console.log("k " + fileList);
+  let promises = [];
+  for (let i in fileList) {
+    let file = encodeURIComponent(prefix + fileList[i]);
+    let promise = new Promise((resolve, reject) => {
+      axios.delete(`${BASE_URL}/file/delete`, {params : {path : file}}).then((response) => {
+        if (response.data.success) {
+          resolve("success");
+        } else {
+          reject("Server Error");
+        }
+      })
+    });
+    promises.push(promise);
+  }
+  Promise.all(promises).then((values) => {
+    return new Promise((resolve, reject) => {
+      console.log(values);
+      if (values.indexOf("Server Error") >= 0) {
+        cb('error');
+      } else {
+        cb('success');
+      }
+    })
+  })
+}
+
+export const updateSelectedFiles = (files) => (dispatch) => {
+  console.log(files);
+  dispatch({type : 'SELECT_FILES', payload : files});
 }
 
 export const updateUploadableFiles = (files) => (dispatch) => {

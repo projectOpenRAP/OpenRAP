@@ -6,11 +6,8 @@ import FolderUnitComponent from './FolderUnitComponent'
 import FileUnitComponent from './FileUnitComponent'
 
 const fileDisplayStyles = {
-  dirDisplay : {
-    'color' : 'blue'
-  },
-  fileDisplay : {
-    'color' : 'red'
+  topBar : {
+    'verticalAlign' : 'middle',
   }
 
 }
@@ -58,19 +55,34 @@ class FileDisplayComponent extends Component {
     });
   }
 
+  deleteSelected() {
+    let consent = window.confirm("All selected files will be deleted! [No Undo]");
+    if (!consent) {
+      return;
+    }
+    let deleteableFiles = this.props.filemgmt.selectedFiles;
+    console.log(deleteableFiles);
+    this.props.deleteBunchOfFiles(this.props.filemgmt.currentDir, deleteableFiles, (res) => {
+      alert(res);
+      this.props.readFolder(this.props.filemgmt.currentDir);
+    });
+  }
+
   handleFolderNameChange(e) {
     this.setState({newFolderName : e.target.value})
   }
 
   renderFileDisplayComponent() {
+    console.log(this.state.allChecked);
+    let that = this;
     let folders = this.props.filemgmt.files.map((item, index) => {
         return (
-          item.type === 'dir' ? <List.Item key={index}><FolderUnitComponent name={item.name} size={item.size}/></List.Item>  : null
+          item.type === 'dir' ? <List.Item key={index}><FolderUnitComponent name={item.name} size={item.size} /></List.Item>  : null
         )
     });
     let files = this.props.filemgmt.files.map((item, index) => {
         return (
-          item.type === 'file' ? <List.Item key={index}><FileUnitComponent name={item.name} size={item.size}/></List.Item> : null
+          item.type === 'file' ? <List.Item key={index}><FileUnitComponent name={item.name} size={item.size} /></List.Item> : null
         )
     });
     return (
@@ -89,7 +101,7 @@ class FileDisplayComponent extends Component {
     let isDisabled = this.props.filemgmt.currentDir === '/' ? true : false ;
     return (
       <div>
-      <span>
+      <span style={fileDisplayStyles.topBar}>
         <span>
           <Button animated color='orange' disabled = {isDisabled} onClick={this.goBack.bind(this)}>
             <Button.Content visible>Back</Button.Content>
@@ -99,6 +111,13 @@ class FileDisplayComponent extends Component {
         { this.props.auth.user.permissions.search(/UPLOAD_FILES|ALL/) >= 0 ? <span>
           <Input action={{ color: 'teal', labelPosition: 'right', icon: 'plus', content: 'Make New Folder', onClick : this.createNewFolder.bind(this)}} placeholder='Type name here...' onChange={this.handleFolderNameChange.bind(this)} />
         </span> : null}
+
+        <span style={{float:'right'}}>
+          <Button animated color='red' onClick={this.deleteSelected.bind(this)}>
+            <Button.Content visible>Delete Selected</Button.Content>
+            <Button.Content hidden><Icon name='remove circle' /></Button.Content>
+          </Button>
+        </span>
       </span>
       <Divider></Divider>
       <div>

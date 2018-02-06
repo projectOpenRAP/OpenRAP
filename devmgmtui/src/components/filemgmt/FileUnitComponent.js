@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/filemgmt'
-import { Card, Image, Icon, Divider } from 'semantic-ui-react'
+import { Card, Image, Icon, Divider, Checkbox } from 'semantic-ui-react'
 
 
 let formatBytes = (bytes,decimals) => {
@@ -13,10 +13,38 @@ let formatBytes = (bytes,decimals) => {
    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
+let fileDisplayStyles = {
+  rightPadded : {
+    'paddingRight' : '5px',
+  }
+}
+
 class FileUnitComponent extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      selected : false
+    }
+    this.toggleSelected = this.toggleSelected.bind(this);
+  }
+/*
+  componentWillMount() {
+    let currentlySelectedFiles = this.props.filemgmt.selectedFiles;
+    if (currentlySelectedFiles.indexOf(this.props.name) >= 0) {
+      this.setState({selected: true});
+    }
+  }*/
+
+  toggleSelected() {
+    let currentlySelectedFiles = this.props.filemgmt.selectedFiles;
+    if (this.state.selected) {
+      currentlySelectedFiles.splice(currentlySelectedFiles.indexOf(this.props.name), 1);
+    } else {
+      currentlySelectedFiles.push(this.props.name);
+    }
+    this.setState({selected : !this.state.selected});
+    this.props.updateSelectedFiles(currentlySelectedFiles);
   }
 
   shortenString(string) {
@@ -45,17 +73,20 @@ class FileUnitComponent extends Component {
     return (
       <div>
         <span>
+        { this.props.auth.user.permissions.search(/DELETE_FILES|ALL/) >= 0 ?  <span style={fileDisplayStyles.rightPadded}><Checkbox onClick = {() => this.toggleSelected(this)} checked={this.state.selected}/></span> : null}
           <Icon name='file' color='teal' size='big'/>
             {this.shortenString(this.props.name)}
         </span>
         <span>
           {'\t[' + formatBytes(this.props.size) + ']'}
         </span>
-        { this.props.auth.user.permissions.search(/DELETE_FILES|ALL/) >= 0 ? <a href='javascript:void(0);' onClick={this.handleDelete.bind(this)}>
+        { this.props.auth.user.permissions.search(/DELETE_FILES|ALL/) >= 0 ?
         <span style={{float:'right'}}>
-          <Icon name='trash outline' color='red' size='big' />
+          <a href='javascript:void(0);' onClick={this.handleDelete.bind(this)}>
+            <Icon name='trash outline' color='red' size='big' />
+          </a>
         </span>
-        </a> : null}
+         : null}
         <Divider></Divider>
       </div>
     )
