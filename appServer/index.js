@@ -10,16 +10,10 @@ app.get("/one", (req, res) => {
 
 // require('./plugins/three/three.routes')(app);
 glob("./plugins/**/*.routes.js", function (er, files) {
-    // files is an array of filenames.
-    // If the `nonull` option is set, and nothing
-    // was found, then files is ["**/*.js"]
-    // er is an error object or null.
-    console.log(files);
-    for(let i =0;i<files.length;i++){
-        console.log(files[i]);
+    for (let i = 0; i < files.length; i++) {
         require(files[i])(app);
     }
-  })
+})
 
 app.listen(9090, err => {
     if (err)
