@@ -28,6 +28,9 @@ tm_jwt=""
 tmDir = "/var/www/ekstep/telemetry"
 tm_timer_interval=300 # 5 minutes
 
+tm_token_generate_timer_interval=300 # 5 minutes
+currentTokenStatus = 0 # invalid token
+
 #################
 class BreakoutException(Exception):
     """ Custom expection """
@@ -91,6 +94,14 @@ def check_netconnectivity():
     return False
 
 def token_generate():
+    global tm_token_generate_timer_interval
+    global currentTokenStatus
+    log.info("Generating token ... ")
+
+    if currentTokenStatus:
+        #We have a valid token already
+        return
+
     #generate a unique device_key
     global device_key, device_secret, tm_jwt
 
@@ -107,16 +118,26 @@ def token_generate():
     auth_text = "bearer " + app_jwt
     headers = {'Content-Type': 'application/json', 'Authorization': auth_text}
 
-    r  = requests.post(url=regURL, data=json.dumps(payload), headers=headers)
-    if r.status_code // 100 != 2:
-        log.error("Server error: Not received SECRET for device_key: " + device_key)
-        sys.exit(1)
+    try:
+        r  = requests.post(url=regURL, data=json.dumps(payload), headers=headers)
+        if r.status_code // 100 != 2:
+            log.error("Server error: Refused(err: " + r.status_code + " ) ")
+            threading.Timer(tm_token_generate_timer_interval, token_generate).start()
+            return
+    except:
+            log.error("Server error: error generating token ... ")
+            # Need to try again
+            threading.Timer(tm_token_generate_timer_interval, token_generate).start()
+            return
 
     device_key = r.json().get('result').get('key')
     device_secret = r.json().get('result').get('secret')
     #generate the telemetry jwt from app key and secret
     tm_jwt = jwt_generate(device_key, device_secret).decode()
     log.info("Device_key[%s] Device_secret[%s] JWT_token[%s]\n" %(device_key, device_secret, tm_jwt))
+    currentTokenStatus = 1
+    #start uploading again
+    telemetry_upload_dir()
 
 
 def telemetry_upload_file(filename, jwt, endpoint=tmURL):
@@ -198,7 +219,8 @@ def telemetry_upload_dir():
                         (filename, status, es_resp_status, es_resp_err, es_resp_errmsg))
                 log.info("Unauthorized: Regenerating token...")
                 token_generate()
-                break
+                # just return; uploading will be retried out once we have a valid token.
+                return
             elif status == 429:
                 log.info("telemetry upload(%s) status: %d es_status: %s es_err: %s es_errmsg: %s" %
                         (filename, status, es_resp_status, es_resp_err, es_resp_errmsg))
@@ -233,4 +255,4 @@ def telemetry_upload_dir():
 if __name__ == '__main__':
     logging_init()
     token_generate()
-    telemetry_upload_dir()
+    #telemetry_upload_dir()
