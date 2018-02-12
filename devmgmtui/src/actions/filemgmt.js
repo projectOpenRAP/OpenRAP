@@ -79,8 +79,39 @@ export const deleteFile = (prefix, folderName, cb) =>  (dispatch) => {
   });
 }
 
+export const copyBunchOfFiles = (prefix, fileList, destination, cb) => (dispatch) => {
+  let promises = [];
+  let destinationEncoded = encodeURIComponent(destination);
+  for (let i in fileList) {
+    let file = encodeURIComponent(prefix + fileList[i]);
+    let promise = new Promise((resolve, reject) => {
+      axios.put(`${BASE_URL}/file/copy`, {old : file, new : destinationEncoded}).then((response) => {
+        if (response.data.success) {
+          resolve("success");
+        } else {
+          reject("Server Error");
+        }
+      }).catch(e => {
+        reject("Error!");
+      })
+    });
+    promises.push(promise);
+  }
+  Promise.all(promises).then((values) => {
+    return new Promise((resolve, reject) => {
+      console.log(values);
+      if (values.indexOf("Server Error") >= 0) {
+        cb('Error');
+      } else {
+        cb('Success');
+      }
+    })
+  }, reason => {
+    cb(reason);
+  })
+}
+
 export const deleteBunchOfFiles = (prefix, fileList, cb) => (dispatch) => {
-  console.log("k " + fileList);
   let promises = [];
   for (let i in fileList) {
     let file = encodeURIComponent(prefix + fileList[i]);
@@ -97,13 +128,40 @@ export const deleteBunchOfFiles = (prefix, fileList, cb) => (dispatch) => {
   }
   Promise.all(promises).then((values) => {
     return new Promise((resolve, reject) => {
-      console.log(values);
       if (values.indexOf("Server Error") >= 0) {
-        cb('error');
+        cb('Error');
       } else {
-        cb('success');
+        cb('Success');
       }
     })
+  })
+}
+
+export const verifyConnectedUSB = (dir, cb) => (dispatch) => {
+  let dirEncoded = encodeURIComponent(dir);
+  axios.get(`${BASE_URL}/file/getUSB`, {params : {dir : dirEncoded}}).then(resolve => {
+    if (dir.length < 1) {
+      dispatch({type : 'USB_DIR', payload : resolve.data.dir});
+    } else {
+      dispatch({type : 'USB_DIR_DOWN', payload : resolve.data.files})
+    }
+    cb(true);
+  }, reject => {
+    cb(false);
+  });
+}
+
+export const copyFile = (src, dest, cb) => (dispatch) => {
+  let encodedSrc = encodeURIComponent(src);
+  let encodedDest = encodeURIComponent(dest);
+  axios.put(`${BASE_URL}/file/copy`, {old : encodedSrc, new : encodedDest}).then(response => {
+    if (response.data.success) {
+      cb(null, 'Success');
+    } else {
+      cb('err', response.msg);
+    }
+  }).catch(e => {
+    cb('err', 'error');
   })
 }
 

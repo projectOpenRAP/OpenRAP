@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-export default function (state={currentDir : '/var/www/', files : [], uploadableFiles : [], selectedFiles : [], allSelected : false, usbDir : ''}, action){
-=======
-export default function (state={currentDir : '/home/admin/', files : [], uploadableFiles : []}, action){
->>>>>>> 6b61d90b5ac94d583d72c0420f84ec8490a847be
+export default function (state={currentDir : '/var/www/', files : [], uploadableFiles : [], selectedFiles : [], allSelected : false, usbDir : '', usbDownFiles : []}, action){
     switch(action.type){
       case 'OPEN_DIR' :
         return {...state, currentDir : action.payload}
@@ -14,6 +10,8 @@ export default function (state={currentDir : '/home/admin/', files : [], uploada
         return {...state, selectedFiles : action.payload}
       case 'USB_DIR' :
         return {...state, usbDir : action.payload}
+      case 'USB_DIR_DOWN' :
+        return {...state, usbDownFiles : action.payload}
       default:
         return state
     }

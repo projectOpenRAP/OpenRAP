@@ -29,7 +29,7 @@ class FolderUnitComponent extends Component {
   componentWillReceiveProps(newProps, newState) {
     this.setState({selected : (newProps.filemgmt.selectedFiles.indexOf(this.props.name) >= 0)})
   }
-  
+
   toggleSelected() {
     let currentlySelectedFiles = this.props.filemgmt.selectedFiles;
     if (this.state.selected) {
@@ -55,7 +55,7 @@ class FolderUnitComponent extends Component {
   handleDelete() {
     let consent = window.confirm("This folder will be deleted! [No Undo]");
     if (consent) {
-      this.props.deleteFolder(this.props.filemgmt.currentDir, this.props.name, (err, res) => {
+      this.props.delete(this.props.filemgmt.currentDir, this.props.name, (err, res) => {
         if (err) {
           alert(res);
         } else {
