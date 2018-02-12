@@ -26,23 +26,11 @@ const button_text = {
   'ERROR' : 'Error!'
 }
 
-let formatBytes = (bytes,decimals) => {
-   if(bytes == 0) return '0 Bytes';
-   var k = 1024,
-       dm = decimals || 2,
-       sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-       i = Math.floor(Math.log(bytes) / Math.log(k));
-   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-}
-
 class SelectedFileShowComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      fileName : props.file.name,
-      fileSize : formatBytes(props.file.size, 2),
-      uploadStatus : props.uploadStatus,
-      hidden : false,
+      uploadStatus : props.uploadStatus
     }
     this.initiateUpload.bind(this);
   }
@@ -64,6 +52,12 @@ class SelectedFileShowComponent extends Component {
     if (this.state.uploadStatus === 'INACTIVE') {
       this.setState({uploadStatus : 'UPLOADING'})
     }
+  }
+
+  handleDeleteClick() {
+    let uploadableFiles = this.props.filemgmt.uploadableFiles;
+    uploadableFiles.splice(uploadableFiles.indexOf(this.props.file), 1);
+    this.props.updateUploadableFiles(uploadableFiles);
   }
 
   hide() {
@@ -92,10 +86,7 @@ class SelectedFileShowComponent extends Component {
           break;
 
       case 'UPLOADED':
-          let uploadableFiles = this.props.filemgmt.uploadableFiles;
-          uploadableFiles.splice(uploadableFiles.indexOf(this.props.file), 1);
-          this.props.updateUploadableFiles(uploadableFiles);
-          window.setTimeout(this.hide(), 3000);
+          this.handleDeleteClick();
           break;
 
       case 'ERROR' :
@@ -110,17 +101,21 @@ class SelectedFileShowComponent extends Component {
   renderSelectedFileShowComponent() {
     return (
       <div>
-        {this.state.hidden ? null :<Segment>
-          {this.state.uploadStatus === "UPLOADING" ? <Dimmer active><Loader active /></Dimmer> : null}
-          <span style={selectedStyles.upload_wrapper}>{this.state.fileName}</span>
+        <Segment>
+          {this.state.uploadStatus === "UPLOADING" ? <Dimmer inverted active><Loader active /></Dimmer> : null}
+          <span style={selectedStyles.upload_wrapper}>{this.props.file.name}</span>
           <span style={{float : 'right'}}>
             <Button animated color={colors[this.state.uploadStatus]} onClick={this.handleUploadClick.bind(this)} disabled={this.state.uploadStatus !== 'INACTIVE'}>
             <Button.Content visible>{button_text[this.state.uploadStatus]}</Button.Content>
             <Button.Content hidden><Icon name='checkmark' /></Button.Content>
             </Button>
+            <Button animated color='red' onClick={this.handleDeleteClick.bind(this)}>
+            <Button.Content visible>Delete File</Button.Content>
+            <Button.Content hidden><Icon name='trash' /></Button.Content>
+            </Button>
           </span>
           <Divider></Divider>
-        </Segment>}
+        </Segment>
       </div>
     )
   }

@@ -17,7 +17,8 @@ const captiveStyles = {
     "paddingTop" : "10px",
     "textAlign" : "center",
     "marginLeft" : "25px",
-    "marginRight" : "25px"
+    "marginRight" : "25px",
+    "height" : "100%"
   }
 }
 
@@ -55,6 +56,7 @@ class Captive extends Component {
           alert(res);
         } else {
           alert("Successfully wrote to file!");
+          this.setState(this.state);
         }
       });
     }
@@ -78,12 +80,15 @@ class Captive extends Component {
       });
     }
 
-    render() {
+    renderCaptivePortal() {
         let { editorState } = this.state ;
         return (
             <SideNav>
-                <br />
-                <br />
+              <br />
+              <br />
+              <Grid divided='vertically'>
+                <Grid.Row columns = {2}>
+                <Grid.Column>
                 <div style={captiveStyles.container}>
                 <div>
                     <Editor
@@ -104,15 +109,39 @@ class Captive extends Component {
                 <input type='file' id='apkinput' style = {{display : 'None'}}
                 onChange={(e) => this.uploadApkCallBack(e.target.files[0])} accept='.apk'/>
                 <Container style = {captiveStyles.container}>
-                  <Button color = 'violet' onClick={this.writeToHtmlFile.bind(this)}>
+                  <Button color = 'teal' onClick={this.writeToHtmlFile.bind(this)}>
                     <Button.Content visible>
                       Write Changes To Captive Portal
                     </Button.Content>
                   </Button>
                 </Container>
                 </div>
+              </Grid.Column>
+              <Grid.Column style={{height:'100%'}}>
+                <div style={captiveStyles.container}>
+                  <Header as={'h3'}>Current Captive Portal: </Header>
+                  <Segment style={{height:'100%'}}>
+                    <iframe id = 'captiveframe' src='http://localhost/' width='100%' height='100%'></iframe>
+                  </Segment>
+                </div>
+              </Grid.Column>
+              </Grid.Row>
+              </Grid>
             </SideNav>
         )
+    }
+
+    render() {
+      if (typeof this.props.auth.user !== 'undefined') {
+        return (
+          <div>
+            {this.renderCaptivePortal()}
+          </div>
+        )
+      } else {
+        this.props.history.push('/');
+        return null;
+      }
     }
 
 }
