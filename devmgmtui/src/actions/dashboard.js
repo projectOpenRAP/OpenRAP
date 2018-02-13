@@ -3,6 +3,14 @@ import { BASE_URL } from '../config/config';
 
 export const fetchSystemData = () => (dispatch) => {
 
+    axios.get(`${BASE_URL}/dashboard/system/connected`)
+        .then((response) => {
+            dispatch({type: 'USERS_CONNECTED_FETCH', payload: response.data});
+        })
+        .catch((e) => {
+            console.log(e);
+        })
+
     axios.get(`${BASE_URL}/dashboard/system/memory`)
         .then((response) => {
             dispatch({type: 'MEMORY_FETCH', payload: response.data});
