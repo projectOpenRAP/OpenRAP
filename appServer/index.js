@@ -1,19 +1,28 @@
+/*
+    Server entry file.
+    No changes are required here to load a plugin
+*/
+
 'use strict';
 
 const express = require('express');
 const app = express();
 const glob = require('glob');
-app.get("/one", (req, res) => {
-    res.send("one");
-})
-// require('./plugins/two/two.routes')(app);
 
-// require('./plugins/three/three.routes')(app);
+/*
+    Loading all the plugins from plugin directory
+*/
+
 glob("./plugins/**/*.routes.js", function (er, files) {
     for (let i = 0; i < files.length; i++) {
         require(files[i])(app);
     }
 })
+
+/*
+    Starting the server on port 9090.
+    TODO: make the port configurable later
+*/
 
 app.listen(9090, err => {
     if (err)
