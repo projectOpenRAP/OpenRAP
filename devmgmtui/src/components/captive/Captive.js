@@ -19,21 +19,22 @@ const captiveStyles = {
     "marginLeft" : "25px",
     "marginRight" : "25px",
     "height" : "100%"
+  },
+  container2 : {
+    "paddingTop" : "10px",
+    "textAlign" : "center",
+    "marginLeft" : "25px",
+    "marginRight" : "25px",
+    "height" : "100%",
+    "overflow" : "auto"
   }
 }
 
-const defaultHtmlCode = `
-  <h1>Default OpenRAP Captive Portal</h1>
-  <p>This is an introduction paragraph. Use this to type something about the captive portal. You are allowed to upload images and APKs for download, which will be appended to the end of the document.</p>
-  <p>Happy customizing!</p>
-`;
 class Captive extends Component {
     constructor(props) {
         super(props);
-        let defaultHtmlBlocks = convertFromHTML(defaultHtmlCode);
-        let defaultHtmlContent = ContentState.createFromBlockArray(defaultHtmlBlocks.contentBlocks, defaultHtmlBlocks.entityMap);
         this.state = {
-          editorState: EditorState.createWithContent(defaultHtmlContent),
+          editorState: '',
         }
         this.onEditorStateChange = this.onEditorStateChange.bind(this);
         this.uploadImageCallBack = this.uploadImageCallBack.bind(this);
@@ -41,6 +42,14 @@ class Captive extends Component {
 
     componentWillMount()  {
       document.title="Captive Portal";
+    }
+
+    componentDidMount() {
+      this.props.getCurrentCaptivePortal((res) => {
+        let newHtmlBlock = convertFromHTML(res);
+        let newHtmlContent = ContentState.createFromBlockArray(newHtmlBlock.contentBlocks, newHtmlBlock.entityMap);
+        this.setState({editorState : EditorState.createWithContent(newHtmlContent)});
+      })
     }
 
     onEditorStateChange(editorState) {
@@ -56,6 +65,8 @@ class Captive extends Component {
           alert(res);
         } else {
           alert("Successfully wrote to file!");
+          let iframe = document.getElementById("captiveframe");
+          iframe.contentWindow.location.reload(true);
           this.setState(this.state);
         }
       });
@@ -118,7 +129,7 @@ class Captive extends Component {
                 </div>
               </Grid.Column>
               <Grid.Column style={{height:'100%'}}>
-                <div style={captiveStyles.container}>
+                <div style={captiveStyles.container2}>
                   <Header as={'h3'}>Current Captive Portal: </Header>
                   <Segment style={{height:'100%'}}>
                     <iframe id = 'captiveframe' src='http://localhost/' width='100%' height='100%'></iframe>
