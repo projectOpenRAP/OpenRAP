@@ -45,6 +45,33 @@ export const uploadApksToCaptive = (file) => (dispatch) => {
 
 }
 
+export const getCurrentCaptivePortal = (cb) => (dispatch) => {
+  let defaultHtmlContent = '<p>Error in retrieving captive portal data!</p>';
+  /*
+  axios.get(`${BASE_URL}`.slice(0, BASE_URL.indexOf(":",6))).then(response => {
+    console.log("Hello ");
+    console.log(response);
+    let cleanedResponse = response.slice(response.IndexOf('<body>')+6, response.indexOf('</body>'))
+    cb(response);
+  }).catch(err => {
+    console.log(err);
+    cb(defaultHtmlContent);
+  })*/
+  axios.get(`${BASE_URL}/captive/getCurrent`).then(response => {
+    if (response.data.success) {
+      let answer = response.data.data;
+      let cleanedResponse = answer.slice(answer.indexOf('<body>')+6, answer.indexOf('</body>'))
+      cb(cleanedResponse);
+    } else {
+      console.log('something else');
+      cb(defaultHtmlContent);
+    }
+  }).catch(e => {
+    console.log(e);
+    cb(defaultHtmlContent);
+  })
+}
+
 export const writeToHtmlFile = (htmlData, cb) => (dispatch) => {
   axios.post(`${BASE_URL}/captive/writeHtml`, {htmlData}).then(response => {
     if (response.data.success) {
