@@ -19,7 +19,7 @@ let getNumberOfUsersConnected = (req, res) => {
         msg : 'Successfully retrieved number of users connected.'
     }
 
-    const cmd = path.join(__dirname, '/opt/opencdn/CDN/getall_stations.sh');
+    const cmd = path.join(__dirname, '../../CDN/getall_stations.sh');
 
     exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
         console.log('Error: ' + err);
