@@ -63,7 +63,7 @@ class FileUploadComponent extends Component {
   }
 
   transferFromUSB() {
-    this.props.verifyConnectedUSB('ecar_files', (ans) => {
+    this.props.verifyConnectedUSB('', (ans) => {
       if (!ans) {
         alert('USB unplugged!');
         this.setState({usbConnected : false});
@@ -107,14 +107,6 @@ class FileUploadComponent extends Component {
             </Button.Content>
             <Button.Content hidden>
               <Icon name='upload' />
-            </Button.Content>
-          </Button>
-          <Button animated color='blue'>
-            <Button.Content visible>
-              Choose a folder to upload
-            </Button.Content>
-            <Button.Content hidden>
-              <Icon name='upload' /><Icon name='folder' />
             </Button.Content>
           </Button>
           <input type='file' id='fileinput' style = {{display : 'None'}}
