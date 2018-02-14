@@ -56,14 +56,17 @@ class FileUploadComponent extends Component {
           } else {
             alert('Copy to USB successful!');
           }
+          this.props.verifyConnectedUSB((ans) => {
+            return;
+          })
           this.setState({isUploadingToUsb : false})
         })
       }
-    })
+    });
   }
 
   transferFromUSB() {
-    this.props.verifyConnectedUSB('ecar_files', (ans) => {
+    this.props.verifyConnectedUSB('', (ans) => {
       if (!ans) {
         alert('USB unplugged!');
         this.setState({usbConnected : false});
@@ -71,6 +74,9 @@ class FileUploadComponent extends Component {
         this.setState({isDownloadingFromUsb : true})
         this.props.copyBunchOfFiles(this.props.filemgmt.usbDir, this.props.filemgmt.usbDownFiles, this.props.filemgmt.currentDir, (msg) => {
           alert(msg);
+          this.props.verifyConnectedUSB((ans) => {
+            return;
+          })
           this.props.readFolder(this.props.filemgmt.currentDir);
           this.setState({isDownloadingFromUsb : false})
         })
@@ -107,14 +113,6 @@ class FileUploadComponent extends Component {
             </Button.Content>
             <Button.Content hidden>
               <Icon name='upload' />
-            </Button.Content>
-          </Button>
-          <Button animated color='blue'>
-            <Button.Content visible>
-              Choose a folder to upload
-            </Button.Content>
-            <Button.Content hidden>
-              <Icon name='upload' /><Icon name='folder' />
             </Button.Content>
           </Button>
           <input type='file' id='fileinput' style = {{display : 'None'}}
