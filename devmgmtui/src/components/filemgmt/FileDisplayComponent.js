@@ -118,7 +118,7 @@ class FileDisplayComponent extends Component {
   }
 
   render() {
-    let isDisabled = this.props.filemgmt.currentDir === '/';
+    let isDisabled = this.props.filemgmt.currentDir === '/home/admin/';
     return (
       <div>
       <span style={fileDisplayStyles.topBar}>

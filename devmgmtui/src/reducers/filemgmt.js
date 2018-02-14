@@ -1,4 +1,4 @@
-export default function (state={currentDir : '/', files : [], uploadableFiles : [], selectedFiles : [], allSelected : false, usbDir : '', usbDownFiles : []}, action){
+export default function (state={currentDir : '/home/admin/', files : [], uploadableFiles : [], selectedFiles : [], allSelected : false, usbDir : '', usbDownFiles : []}, action){
     switch(action.type){
       case 'OPEN_DIR' :
         return {...state, currentDir : action.payload}
