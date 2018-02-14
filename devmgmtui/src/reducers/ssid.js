@@ -1,4 +1,4 @@
-export default function (state={ ssidSet: false, currentSSID: 'placeholder' }, action) {
+export default function (state={ ssidSet: false }, action) {
     switch(action.type) {
         case 'SET_SSID':
             return {...state, ssidSet: action.payload.resData.ssidSetSuccessful, currentSSID: action.payload.ssid};

@@ -5,7 +5,6 @@ const exec = require('child_process').exec;
 
 
 const setSSID = (req, res) => {
-
     const ssid = req.body['ssid'].trim();
 
     let responseData = {
@@ -21,8 +20,6 @@ const setSSID = (req, res) => {
     }
 
     const cmd = path.join(__dirname, '../../CDN/modeChange.sh') + ' apmode ' + ssid
-
-    // const cmd = path.join('~/Desktop/test.sh') + ' apmode ' + ssid
 
     // executing the bash script for updating SSID
     exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
@@ -40,6 +37,34 @@ const setSSID = (req, res) => {
     });
 }
 
+const getSSID = (req, res) => {
+    let responseData = {
+        currentSSID : undefined,
+        msg : ''
+    }
+
+    const cmd = path.join(__dirname, '../../CDN/get_ssid.sh');
+
+    // executing the bash script for updating SSID
+    exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
+
+        console.log('Error: ' + err);
+        console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+
+    	if(err) {
+    		responseData.msg = err;
+    	}
+        else {
+            responseData.currentSSID = stdout.trim();
+            responseData.msg = 'SSID successfully retrieved.';
+        }
+
+        res.status(200).json(responseData);
+    });
+}
+
 module.exports = {
-    setSSID
+    setSSID,
+    getSSID
 }
