@@ -55,7 +55,7 @@ class FolderUnitComponent extends Component {
   handleDelete() {
     let consent = window.confirm("This folder will be deleted! [No Undo]");
     if (consent) {
-      this.props.delete(this.props.filemgmt.currentDir, this.props.name, (err, res) => {
+      this.props.deleteFolder(this.props.filemgmt.currentDir, this.props.name, (err, res) => {
         if (err) {
           alert(res);
         } else {

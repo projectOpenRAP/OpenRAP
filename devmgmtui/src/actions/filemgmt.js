@@ -60,7 +60,7 @@ export const createFolder = (prefix, folderName, cb) => (dispatch) => {
 
 export const deleteFolder = (prefix, folderName, cb) =>  (dispatch) => {
   let fullPath = encodeURIComponent(prefix + folderName);
-  axios.delete(`${BASE_URL}/file/deleteFolder`, {params : {path : fullPath, timestamp : new Date()}}).then((response) => {
+  axios.delete(`${BASE_URL}/file/delete`, {params : {path : fullPath, timestamp : new Date()}}).then((response) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
