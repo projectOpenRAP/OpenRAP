@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/filemgmt'
-import { Button, Icon, Segment, Popup } from 'semantic-ui-react'
+import { Button, Icon, Segment, Popup, Divider } from 'semantic-ui-react'
 import SelectedFileShowComponent from './SelectedFileShowComponent'
 
 
@@ -11,8 +11,7 @@ class FileUploadComponent extends Component {
     super(props);
     this.state = {
       autoUpload : false,
-      usbUploadableConnected : false,
-      usbDownloadableConnected : false,
+      usbConnected : false,
       isUploadingToUsb : false,
       isDownloadingFromUsb : false,
     }
@@ -33,14 +32,8 @@ class FileUploadComponent extends Component {
 
   componentDidMount() {
     this.props.readFolder(this.props.filemgmt.currentDir);
-    let downState = false;
-    let upState = false;
     this.props.verifyConnectedUSB('', (ans) => {
-      upState = ans;
-      this.props.verifyConnectedUSB('ecar_files', ans => {
-        downState = ans;
-        this.setState({usbDownloadableConnected : downState, usbUploadableConnected : upState});
-      });
+      this.setState({usbConnected : ans});
     });
   }
 
@@ -54,7 +47,7 @@ class FileUploadComponent extends Component {
     this.props.verifyConnectedUSB('', (ans) => {
       if (!ans) {
         alert('USB unplugged!');
-        this.setState({upState : false});
+        this.setState({usbConnected : false});
       } else {
         this.setState({isUploadingToUsb : true})
         this.props.copyFile(this.props.filemgmt.currentDir, this.props.filemgmt.usbDir, (err, msg) => {
@@ -63,21 +56,27 @@ class FileUploadComponent extends Component {
           } else {
             alert('Copy to USB successful!');
           }
+          this.props.verifyConnectedUSB((ans) => {
+            return;
+          })
           this.setState({isUploadingToUsb : false})
         })
       }
-    })
+    });
   }
 
   transferFromUSB() {
-    this.props.verifyConnectedUSB('ecar_files', (ans) => {
+    this.props.verifyConnectedUSB('', (ans) => {
       if (!ans) {
         alert('USB unplugged!');
-        this.setState({downState : false, upState : false});
+        this.setState({usbConnected : false});
       } else {
         this.setState({isDownloadingFromUsb : true})
         this.props.copyBunchOfFiles(this.props.filemgmt.usbDir, this.props.filemgmt.usbDownFiles, this.props.filemgmt.currentDir, (msg) => {
           alert(msg);
+          this.props.verifyConnectedUSB((ans) => {
+            return;
+          })
           this.props.readFolder(this.props.filemgmt.currentDir);
           this.setState({isDownloadingFromUsb : false})
         })
@@ -94,11 +93,11 @@ class FileUploadComponent extends Component {
       <div>
         <Segment>
         <span>
-        <Button animated color='teal' onClick={this.transferToUSB.bind(this)} disabled = {!this.state.usbUploadableConnected || this.state.isUploadingToUsb} loading={this.state.isUploadingToUsb}>
+        <Button animated color='teal' onClick={this.transferToUSB.bind(this)} disabled = {!this.state.usbConnected || this.state.isUploadingToUsb} loading={this.state.isUploadingToUsb}>
           <Button.Content visible>Transfer Folder to USB</Button.Content>
           <Button.Content hidden><Icon name='usb' /><Icon name='up arrow'/></Button.Content>
         </Button>
-        <Button animated color='teal' onClick={this.transferFromUSB.bind(this)} disabled = {!this.state.usbDownloadableConnected || this.state.isDownloadingFromUsb} loading={this.state.isDownloadingFromUsb}>
+        <Button animated color='teal' onClick={this.transferFromUSB.bind(this)} disabled = {!this.state.usbConnected || this.state.isDownloadingFromUsb} loading={this.state.isDownloadingFromUsb}>
           <Button.Content visible>Transfer Here From USB</Button.Content>
           <Button.Content hidden><Icon name='usb' /><Icon name='down arrow'/></Button.Content>
         </Button>

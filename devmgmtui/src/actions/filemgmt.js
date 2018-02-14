@@ -147,11 +147,8 @@ export const deleteBunchOfFiles = (prefix, fileList, cb) => (dispatch) => {
 export const verifyConnectedUSB = (dir, cb) => (dispatch) => {
   let dirEncoded = encodeURIComponent(dir);
   axios.get(`${BASE_URL}/file/getUSB`, {params : {dir : dirEncoded}}).then(resolve => {
-    if (dir.length < 1) {
       dispatch({type : 'USB_DIR', payload : resolve.data.dir});
-    } else {
-      dispatch({type : 'USB_DIR_DOWN', payload : resolve.data.files})
-    }
+      dispatch({type : 'USB_DIR_DOWN', payload : resolve.data.files});
     cb(true);
   }, reject => {
     cb(false);
