@@ -9,7 +9,7 @@ module.exports = app => {
   app.delete('/file/delete', storeTimestamp, deleteFileFromDisk);
   app.post('/file/newFolder', storeTimestamp, createNewFolder)
   app.get('/file/open', openDirectory);
-  app.put('/file/copy', copyFile);
+  app.put('/file/copy', storeTimestamp, copyFile);
   app.put('/file/move', moveFile);
   app.get('/file/getUSB', getUSB);
 }

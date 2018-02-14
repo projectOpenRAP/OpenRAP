@@ -161,7 +161,7 @@ export const verifyConnectedUSB = (dir, cb) => (dispatch) => {
 export const copyFile = (src, dest, cb) => (dispatch) => {
   let encodedSrc = encodeURIComponent(src);
   let encodedDest = encodeURIComponent(dest);
-  axios.put(`${BASE_URL}/file/copy`, {old : encodedSrc, new : encodedDest}).then(response => {
+  axios.put(`${BASE_URL}/file/copy`, {old : encodedSrc, new : encodedDest, timestamp: getTimestamp()}).then(response => {
     if (response.data.success) {
       cb(null, 'Success');
     } else {
