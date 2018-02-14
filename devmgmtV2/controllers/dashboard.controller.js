@@ -65,7 +65,7 @@ let getSystemCpu = (req,res) => {
 }
 
 let getSystemVersion = (req,res) => {
-    let cdn = path.join(__dirname,"/opt/opencdn/CDN/version.txt");
+    let cdn = path.join(__dirname,"../../CDN/version.txt");
     fs.readFile(cdn, 'utf-8', (err,data)=>{
       //  console.log(err);
         res.send({data});
