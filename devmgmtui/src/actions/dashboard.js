@@ -3,6 +3,7 @@ import { BASE_URL } from '../config/config';
 
 export const fetchSystemData = () => (dispatch) => {
 
+
     axios.get(`${BASE_URL}/dashboard/system/lastRefresh`)
         .then((response) => {
             dispatch({type: 'LAST_REFRESH_FETCH', payload: response.data})
@@ -13,7 +14,15 @@ export const fetchSystemData = () => (dispatch) => {
 
     axios.get(`${BASE_URL}/dashboard/system/usersConnected`)
         .then((response) => {
-            dispatch({type: 'USERS_CONNECTED_FETCH', payload: response.data});
+            dispatch({type: 'USERS_CONNECTED_FETCH', payload: response.data})
+        })
+        .catch((e) => {
+            console.log(e);
+        })
+
+    axios.get(`${BASE_URL}/ssid`)
+        .then((response) => {
+            dispatch({type: 'SSID_FETCH', payload: response.data.currentSSID});
         })
         .catch((e) => {
             console.log(e);

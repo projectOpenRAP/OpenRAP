@@ -1,0 +1,6 @@
+#!/bin/bash
+### Script to get internet status, an optimized logic need to be developed, until than, a simple approach
+
+### For now it is not connected
+echo 0
+exit -1

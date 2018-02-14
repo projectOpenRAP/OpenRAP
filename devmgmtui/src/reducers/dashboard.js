@@ -4,6 +4,8 @@ export default function (state={}, action) {
             return {...state, lastRefreshTime: action.payload}
         case 'USERS_CONNECTED_FETCH':
             return {...state, usersConnected: action.payload}
+        case 'SSID_FETCH':
+            return {...state, currentSSID: action.payload};
         case 'MEMORY_FETCH':
             return {...state, memoryData: action.payload};
         case 'SPACE_FETCH':

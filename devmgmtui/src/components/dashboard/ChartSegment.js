@@ -140,9 +140,10 @@ class ChartSegment extends Component {
                     return result;
                 }
 
-                let sysUpTimeInDDHHMMSS = secondsToDDHHMMSS(memoryData.sysUpTime);
-                let sysVersion = version.data.toString();
-                let numberOfUsersConnected = usersConnected.numberOfUsers;
+                let ssid                    = this.props.ssid.currentSSID || this.props.dashboard.currentSSID;
+                let sysVersion              = version.data.toString();
+                let sysUpTimeInDDHHMMSS     = secondsToDDHHMMSS(memoryData.sysUpTime);
+                let numberOfUsersConnected  = usersConnected.numberOfUsers;
 
                 return (
                     <Segment color='teal'>
@@ -150,7 +151,7 @@ class ChartSegment extends Component {
                             System Information
                         </Header>
 
-                        <Grid relaxed columns={5}>
+                        <Grid relaxed columns={6}>
                             <Grid.Column verticalAlign='middle'>
                                 <UserChart
                                     numberOfUsers={numberOfUsersConnected}
@@ -170,6 +171,14 @@ class ChartSegment extends Component {
                                     icon='tag'
                                     header='System Version'
                                     content={sysVersion}
+                                    />
+                            </Grid.Column>
+
+                            <Grid.Column verticalAlign='middle'>
+                                <Message
+                                icon='wifi'
+                                header='SSID'
+                                content={ssid}
                                 />
                             </Grid.Column>
 
@@ -238,8 +247,8 @@ class ChartSegment extends Component {
     }
 }
 
-function mapStateToProps({ dashboard }) {
-    return { dashboard }
+function mapStateToProps({ dashboard, ssid }) {
+    return { dashboard, ssid }
 }
 
 export default connect(mapStateToProps, actions)(ChartSegment);
