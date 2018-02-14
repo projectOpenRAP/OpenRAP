@@ -3,7 +3,7 @@
 let q = require('q')
 let fs = require('fs')
 let { exec } = require('child_process')
-let updateFileLocation = '/opt/OpenCDN_upgrade.tgz'
+let updateFileLocation = 'file:///opt/OpenCDN_upgrade.tgz'
 
 let writeUpdateFile = (req, res) => {
   let temporaryPath = req.files.file.path
