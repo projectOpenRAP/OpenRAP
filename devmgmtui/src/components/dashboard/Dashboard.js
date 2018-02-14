@@ -25,11 +25,9 @@ class Dashboard extends Component {
             this.props.history.push("/");
         }
 
-        this.props.fetchSystemData();
-
-        setInterval(() => { this.props.fetchSystemData() }, 1000);
         document.title = "Dashboard";
-        // this.props.fetchSystemData()
+
+        this.props.fetchSystemData();
         timer = setInterval(() => { this.props.fetchSystemData() }, 1000);
     }
 

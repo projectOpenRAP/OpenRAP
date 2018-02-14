@@ -1,4 +1,4 @@
-!#/bin/bash
+#!/bin/bash
 
 ##Works only on device that has wlan device name as wlan0
 

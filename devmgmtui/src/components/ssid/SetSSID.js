@@ -30,6 +30,7 @@ class SetSSID extends Component {
         }
         document.title = "Set SSID";
     }
+
     componentWillReceiveProps(nextProps) {
         if (nextProps.auth && !nextProps.auth.authenticated) {
             this.props.history.push("/");
@@ -43,12 +44,14 @@ class SetSSID extends Component {
     }
 
     handleSubmit() {
+        alert("Your device is about to be disconnected. You may reconnect after the SSID has been updated.");
+
         this.props.setSSID(this.state.ssid, (err, data) => {
             if(err) {
                 alert(data.msg);
             }
             else {
-                alert("SSID set successfully!");
+                // alert("SSID set successfully to : " + this.state.ssid);
                 this.props.history.push('/dashboard');
             }
         });
@@ -87,11 +90,13 @@ class SetSSID extends Component {
     }
 
     render() {
-        return (
-            <SideNav>
-                {this.renderSSIDForm()}
-            </SideNav>
-        )
+        if (typeof this.props.auth.user !== `undefined` && (this.props.auth.user.permissions.search(/MODIFY_SSID|ALL/) >= 0)) {
+            return (
+                <SideNav>
+                    {this.renderSSIDForm()}
+                </SideNav>
+            )
+        }
     }
 }
 

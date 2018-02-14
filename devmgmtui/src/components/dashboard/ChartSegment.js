@@ -112,8 +112,9 @@ class ChartSegment extends Component {
                     return result;
                 }
 
+                let ssid                = this.props.ssid.currentSSID || this.props.dashboard.currentSSID;
+                let sysVersion          = version.data.toString();
                 let sysUpTimeInDDHHMMSS = secondsToDDHHMMSS(sysUpTimeInSeconds);
-                let sysVersion = version.data.toString();
 
                 return (
                     <Segment color='teal'>
@@ -138,6 +139,16 @@ class ChartSegment extends Component {
                                     icon='tag'
                                     header='System Version'
                                     content={sysVersion}
+                                    />
+                                </List.Content>
+                            </List.Item>
+
+                            <List.Item>
+                                <List.Content>
+                                    <Message
+                                    icon='wifi'
+                                    header='SSID'
+                                    content={ssid}
                                     />
                                 </List.Content>
                             </List.Item>
@@ -167,15 +178,6 @@ class ChartSegment extends Component {
                     strokeWidth={0.2}
                     viewBoxSize={100}
                     data={data}
-                    // onSectorHover={(d, i, e) => {
-                    //         if(d) {
-                    //             console.log("Mouse enter - Index:", i, "Data:", d, "Event:", e)
-                    //         }
-                    //         else {
-                    //             console.log("Mouse leave - Index:", i, "Event:", e)
-                    //         }
-                    //     }
-                    // }
                 />
             </Segment>
         )
@@ -200,8 +202,8 @@ class ChartSegment extends Component {
     }
 }
 
-function mapStateToProps({ dashboard }) {
-    return { dashboard }
+function mapStateToProps({ dashboard, ssid }) {
+    return { dashboard, ssid }
 }
 
 export default connect(mapStateToProps, actions)(ChartSegment);
