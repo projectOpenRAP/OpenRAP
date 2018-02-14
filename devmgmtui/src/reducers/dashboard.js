@@ -1,5 +1,7 @@
 export default function (state={}, action) {
     switch(action.type) {
+        case 'LAST_REFRESH_FETCH':
+            return {...state, lastRefreshTime: action.payload}
         case 'USERS_CONNECTED_FETCH':
             return {...state, usersConnected: action.payload}
         case 'MEMORY_FETCH':

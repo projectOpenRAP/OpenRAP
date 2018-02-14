@@ -51,6 +51,7 @@ class ChartSegment extends Component {
         let cpuData = this.props.dashboard.cpuData;
         let version = this.props.dashboard.version;
         let usersConnected = this.props.dashboard.usersConnected;
+        let lastRefreshTime = this.props.dashboard.lastRefreshTime;
 
         let data = [];
         let header = {};
@@ -184,7 +185,7 @@ class ChartSegment extends Component {
                                 <Message
                                     icon='refresh'
                                     header='Last Content Refresh'
-                                    content={''}
+                                    content={lastRefreshTime.data}
                                 />
                             </Grid.Column>
                         </Grid>

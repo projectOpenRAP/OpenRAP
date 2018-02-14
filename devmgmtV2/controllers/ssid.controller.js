@@ -20,7 +20,7 @@ const setSSID = (req, res) => {
         return res.status(200).json(responseData);
     }
 
-    const cmd = path.join(__dirname, '../../CDN/modeChange.sh') + ' apmode ' + ssid
+    const cmd = path.join(__dirname, '/opt/opencdn/CDN/modeChange.sh') + ' apmode ' + ssid
 
     // executing the bash script for updating SSID
     exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {

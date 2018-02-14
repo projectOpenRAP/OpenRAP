@@ -5,16 +5,21 @@ const fs = require("fs");
 const path = require('path');
 const exec = require('child_process').exec;
 
-let getNumberOfUsersConnected = (req, res) => {
-    console.log('fecthing number of users');
+let getLastRefresh = (req, res) => {
+    let meta = path.join('/opt/opencdn/devmgmtV2/meta');
+    fs.readFile(meta, 'utf-8', (err,data)=>{
+        res.send({data});
+    })
+}
 
+let getNumberOfUsersConnected = (req, res) => {
     let responseData = {
         retrieveSuccessful : true,
         numberOfUsers : undefined,
         msg : 'Successfully retrieved number of users connected.'
     }
 
-    const cmd = path.join(__dirname, '../../CDN/getall_stations.sh');
+    const cmd = path.join(__dirname, '/opt/opencdn/CDN/getall_stations.sh');
 
     exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
         console.log('Error: ' + err);
@@ -54,14 +59,13 @@ let getSystemSpace = (req, res) => {
 
 let getSystemCpu = (req,res) => {
     os.cpuUsage(function(v){
-      //  console.log( 'CPU Usage (%): ' + v );
         v = v * 100;
         res.send({v})
     });
 }
 
 let getSystemVersion = (req,res) => {
-    let cdn = path.join(__dirname,"../../CDN/version.txt"); // change to opencdn
+    let cdn = path.join(__dirname,"/opt/opencdn/CDN/version.txt");
     fs.readFile(cdn, 'utf-8', (err,data)=>{
       //  console.log(err);
         res.send({data});
@@ -69,6 +73,7 @@ let getSystemVersion = (req,res) => {
 }
 
 module.exports = {
+    getLastRefresh,
     getNumberOfUsersConnected,
     getSystemMemory,
     getSystemSpace,

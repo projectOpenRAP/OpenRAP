@@ -375,6 +375,20 @@ let writeFileToDisk = (req, res) => {
   });
 }
 
+// Middleware to write content refresh time to a file
+let storeTimestamp = (req, res, next) => {
+    let timestamp = req.body.timestamp || req.query.timestamp;
+
+    fs.writeFile("/opt/opencdn/devmgmtV2/meta", timestamp, function(err) {
+        if(err) {
+            return console.log(err);
+        }
+
+        next();
+        console.log("Timestamp stored.");
+    });
+}
+
 module.exports = {
-  openDirectory, deleteFileFromDisk, createNewFolder, copyFile, moveFile, writeFileToDisk, getUSB
+  openDirectory, deleteFileFromDisk, createNewFolder, copyFile, moveFile, writeFileToDisk, getUSB, storeTimestamp
 }
