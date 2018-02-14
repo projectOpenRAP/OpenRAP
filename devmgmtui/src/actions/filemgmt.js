@@ -1,6 +1,12 @@
 import axios from 'axios'
 import { BASE_URL } from '../config/config'
 
+const getTimestamp = () => {
+    let currentTime = new Date();
+    let options = { hour: 'numeric', minute: 'numeric', hour12: true, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+    return currentTime.toLocaleString('en-IN', options);
+}
 
 export const readFolder = (folderPath, update=true) => (dispatch) => {
   let encodedPath = encodeURIComponent(folderPath)
@@ -22,7 +28,7 @@ export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
   let data = new FormData();
   data.append('file', fileData);
   data.append('prefix', prefix);
-  data.append('timestamp', new Date());
+  data.append('timestamp', getTimestamp());
   axios.post(`${BASE_URL}/file/new`, data, {
     headers : {
       'Content-type' : 'multipart/form-data'
@@ -41,7 +47,7 @@ export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
 
 export const createFolder = (prefix, folderName, cb) => (dispatch) => {
   let fullPath = encodeURIComponent(prefix + folderName);
-  axios.post(`${BASE_URL}/file/newFolder`, {path : fullPath, timestamp : new Date()}).then((response) => {
+  axios.post(`${BASE_URL}/file/newFolder`, {path : fullPath, timestamp : getTimestamp()}).then((response) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
@@ -68,7 +74,7 @@ export const deleteFolder = (prefix, folderName, cb) =>  (dispatch) => {
 
 export const deleteFile = (prefix, folderName, cb) =>  (dispatch) => {
   let fullPath = encodeURIComponent(prefix + folderName);
-  axios.delete(`${BASE_URL}/file/delete`, {params : {path : fullPath, timestamp : new Date()}}).then((response) => {
+  axios.delete(`${BASE_URL}/file/delete`, {params : {path : fullPath, timestamp : getTimestamp()}}).then((response) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
@@ -86,7 +92,7 @@ export const copyBunchOfFiles = (prefix, fileList, destination, cb) => (dispatch
   for (let i in fileList) {
     let file = encodeURIComponent(prefix + fileList[i]);
     let promise = new Promise((resolve, reject) => {
-      axios.put(`${BASE_URL}/file/copy`, {old : file, new : destinationEncoded, timestamp : new Date()}).then((response) => {
+      axios.put(`${BASE_URL}/file/copy`, {old : file, new : destinationEncoded, timestamp : getTimestamp()}).then((response) => {
         if (response.data.success) {
           resolve("success");
         } else {
@@ -117,7 +123,7 @@ export const deleteBunchOfFiles = (prefix, fileList, cb) => (dispatch) => {
   for (let i in fileList) {
     let file = encodeURIComponent(prefix + fileList[i]);
     let promise = new Promise((resolve, reject) => {
-      axios.delete(`${BASE_URL}/file/delete`, {params : {path : file, timestamp : new Date()}}).then((response) => {
+      axios.delete(`${BASE_URL}/file/delete`, {params : {path : file, timestamp : getTimestamp()}}).then((response) => {
         if (response.data.success) {
           resolve("success");
         } else {
