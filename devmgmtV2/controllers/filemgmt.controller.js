@@ -379,7 +379,7 @@ let writeFileToDisk = (req, res) => {
 let storeTimestamp = (req, res, next) => {
     let timestamp = req.body.timestamp || req.query.timestamp;
 
-    fs.writeFile("/opt/opencdn/devmgmtV2/meta", timestamp, function(err) {
+    fs.writeFile("/home/admin/meta", timestamp, function(err) {
         if(err) {
             return console.log(err);
         }

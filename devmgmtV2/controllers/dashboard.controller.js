@@ -6,7 +6,7 @@ const path = require('path');
 const exec = require('child_process').exec;
 
 let getLastRefresh = (req, res) => {
-    let meta = path.join('/opt/opencdn/devmgmtV2/meta');
+    let meta = path.join('/home/admin/meta');
     fs.readFile(meta, 'utf-8', (err,data)=>{
         res.send({data});
     })
