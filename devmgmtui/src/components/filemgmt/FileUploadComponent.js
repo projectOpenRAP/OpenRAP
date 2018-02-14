@@ -56,10 +56,13 @@ class FileUploadComponent extends Component {
           } else {
             alert('Copy to USB successful!');
           }
+          this.props.verifyConnectedUSB((ans) => {
+            return;
+          })
           this.setState({isUploadingToUsb : false})
         })
       }
-    })
+    });
   }
 
   transferFromUSB() {
@@ -71,6 +74,9 @@ class FileUploadComponent extends Component {
         this.setState({isDownloadingFromUsb : true})
         this.props.copyBunchOfFiles(this.props.filemgmt.usbDir, this.props.filemgmt.usbDownFiles, this.props.filemgmt.currentDir, (msg) => {
           alert(msg);
+          this.props.verifyConnectedUSB((ans) => {
+            return;
+          })
           this.props.readFolder(this.props.filemgmt.currentDir);
           this.setState({isDownloadingFromUsb : false})
         })

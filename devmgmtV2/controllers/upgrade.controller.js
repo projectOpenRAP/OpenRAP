@@ -3,16 +3,17 @@
 let q = require('q')
 let fs = require('fs')
 let { exec } = require('child_process')
-let updateFileLocation = 'file:///opt/OpenCDN_upgrade.tgz'
+let updateFileLocation = '/opt/OpenCDN_upgrade.tgz'
 
 let writeUpdateFile = (req, res) => {
   let temporaryPath = req.files.file.path
+  let updateFileArgument = 'file://' + updateFileLocation;
   fs.rename(temporaryPath, updateFileLocation, (err) => {
     if (err) {
       console.log(err);
       res.status(500).json({success : false});
     } else {
-      exec('sh ../CDN/upgrade.sh ' + updateFileLocation, (err, stdout, stderr) => {
+      exec('sh ../CDN/upgrade.sh ' + updateFileArgument, (err, stdout, stderr) => {
         if (err){
           console.log(err);
           return res.status(500).json({success : false, msg : 'Server Error!'})
