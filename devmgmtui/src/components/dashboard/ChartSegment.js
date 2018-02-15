@@ -14,8 +14,8 @@ const UserChart = ({ numberOfUsers }) => {
     let numberOfUsersPercent = Math.floor((numberOfUsers * 100) / 12);
 
     let data = [
-        {title: 'Users connected', value: numberOfUsersPercent, color: 'teal'},
-        {title: 'Current capacity', value: 100-numberOfUsersPercent, color: '#B2DFDB'}
+        { title: 'Current capacity', value: 100-numberOfUsersPercent, color: '#B2DFDB' },
+        { title: 'Users connected', value: numberOfUsersPercent, color: 'teal' }
     ]
 
     return (
@@ -66,8 +66,8 @@ class ChartSegment extends Component {
                 let freememPercentage = memoryData.usage;
                 let usedmemPercentage = 100 - freememPercentage;
 
-                let totalMemory = memoryData.total  ;
-                let freeMemory = memoryData.free ;
+                let totalMemory = memoryData.total;
+                let freeMemory = memoryData.free;
                 let usedMemory = totalMemory - freeMemory;
 
                 data = [
@@ -152,7 +152,7 @@ class ChartSegment extends Component {
                         </Header>
 
                         <Grid relaxed columns={6}>
-                            <Grid.Column verticalAlign='middle'>
+                            <Grid.Column width={2} verticalAlign='middle'>
                                 <UserChart
                                     numberOfUsers={numberOfUsersConnected}
                                 />
@@ -190,7 +190,7 @@ class ChartSegment extends Component {
                                 />
                             </Grid.Column>
 
-                            <Grid.Column verticalAlign='middle'>
+                            <Grid.Column width={3} verticalAlign='middle'>
                                 <Message
                                     icon='refresh'
                                     header='Last Content Refresh'
