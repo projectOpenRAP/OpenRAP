@@ -3,7 +3,7 @@ import { BASE_URL } from '../config/config'
 
 const getTimestamp = () => {
     let currentTime = new Date();
-    let options = { hour: 'numeric', minute: 'numeric', hour12: true, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    let options = { hour: 'numeric', minute: 'numeric', hour12: true, weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
 
     return currentTime.toLocaleString('en-IN', options);
 }
@@ -60,7 +60,7 @@ export const createFolder = (prefix, folderName, cb) => (dispatch) => {
 
 export const deleteFolder = (prefix, folderName, cb) =>  (dispatch) => {
   let fullPath = encodeURIComponent(prefix + folderName);
-  axios.delete(`${BASE_URL}/file/delete`, {params : {path : fullPath, timestamp : new Date()}}).then((response) => {
+  axios.delete(`${BASE_URL}/file/delete`, {params : {path : fullPath, timestamp : getTimestamp()}}).then((response) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
@@ -158,7 +158,7 @@ export const verifyConnectedUSB = (dir, cb) => (dispatch) => {
 export const copyFile = (src, dest, cb) => (dispatch) => {
   let encodedSrc = encodeURIComponent(src);
   let encodedDest = encodeURIComponent(dest);
-  axios.put(`${BASE_URL}/file/copy`, {old : encodedSrc, new : encodedDest, timestamp: getTimestamp()}).then(response => {
+  axios.put(`${BASE_URL}/file/copy`, {old : encodedSrc, new : encodedDest, timestamp : getTimestamp()}).then(response => {
     if (response.data.success) {
       cb(null, 'Success');
     } else {

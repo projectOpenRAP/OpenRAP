@@ -10,6 +10,6 @@ module.exports = app => {
   app.post('/file/newFolder', storeTimestamp, createNewFolder)
   app.get('/file/open', openDirectory);
   app.put('/file/copy', storeTimestamp, copyFile);
-  app.put('/file/move', moveFile);
+  app.put('/file/move', storeTimestamp, moveFile);
   app.get('/file/getUSB', getUSB);
 }
