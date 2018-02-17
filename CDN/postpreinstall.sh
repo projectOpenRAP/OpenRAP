@@ -25,10 +25,18 @@ restore_files()
 	done
 }
 
+telemetry_script_enable()
+{
+    ln -s /lib/systemd/system/telemetry.service /etc/systemd/system/multi-user.target.wants/telemetry.service
+    systemctl restart telemetry
+}
+
+
 post_install()
 {
 echo "Running post install scripts"
 restore_files
+telemetry_script_enable
 exit 0
 
 }
