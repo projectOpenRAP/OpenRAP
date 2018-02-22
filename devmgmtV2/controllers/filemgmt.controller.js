@@ -3,6 +3,102 @@ let fs = require('fs')
 let unzip = require('unzip')
 let { exec } = require('child_process');
 
+let checkIfDeviceIsUSB = (string) => {
+  let defer = q.defer();
+  let uuidBegin = string.indexOf("UUID") + 5;
+  let uuidEnd = string.indexOf('"', uuidBegin + 1);
+  if (uuidEnd - uuidBegin == 10) {
+    defer.resolve(string);
+  } else {
+    defer.reject(string);
+  }
+  return defer.promise;
+}
+
+let verifyIfBlockDevice = (mountPoint) => {
+  let defer = q.defer();
+  exec('blkid', (err, stdout, stderr) => {
+    if (err) {
+      return defer.reject(err);
+    } else {
+      let blkLines = stdout.split('\n');
+      for (let i in blkLines) {
+        if (blkLines[i].indexOf('/dev/' + mountPoint) >= 0) {
+          return defer.resolve(blkLines[i]);
+        }
+      }
+    }
+  })
+  return defer.promise;
+}
+
+let extractUSBDeviceFromList = (output, dir) => {
+  let defer = q.defer();
+  let outputLines = output.split('\n');
+  for (let i in outputLines) {
+    let line = outputLines[i];
+    let index = line.indexOf('/media/');
+    let usbDeviceFound = false;
+    if (index >= 0) {
+      let mediaDirectory = line.slice(index);
+      let mountPointRegExp = /sd[a-zA-Z][\d]+/;
+      let mediaMountPoint = '';
+      try {
+        mediaMountPoint = line.match(mountPointRegExp)[0];
+      } catch (err) {
+        continue;
+      }
+      verifyIfBlockDevice(mediaMountPoint).then(resolve => {
+        return checkIfDeviceIsUSB(resolve);
+      }, reject => {
+      }).then(resolve => {
+        let directoryToRead = line.slice(index) + '/' + dir;
+        fs.readdir(directoryToRead, (err, files) => {
+          if (err) {
+            console.log("err: " + err);
+            return defer.reject(err);
+          } else {
+            usbDeviceFound = true;
+            return defer.resolve({dir : directoryToRead, files});
+          }
+        })
+      }, reject => {
+        return defer.reject(reject);
+      });
+      if(usbDeviceFound) {
+        break;
+      }
+    }
+  }
+  return defer.promise;
+}
+
+let getConnectedDevice = (dir) => {
+  let defer = q.defer();
+  exec('lsblk', (err, stdout, stderr) => {
+    if (err) {
+      return defer.reject(err);
+    } else {
+      extractUSBDeviceFromList(stdout, dir).then(resolve => {
+        return defer.resolve(resolve);
+      }, reject => {
+        return defer.reject(reject);
+      });
+    }
+  })
+  return defer.promise;
+}
+
+let getUSB = (req, res) => {
+  let dir = decodeURIComponent(req.query.dir);
+  getConnectedDevice(dir).then(resolve => {
+    return res.status(200).json(resolve);
+  }, reject => {
+    return res.status(500).json({'msg' : reject});
+  })
+
+}
+
 let classify = (dir, file) => {
   let defer = q.defer();
   fs.stat(dir + file, (err, stats)  => {
@@ -29,6 +125,7 @@ let moveFileWithPromise = (source, destination) => {
       return defer.resolve(destination);
     }
   })
+  return defer.promise;
 }
 
 let createFolderIfNotExists = (folderName) => {
@@ -169,7 +266,7 @@ let openDirectory = (req, res) => {
       return res.status(200).json(responseStructure);
     }
   }).then(response => {
-    let taskArray = []
+    let taskArray = [];
     for (let i in response) {
       taskArray.push(classify(currentPath, response[i]));
     }
@@ -189,34 +286,16 @@ let openDirectory = (req, res) => {
   })
 }
 
-let deleteFolder = (req, res) => {
-  let dirToDelete = decodeURIComponent(req.query.path);
-  let responseStructure = {
-    success : false,
-    msg : ''
-  }
-  exec ("rm -rf '" + dirToDelete + "'", (err, stdout, stderr) => {
-    if (err) {
-      console.log(err);
-      responseStructure.msg = "Cannot delete this folder!";
-      return res.status(500).json(responseStructure);
-    } else {
-      responseStructure.success = true;
-      return res.status(200).json(responseStructure);
-    }
-  })
-}
-
 let deleteFileFromDisk = (req, res) => {
   let fileToDelete = decodeURIComponent(req.query.path);
   let responseStructure = {
     success : false,
     msg : ''
   }
-  fs.unlink(fileToDelete, (err) => {
+  exec ("rm -rf '" + fileToDelete + "'", (err, stdout, stderr) => {
     if (err) {
       console.log(err);
-      responseStructure.msg = `File doesn't exist`
+      responseStructure.msg = "Cannot delete this file!";
       return res.status(500).json(responseStructure);
     } else {
       responseStructure.success = true;
@@ -244,16 +323,16 @@ let createNewFolder = (req, res) => {
 }
 
 let copyFile = (req, res) => {
-  let oldFile = req.body.old;
-  let newFile = req.body.new;
+  let oldFile = decodeURIComponent(req.body.old);
+  let newFile = decodeURIComponent(req.body.new);
   let responseStructure = {
     success : false,
     msg : ''
   }
-  fs.copyFile(oldFile, newFile, (err) => {
+  exec ('cp -r "' + oldFile + '" "' + newFile + '"', (err, stdout, stderr) => {
     if (err) {
       console.log(err);
-      responseStructure.msg = `Copying failed`;
+      responseStructure.msg = "Cannot copy file!";
       return res.status(500).json(responseStructure);
     } else {
       responseStructure.success = true;
@@ -296,6 +375,20 @@ let writeFileToDisk = (req, res) => {
   });
 }
 
+// Middleware to write content refresh time to a file
+let storeTimestamp = (req, res, next) => {
+    let timestamp = req.body.timestamp || req.query.timestamp;
+
+    fs.writeFile("/home/admin/meta", timestamp, function(err) {
+        if(err) {
+            return console.log(err);
+        }
+
+        next();
+        console.log("Timestamp stored.");
+    });
+}
+
 module.exports = {
-  openDirectory, deleteFolder, deleteFileFromDisk, createNewFolder, copyFile, moveFile, writeFileToDisk
+  openDirectory, deleteFileFromDisk, createNewFolder, copyFile, moveFile, writeFileToDisk, getUSB, storeTimestamp
 }

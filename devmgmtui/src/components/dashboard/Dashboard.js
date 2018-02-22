@@ -11,13 +11,6 @@ import ChartSegment from './ChartSegment';
 
 let timer;
 
-const styles = {
-    container: {
-        marginTop: '3%',
-        width: '650px'
-    }
-}
-
 class Dashboard extends Component {
 
     componentWillMount() {
@@ -25,12 +18,11 @@ class Dashboard extends Component {
             this.props.history.push("/");
         }
 
+        document.title = "Dashboard";
+
         this.props.fetchSystemData();
 
-        setInterval(() => { this.props.fetchSystemData() }, 1000);
-        document.title = "Dashboard";
-        // this.props.fetchSystemData()
-        timer = setInterval(() => { this.props.fetchSystemData() }, 1000);
+        timer = setInterval(() => { this.props.fetchSystemData() }, 5000);
     }
 
     componentWillUnmount() {
@@ -53,23 +45,24 @@ class Dashboard extends Component {
             return (
                 <Grid>
                     <Grid.Row>
-                        <Grid.Column width={8}>
+                        <Grid.Column>
                             {systemInfo()}
-                        </Grid.Column>
-
-                        <Grid.Column width={8}>
-                            {memoryUsage()}
                         </Grid.Column>
                     </Grid.Row>
 
-                    <Grid.Row>
-                        <Grid.Column width={8}>
+                    <Grid.Row relaxed columns={3}>
+                        <Grid.Column >
+                            {cpuUsage()}
+                        </Grid.Column>
+
+                        <Grid.Column>
+                            {memoryUsage()}
+                        </Grid.Column>
+
+                        <Grid.Column >
                             {spaceUsage()}
                         </Grid.Column>
 
-                        <Grid.Column width={8}>
-                            {cpuUsage()}
-                        </Grid.Column>
                     </Grid.Row>
                 </Grid>
             );
@@ -85,11 +78,9 @@ class Dashboard extends Component {
         if(typeof this.props.auth.user !== 'undefined') {
             return (
                 <SideNav>
-                    <Container style={styles.container}>
-                        <Segment>
-                            { this.renderCharts() }
-                        </Segment>
-                    </Container>
+                    <Segment style={{marginTop: '2.5%'}}>
+                        { this.renderCharts() }
+                    </Segment>
                 </SideNav>
             );
         }  else {

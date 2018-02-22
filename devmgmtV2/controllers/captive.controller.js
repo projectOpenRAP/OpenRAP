@@ -135,6 +135,16 @@ let uploadApk = (req, res) => {
   });
 }
 
+let getCurrentCaptivePortal = (req, res) => {
+  fs.readFile('/var/www/html/index.html', (err, data) => {
+    if(err) {
+      return res.status(500).json({success : false})
+    } else {
+      res.status(200).json({success : true, data : data.toString('utf-8')})
+    }
+  })
+}
+
 let writeToHtmlFile = (req, res) => {
   let htmlDump = "<html><head><title>Captive Portal</title></head><body>" + req.body.htmlData + "</body></html>";
   let targetFile = '/var/www/html/index.html';
@@ -148,4 +158,4 @@ let writeToHtmlFile = (req, res) => {
   });
 }
 
-module.exports = { uploadImage, uploadApk, writeToHtmlFile }
+module.exports = { uploadImage, uploadApk, writeToHtmlFile, getCurrentCaptivePortal }
