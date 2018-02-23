@@ -164,3 +164,24 @@ let listTables = (params) => {
     return defer.promise;
 
 }
+
+let deleteTable = (params) => {
+    let defer = q.defer();
+
+    let connection = mysql.createConnection(getDbCredentials(params.db.name));
+    connection.connect();
+
+    let query = mysql.format('DROP TABLE ??', [params.table.name]);
+
+    connection.query(query, (error, results, fields) => {
+        if(error) {
+            defer.reject(error);
+        } else {
+            defer.resolve(results); // TODO Change this to an apt message
+        }
+    });
+
+    connection.end();
+
+    return defer.promise;
+}
