@@ -23,3 +23,25 @@ let createDatabase = (params) => {
 
     return defer.promise;
 }
+
+let listDatabases  = () => {
+    let defer = q.defer();
+
+    let connection = mysql.createConnection(getDbCredentials());
+    connection.connect();
+
+    let query = 'SHOW DATABASES';
+
+    connection.query(query, (error, results, fields) => {
+        if(error) {
+            defer.reject(error);
+        } else {
+            let databaseList = results.map(row => row.Database);
+            defer.resolve(databaseList);
+        }
+    });
+
+    connection.end();
+
+    return defer.promise;
+}
