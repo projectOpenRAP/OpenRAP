@@ -66,3 +66,78 @@ let deleteDatabase = (params) => {
 
     return defer.promise;
 }
+
+// params object structure [WIP]
+//
+// {
+//     db : {
+//         name : '',
+//     }
+//
+//     table : {
+//         name : '',
+//         fields : [
+//             {
+//                 name : '',
+//                 type : '',
+//                 references : {
+//                     table : '',
+//                     field : ''
+//                 },
+//                 isNullable : true,
+//                 isPrimary : false,
+//             },
+//
+//             {
+//                 name : '',
+//                 type : '',
+//                 references : {
+//                     table : '',
+//                     field : ''
+//                 },
+//                 isNullable : true,
+//                 isPrimary : false,
+//             },
+//         ]
+//     }
+// }
+
+let createTable = (params) => {
+    let defer = q.defer();
+
+    let connection = mysql.createConnection(getDbCredentials(params.db.name));
+    connection.connect();
+
+    let query = '';
+
+    params.table.fields.map((field, index) => {
+        query = [
+                    mysql.escapeId(field.name),
+                    field.type,
+                    field.isNullable ? ',' : 'NOT NULL ,',
+                    query
+                ].join(' ');
+
+        if(field.isPrimary) {
+            query += mysql.format('PRIMARY KEY (??)', field.name);
+        }
+
+        if(field.references !== undefined) {
+            query += mysql.format(', FOREIGN KEY (??) REFERENCES ??(??)', [field.name, field.references.table, field.references.field]);
+        }
+    });
+
+    query = mysql.format('CREATE TABLE ?? (', params.table.name) + query + ')';
+
+    connection.query(query, (error, results, fields) => {
+        if(error) {
+            defer.reject(error);
+        } else {
+            defer.resolve(results); // TODO Change this to an apt message
+        }
+    });
+
+    connection.end();
+
+    return defer.promise;
+}
