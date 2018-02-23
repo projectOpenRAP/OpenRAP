@@ -141,3 +141,26 @@ let createTable = (params) => {
 
     return defer.promise;
 }
+
+let listTables = (params) => {
+    let defer = q.defer();
+
+    let connection = mysql.createConnection(getDbCredentials(params.db.name));
+    connection.connect();
+
+    let query = 'SHOW TABLES';
+
+    connection.query(query, (error, results, fields) => {
+        if(error) {
+            defer.reject(error);
+        } else {
+            let tableList = results.map(row => { /*returns table name*/ for(key in row) return row[key]; });
+            defer.resolve(tableList);
+        }
+    });
+
+    connection.end();
+
+    return defer.promise;
+
+}
