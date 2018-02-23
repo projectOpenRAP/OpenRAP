@@ -206,3 +206,18 @@ let clearRecords = (params) => {
 
     return defer.promise;
 }
+
+let addRecord = (data) => {}
+let deleteRecord = (id) => {}
+
+module.exports = {
+    createDatabase,
+    listDatabases,
+    deleteDatabase,
+
+    createTable,
+    listTables,
+    deleteTable,
+
+    clearRecords,
+}
