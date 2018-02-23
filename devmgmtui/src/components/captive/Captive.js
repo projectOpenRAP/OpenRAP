@@ -6,7 +6,7 @@ import draftToHtml from 'draftjs-to-html';
 import { connect } from 'react-redux'
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { Container, Grid, Segment, Input, Header, Button, Icon } from 'semantic-ui-react';
+import { Container, Grid, Segment, Header, Button} from 'semantic-ui-react';
 import './captive.css';
 import UploadApkButton from './UploadApkButton.js';
 import * as actions from '../../actions/captive.js';

@@ -28,9 +28,9 @@ const setSSID = (req, res) => {
         console.log('stdout: ' + stdout);
         console.log('stderr: ' + stderr);
 
-    	if(err) {
+    	if(stderr || err) {
             responseData.ssidSetSuccessful = false;
-    		responseData.msg = err;
+    		responseData.msg = stderr || err;
     	}
 
         res.status(200).json(responseData);
@@ -52,8 +52,8 @@ const getSSID = (req, res) => {
         console.log('stdout: ' + stdout);
         console.log('stderr: ' + stderr);
 
-    	if(err) {
-    		responseData.msg = err;
+    	if(stderr || err) {
+    		responseData.msg = stderr || err;
     	}
         else {
             responseData.currentSSID = stdout.trim();

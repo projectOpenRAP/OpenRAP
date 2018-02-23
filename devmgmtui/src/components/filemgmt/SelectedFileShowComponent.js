@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/filemgmt'
-import { Segment, Container, Button, Icon, Divider, Dimmer, Loader } from 'semantic-ui-react'
+import { Segment, Button, Icon, Divider, Dimmer, Loader } from 'semantic-ui-react'
 
 let selectedStyles = {
   'upload_wrapper' : {
@@ -44,7 +44,7 @@ class SelectedFileShowComponent extends Component {
       } else {
         that.setState({uploadStatus : 'UPLOADED'});
       }
-      that.props.readFolder(that.props.filemgmt.currentDir)
+      that.props.readFolder(that.props.filemgmt.currentDir);
     });
   }
 
@@ -65,16 +65,16 @@ class SelectedFileShowComponent extends Component {
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.uploadStatus != this.props.uploadStatus && this.state.uploadStatus != 'UPLOADED') {
+    if (newProps.uploadStatus !== this.props.uploadStatus && this.state.uploadStatus !== 'UPLOADED') {
       this.setState({uploadStatus : newProps.uploadStatus})
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
     let data_target = null;
-      if (prevProps.uploadStatus != this.props.uploadStatus && prevProps.uploadStatus != 'UPLOADED') {
+      if (prevProps.uploadStatus !== this.props.uploadStatus && prevProps.uploadStatus !== 'UPLOADED') {
         data_target = this.props.uploadStatus;
-    } else if (prevState.uploadStatus != this.state.uploadStatus && prevState.uploadStatus != 'UPLOADED') {
+    } else if (prevState.uploadStatus !== this.state.uploadStatus && prevState.uploadStatus !== 'UPLOADED') {
         data_target = this.state.uploadStatus;
     }
     switch (data_target) {

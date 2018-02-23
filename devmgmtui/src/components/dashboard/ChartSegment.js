@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../../actions/dashboard';
 
-import { Segment, Container, Grid, Icon, Header, List, Divider, Message, Loader, Dimmer } from 'semantic-ui-react';
+import { Segment, Container, Grid, Icon, Header, Message } from 'semantic-ui-react';
 
 import PieChart from 'react-svg-piechart';
 
@@ -151,52 +151,56 @@ class ChartSegment extends Component {
                             System Information
                         </Header>
 
-                        <Grid relaxed columns={6}>
-                            <Grid.Column width={2} verticalAlign='middle'>
-                                <UserChart
-                                    numberOfUsers={numberOfUsersConnected}
-                                />
-                            </Grid.Column>
-
-                            <Grid.Column verticalAlign='middle'>
-                                <Message
-                                    icon='time'
-                                    header='System Uptime'
-                                    content={sysUpTimeInDDHHMMSS}
-                                />
-                            </Grid.Column>
-
-                            <Grid.Column verticalAlign='middle'>
-                                <Message
-                                    icon='tag'
-                                    header='System Version'
-                                    content={sysVersion}
+                        <Grid centered columns='equal'>
+                            <Grid.Row centered>
+                                <Grid.Column verticalAlign='left'>
+                                    <UserChart
+                                        numberOfUsers={numberOfUsersConnected}
                                     />
-                            </Grid.Column>
+                                </Grid.Column>
 
-                            <Grid.Column verticalAlign='middle'>
-                                <Message
-                                icon='wifi'
-                                header='SSID'
-                                content={ssid}
-                                />
-                            </Grid.Column>
+                                <Grid.Column verticalAlign='left'>
+                                    <Message
+                                        icon='time'
+                                        header='System Uptime'
+                                        content={sysUpTimeInDDHHMMSS}
+                                    />
+                                </Grid.Column>
 
-                            <Grid.Column verticalAlign='middle'>
-                                <Message
-                                    icon='signal'
-                                    header='Internet Connectivity'
-                                    content={''}
-                                />
-                            </Grid.Column>
+                                <Grid.Column verticalAlign='left'>
+                                    <Message
+                                        icon='tag'
+                                        header='System Version'
+                                        content={sysVersion}
+                                    />
+                                </Grid.Column>
+                            </Grid.Row>
+                            <Grid.Row centered>
+                                <Grid.Column verticalAlign='left'>
+                                    <Message
+                                        icon='wifi'
+                                        header='SSID'
+                                        content={ssid}
+                                    />
+                                </Grid.Column>
 
-                            <Grid.Column width={3} verticalAlign='middle'>
-                                <Message
-                                    icon='refresh'
-                                    header='Last Content Refresh'
-                                    content={lastRefreshTime.data}
-                                />
-                            </Grid.Column>
+                                <Grid.Column verticalAlign='left'>
+                                    <Message compact
+                                        style={{width: '100%'}}
+                                        icon='signal'
+                                        header='Internet Connectivity'
+                                        content={''}
+                                    />
+                                </Grid.Column>
+
+                                <Grid.Column verticalAlign='left'>
+                                    <Message
+                                        icon='refresh'
+                                        header='Last Content Refresh'
+                                        content={lastRefreshTime.data}
+                                    />
+                                </Grid.Column>
+                            </Grid.Row>
                         </Grid>
                     </Segment>
                 )

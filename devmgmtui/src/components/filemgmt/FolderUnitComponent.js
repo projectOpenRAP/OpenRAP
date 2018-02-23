@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/filemgmt'
-import { Card, Image, Icon, Divider, Checkbox } from 'semantic-ui-react'
+import { Icon, Divider, Checkbox } from 'semantic-ui-react'
 
 
 let fileDisplayStyles = {
@@ -53,12 +53,13 @@ class FolderUnitComponent extends Component {
   }
 
   handleDelete() {
-    let consent = window.confirm("This folder will be deleted! [No Undo]");
+    let consent = window.confirm("Cannot be reverted once it is deleted. Are you sure you want to delete this folder?");
     if (consent) {
       this.props.deleteFolder(this.props.filemgmt.currentDir, this.props.name, (err, res) => {
         if (err) {
           alert(res);
         } else {
+          alert("Folder deletion success");
           this.props.readFolder(this.props.filemgmt.currentDir);
         }
       });

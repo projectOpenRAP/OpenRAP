@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/filemgmt'
-import { Sidebar, Segment, Menu, Icon, Header } from 'semantic-ui-react'
+import { Sidebar, Menu, Icon } from 'semantic-ui-react'
 class SideNav extends Component {
     constructor(props){
         super(props);
