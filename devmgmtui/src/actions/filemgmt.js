@@ -17,7 +17,7 @@ export const readFolder = (folderPath, update=true) => (dispatch) => {
       }
       dispatch({type : 'READ_DIR', payload : response.data.children});
       dispatch({type : 'OPEN_DIR', payload : folderPath});
-    })
+  })
     .catch(e => {
       console.log(e);
       alert ('No permissions to read folder');
@@ -138,7 +138,7 @@ export const deleteBunchOfFiles = (prefix, fileList, cb) => (dispatch) => {
       if (values.indexOf("Server Error") >= 0) {
         cb('Error');
       } else {
-        cb('Success');
+        cb('Deletion Success');
       }
     })
   })

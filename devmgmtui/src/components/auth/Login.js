@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import {Redirect } from 'react-router-dom'
 import * as actions from '../../actions/auth'
 import './login.css'
-import { Container,Grid, Segment, Input, Header, Button, Icon } from 'semantic-ui-react';
+import { Container, Grid, Segment, Input, Header, Button, Icon } from 'semantic-ui-react';
 
 const styles = {
     loginForm: {
