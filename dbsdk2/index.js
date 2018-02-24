@@ -15,7 +15,7 @@ let createDatabase = (params) => {
         if(error) {
             defer.reject(error);
         } else {
-            defer.resolve(results); // TODO Change this to an apt message
+            defer.resolve(results);
         }
     });
 
@@ -24,7 +24,7 @@ let createDatabase = (params) => {
     return defer.promise;
 }
 
-let listDatabases  = () => {
+let listDatabases = () => {
     let defer = q.defer();
 
     let connection = mysql.createConnection(getDbCredentials());
@@ -58,7 +58,7 @@ let deleteDatabase = (params) => {
         if(error) {
             defer.reject(error);
         } else {
-            defer.resolve(results); // TODO Change this to an apt message
+            defer.resolve(results);
         }
     });
 
@@ -67,7 +67,7 @@ let deleteDatabase = (params) => {
     return defer.promise;
 }
 
-// params object structure [WIP]
+// Input JSON
 //
 // {
 //     db : {
@@ -133,7 +133,7 @@ let createTable = (params) => {
         if(error) {
             defer.reject(error);
         } else {
-            defer.resolve(results); // TODO Change this to an apt message
+            defer.resolve(results);
         }
     });
 
@@ -177,7 +177,7 @@ let deleteTable = (params) => {
         if(error) {
             defer.reject(error);
         } else {
-            defer.resolve(results); // TODO Change this to an apt message
+            defer.resolve(results);
         }
     });
 
@@ -185,6 +185,111 @@ let deleteTable = (params) => {
 
     return defer.promise;
 }
+
+let addRecord = (params) => {}
+
+//Input JSON
+//
+// {
+//     "db" : {
+//         "name" : "",
+//     },
+//
+//     "table" : {
+//         "name" : "",
+//         "fields" : ["", ""],
+//         "filters" : [
+//             {
+//                 "by" : "",
+//                 "if" : "",
+//                 "onlyIf" : ""
+//             },
+//             {
+//                 "by" : "",
+//                 "if" : "",
+//                 "onlyIf" : ""
+//             }
+//         ],
+//         "sort" : [
+//             {
+//                 "by" : "",
+//                 "desc" : false
+//             },
+//             {
+//                 "by" : "",
+//                 "desc" : false
+//             }
+//         ]
+//     }
+// }
+
+let readRecords = (params) => {
+    let defer = q.defer();
+
+    let connection = mysql.createConnection(getDbCredentials(params.db.name));
+    connection.connect();
+
+    let query = [
+                    'SELECT',
+                    params.table.fields.map(field => mysql.escapeId(field)),
+                    'FROM',
+                    mysql.escapeId(params.table.name),
+                ].join(' ');
+
+    let filters = params.table.filters;
+    let sort = params.table.sort;
+
+    if(filters !== undefined) {
+        filters.map((filter, index) => {
+            if(index === 0) {
+                query = [
+                            query,
+                            'WHERE',
+                            mysql.escapeId(filter.by),
+                            (filter.if || filter.onlyIf).trim(),
+                        ].join(' ');
+            }
+            else {
+                query = [
+                            query,
+                            filter.if && 'OR',
+                            filter.onlyIf && 'AND',
+                            mysql.escapeId(filter.by),
+                            (filter.if || filter.onlyIf),
+                        ].join(' ');
+            }
+        });
+    }
+
+    if(sort !== undefined) {
+        params.table.sort.map((sort, index) => {
+            query = [
+                        query,
+                        (index === 0) ? 'ORDER BY' : '',
+                        mysql.escapeId(sort.by),
+                        sort.desc ? 'DESC,' : 'ASC,'
+                    ].join(' ');
+        });
+
+        query = query.replace(/,+$/, '');
+    }
+
+    console.log(query);
+
+    connection.query(query, (error, results, fields) => {
+        if(error) {
+            defer.reject(error);
+        } else {
+            defer.resolve(results);
+        }
+    });
+
+    connection.end();
+
+    return defer.promise;
+}
+
+let deleteRecord = (params) => {}
 
 let clearRecords = (params) => {
     let defer = q.defer();
@@ -198,7 +303,7 @@ let clearRecords = (params) => {
         if(error) {
             defer.reject(error);
         } else {
-            defer.resolve(results); // TODO Change this to an apt message
+            defer.resolve(results);
         }
     });
 
@@ -207,8 +312,6 @@ let clearRecords = (params) => {
     return defer.promise;
 }
 
-let addRecord = (data) => {}
-let deleteRecord = (id) => {}
 
 module.exports = {
     createDatabase,
@@ -219,5 +322,8 @@ module.exports = {
     listTables,
     deleteTable,
 
-    clearRecords,
+    addRecord,
+    readRecords,
+    deleteRecord,
+    clearRecords
 }
