@@ -22,23 +22,15 @@ const db = require('./index.js');
 //         }
 //     );
 
-// db.deleteDatabase({ db : { name : 'test1' } })
+// db.deleteDatabase({ db : { name : 'test' } })
 //     .then(
 //         (response) => {
 //             console.log(response);
 //         },
 //         (error) => {
-//             console.log(error);
 //         }
+//             console.log(error);
 //     );
-
-// CREATE TABLE Orders (
-//     OrderID int NOT NULL,
-//     OrderNumber int NOT NULL,
-//     PersonID int,
-//     PRIMARY KEY (OrderID),
-//     FOREIGN KEY (PersonID) REFERENCES Persons(PersonID)
-// );
 
 // let tableDef = {
 //     db : {
@@ -46,7 +38,7 @@ const db = require('./index.js');
 //     },
 //
 //     table : {
-//         name : 'Orders2',
+//         name : 'Orders',
 //         fields : [
 //             {
 //                 name : 'OrderID',
@@ -90,6 +82,51 @@ const db = require('./index.js');
 //     );
 
 // db.deleteTable({db : { name : 'test' }, table : { name : 'Orders2' }})
+//     .then(
+//         (response) => {
+//             console.log(response);
+//         },
+//         (error) => {
+//             console.log(error);
+//         }
+//     );
+
+// let toRead = {
+//     "db" : {
+//         "name" : "test",
+//     },
+//
+//     "table" : {
+//         "name" : "Orders",
+//         "fields" : ["*"],
+//         "filters" : [
+//             {
+//                 "by" : "OrderNumber",
+//                 "onlyIf" : "IN (1, 2)"
+//             },
+//             {
+//                 "by" : "OrderID",
+//                 "if" : "< 12"
+//             },
+//             {
+//                 "by" : "OrderNumber",
+//                 "if" : "IN (1, 2)"
+//             }
+//         ],
+//         "sort" : [
+//             {
+//                 "by" : "OrderID",
+//                 "desc" : true
+//             },
+//             {
+//                 "by" : "OrderNumber",
+//                 "desc" : false
+//             }
+//         ]
+//     }
+// }
+//
+// db.readRecords(toRead)
 //     .then(
 //         (response) => {
 //             console.log(response);
