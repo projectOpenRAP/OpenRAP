@@ -24,7 +24,7 @@ glob(pluginPath + "/**/*.routes.js", function (er, files) {
     TODO: make the port configurable later
 */
 
-app.listen(9090, err => {
+app.listen(9099, err => {
     if (err)
         console.log(err);
     else
