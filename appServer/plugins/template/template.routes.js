@@ -1,6 +1,6 @@
 /* 
     Sample plugin entry file. 
-    File must be named as <pluginName>.routes.js and kept in root directory
+    File must be named as <pluginName>.routes.js and kept in plugin root directory
     A function is exported which takes in express app instance as argument
 
 */

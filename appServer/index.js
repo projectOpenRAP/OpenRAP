@@ -8,12 +8,12 @@
 const express = require('express');
 const app = express();
 const glob = require('glob');
-
+const pluginPath = './plugins';
 /*
     Loading all the plugins from plugin directory
 */
 
-glob("./plugins/**/*.routes.js", function (er, files) {
+glob(pluginPath + "/**/*.routes.js", function (er, files) {
     for (let i = 0; i < files.length; i++) {
         require(files[i])(app);
     }
