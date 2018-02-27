@@ -8,7 +8,6 @@ const targz = require('targz');
 const ncp = require('ncp').ncp;
 ncp.limit = 16;
 
-/* working */
 let readFile = (path) => {
     let defer = q.defer();
     fs.readFile(path, 'utf8', function (err, contents) {
@@ -17,7 +16,6 @@ let readFile = (path) => {
     });
     return defer.promise;
 }
-/* working, overwrites or creates new file */
 let writeFile = (path, contents) => {
     let defer = q.defer();
     fs.writeFile(path, contents, (err) => {
@@ -26,7 +24,6 @@ let writeFile = (path, contents) => {
     });
     return defer.promise;
 }
-/* working */
 let deleteFile = (path) => {
     let defer = q.defer();
     fs.unlink(path, function (err) {
@@ -35,7 +32,6 @@ let deleteFile = (path) => {
     });
     return defer.promise;
 }
-/* working */
 let deleteDir = (path) => {
     let defer = q.defer();
     rimraf(path, function (err) {
@@ -44,7 +40,6 @@ let deleteDir = (path) => {
     });
     return defer.promise;
 }
-/* works for every use case */
 let copy = (source, destination) => {
     let defer = q.defer();
     ncp(source, destination, function (err) {
@@ -53,7 +48,6 @@ let copy = (source, destination) => {
     });
     return defer.promise;
 }
-/* works for every use case */
 let move = (source, destination) => {
     let defer = q.defer();
     fs.rename(source, destination, function (err) {
@@ -62,18 +56,7 @@ let move = (source, destination) => {
     });
     return defer.promise;
 }
-/* works for every use case */
-let rename = (source, destination) => {
-    let defer = q.defer();
-    fs.rename(source, destination, function (err) {
-        if (err) return defer.reject(err);
-        return defer.resolve("Renamed!!!");
-    });
-    return defer.promise;
-}
-/*
-works for directory
-*/
+
 let readdir = (path) => {
     let defer = q.defer();
     fs.readdir(path, function (err, items) {
@@ -83,9 +66,6 @@ let readdir = (path) => {
     return defer.promise;
 }
 
-/*
-works for dir and file 
-*/
 let getInfo = (path) => {
     let defer = q.defer();
     fs.stat(path, function (err, stats) {
@@ -94,7 +74,6 @@ let getInfo = (path) => {
     });
     return defer.promise;
 }
-/* works */
 let extractZip = (source, destination) => {
     let defer = q.defer();
     extract(source, { dir: destination }, function (err) {
@@ -103,7 +82,6 @@ let extractZip = (source, destination) => {
     })
     return defer.promise;
 }
-/* works */
 let extractTar = (source, destination) => {
     let defer = q.defer();
     targz.decompress({
@@ -115,7 +93,6 @@ let extractTar = (source, destination) => {
     });
     return defer.promise;
 }
-/* works */
 let createTar = (source, destination) => {
     let defer = q.defer();
     targz.compress({
@@ -141,11 +118,3 @@ module.exports = {
     extractTar,
     createTar
 }
-
-/* tests */
-// let playground = '/home/stuart/Documents/work/pinut/OpenRAP/filesdk/playground/';
-// extractTar(playground + 'test.tar.gz', playground).then(data => {
-//     console.log(data);
-// }, err => {
-//     console.log(err);
-// })
