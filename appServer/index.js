@@ -6,9 +6,11 @@
 'use strict';
 
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
 const glob = require('glob');
 const pluginPath = './plugins';
+app.use(bodyParser.urlencoded({ extended: true }));
 /*
     Loading all the plugins from plugin directory
 */
@@ -28,5 +30,5 @@ app.listen(9099, err => {
     if (err)
         console.log(err);
     else
-        console.log("listening on 9090");
+        console.log("listening on 9099");
 })

@@ -1,22 +1,30 @@
 let request = require('request');
 let q  = require('q');
+let FormData = require('form-data');
+let fs = require('fs');
 let { BASE_URL, HOME_EXT, SEARCH_EXT, ID_MIDDLE, TELEMETRY_EXT, ECAR_MIDDLE } = require('./config.js');
 
 let getHomePage = (req, res) => {
     /*
-        request body structure :
+        request body structure : stringified
         {
-            'contentid' : 'string',
-            'did' : 'string',
-            'dlang' : 'string',
-            'uid' : 'string'
+            id : 'string',
+            ets : number,
+            request : {
+                context : {
+                    contentid : 'string',
+                    did :  'string',
+                    dlang : 'string',
+                    uid :  'string',
+                }
+            }
+
         }
     */
-    let defer = q.defer();
     let options = {
         url : `${BASE_URL}/${HOME_EXT}`,
         method : 'POST',
-        body : req.body
+        body : JSON.stringify(req.body)
     };
     request(options, (err, resp, body) => {
         if (err) {
@@ -30,12 +38,11 @@ let getHomePage = (req, res) => {
             }
         }
     });
-    return defer.promise;
 }
 
 let performSearch = (req, res) => {
     /*
-        request body structure :
+        request body structure : stringified
         {
            "request": {
             "facets": [
@@ -73,10 +80,12 @@ let performSearch = (req, res) => {
 
 
     */
+    console.log(Object.keys(req));
+    console.log(req.method);
     let options = {
         url : `${BASE_URL}/${SEARCH_EXT}`,
         method : 'POST',
-        body : req.body
+        body : JSON.stringify(req.body)
     };
     request(options, (err, resp, body) => {
         if (err) {
@@ -93,82 +102,36 @@ let performSearch = (req, res) => {
 }
 
 let telemetryData = (req, res) => {
-    /*
-        Takes binary data as body
-    */
+    form = {
+        file : fs.createReadStream(req.files.file.path)
+    }
     let options = {
         url : `${BASE_URL}/${TELEMETRY_EXT}`,
         method : 'POST',
-        body : req.body
+        formData : form
     };
     request(options, (err, resp, body) => {
-        if (err) {
-            return res.status(500).json({err, success : false});
-        } else {
-            let statusCode = resp.statusCode.toString();
-            if (statusCode.search(/^[2][\d][\d]$/) === -1) {
-                return res.status(resp.statusCode).json({err : body, success : false});
+        fs.unlink(req.files.file.path, (err2) => {
+            if (err || err2) {
+                err = err2 | err;
+                return res.status(500).json({err, success : false});
             } else {
-                return res.status(200).json({body, success : true});
+                let statusCode = resp.statusCode.toString();
+                if (statusCode.search(/^[2][\d][\d]$/) === -1) {
+                    return res.status(resp.statusCode).json({err : body, success : false});
+                } else {
+                    return res.status(200).json({body, success : true});
+                }
             }
-        }
-    });
-}
-
-let addEcar = (req, res) => {
-    /*
-        Uses name of file in params as jsonfile
-    */
-    let name = req.query.name;
-    let options = {
-        url : `${BASE_URL}/${ECAR_MIDDLE}/${name}`,
-        method : 'PUT',
-    };
-    request(options, (err, resp, body) => {
-        if (err) {
-            return res.status(500).json({err, success : false});
-        } else {
-            let statusCode = resp.statusCode.toString();
-            if (statusCode.search(/^[2][\d][\d]$/) === -1) {
-                return res.status(resp.statusCode).json({err : body, success : false});
-            } else {
-                return res.status(200).json({body, success : true});
-            }
-        }
-    });
-}
-
-let deleteEcar = (req, res) => {
-    /*
-        Uses name of file in params as jsonfile
-    */
-    let name = req.query.name;
-    let options = {
-        url : `${BASE_URL}/${ECAR_MIDDLE}/${name}`,
-        method : 'DELETE',
-    };
-    request(options, (err, resp, body) => {
-        if (err) {
-            return res.status(500).json({err, success : false});
-        } else {
-            let statusCode = resp.statusCode.toString();
-            if (statusCode.search(/^[2][\d][\d]$/) === -1) {
-                return res.status(resp.statusCode).json({err : body, success : false});
-            } else {
-                return res.status(200).json({body, success : true});
-            }
-        }
+        });
     });
 }
 
 let getEcarById = (req, res) => {
-    /*
-        takes contentID param
-    */
     let contentID = req.query.contentID;
     let options = {
-        url : `${BASE_URL}/${ECAR_MIDDLE}/${name}`,
-        method : 'DELETE',
+        url : `${BASE_URL}/${ID_MIDDLE}/${contentID}`,
+        method : 'GET',
     };
     request(options, (err, resp, body) => {
         if (err) {
@@ -189,6 +152,5 @@ module.exports = {
     getHomePage,
     performSearch,
     telemetryData,
-    addEcar,
-    deleteEcar
+    getEcarById
 }
