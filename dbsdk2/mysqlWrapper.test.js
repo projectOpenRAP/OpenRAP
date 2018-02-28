@@ -1,6 +1,6 @@
 'use strict'
 
-// const db = require('./index.js');
+const db = require('./mysqlWrapper.js');
 
 // db.createDatabase({db : { name : 'test'} })
 //     .then(
