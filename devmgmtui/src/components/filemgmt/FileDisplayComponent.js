@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/filemgmt'
-import {List, Grid, Icon, Button, Divider, Segment, Input, Dimmer, Loader} from 'semantic-ui-react'
+import {List, Icon, Button, Divider, Segment, Input, Dimmer, Loader} from 'semantic-ui-react'
 import FolderUnitComponent from './FolderUnitComponent'
 import FileUnitComponent from './FileUnitComponent'
 
@@ -75,7 +75,7 @@ class FileDisplayComponent extends Component {
     if (this.props.filemgmt.selectedFiles.length < 1) {
       return;
     }
-    let consent = window.confirm("All selected files will be deleted! [No Undo]");
+    let consent = window.confirm("Cannot be reverted once it is deleted. Are you sure you want to delete the selected?");
     if (!consent) {
       return;
     }
@@ -93,7 +93,7 @@ class FileDisplayComponent extends Component {
 
 
   renderFileDisplayComponent() {
-    let that = this;
+    //let that = this;
     let folders = this.props.filemgmt.files.map((item, index) => {
         return (
           item.type === 'dir' ? <List.Item key={index}><FolderUnitComponent name={item.name} size={item.size} /></List.Item>  : null

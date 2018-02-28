@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/filemgmt'
-import { Card, Image, Icon, Divider, Checkbox } from 'semantic-ui-react'
+import { Icon, Divider, Checkbox } from 'semantic-ui-react'
 
 
 let formatBytes = (bytes,decimals) => {
-   if(bytes == 0) return '0 Bytes';
+   if(bytes === 0) return '0 Bytes';
    var k = 1024,
        dm = decimals || 2,
        sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
@@ -58,12 +58,13 @@ class FileUnitComponent extends Component {
   }
 
   handleDelete() {
-    let consent = window.confirm("This file will be deleted! [No Undo]");
+    let consent = window.confirm("Cannot be reverted once it is deleted. Are you sure you want to delete this file?");
     if (consent) {
       this.props.deleteFile(this.props.filemgmt.currentDir, this.props.name, (err, res) => {
         if (err) {
           alert(res);
         } else {
+          alert("File deletion success");
           this.props.readFolder(this.props.filemgmt.currentDir);
         }
       });

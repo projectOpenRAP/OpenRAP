@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/filemgmt'
-import { Button, Icon, Segment, Popup, Divider } from 'semantic-ui-react'
+import { Button, Icon, Segment } from 'semantic-ui-react'
 import SelectedFileShowComponent from './SelectedFileShowComponent'
 
 

@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../../actions/dashboard';
 
-import { Segment, Container, Grid, Icon, Header } from 'semantic-ui-react';
+import { Segment, Grid } from 'semantic-ui-react';
 
 import SideNav from '../common/Sidebar';
 import ChartSegment from './ChartSegment';

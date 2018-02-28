@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import SideNav from '../common/Sidebar'
 import * as actions from '../../actions/filemgmt'
-import { Segment, Container, Sticky, Rail, Grid } from 'semantic-ui-react'
+import { Segment, Grid } from 'semantic-ui-react'
 import FileUploadComponent from './FileUploadComponent'
 import FileDisplayComponent from './FileDisplayComponent'
 

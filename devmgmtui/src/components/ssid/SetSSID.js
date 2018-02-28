@@ -45,14 +45,13 @@ class SetSSID extends Component {
 
     handleSubmit() {
         alert("Your device is about to be disconnected. You may reconnect after the SSID has been updated.");
-
+        setTimeout(() => { alert("SSID is updated to "+this.state.ssid); }, 1500);
         this.props.setSSID(this.state.ssid, (err, data) => {
             if(err) {
                 alert(data.msg);
             }
             else {
-                // alert("SSID set successfully to : " + this.state.ssid);
-                this.props.history.push('/dashboard');
+                alert("SSID was updated to "+this.state.ssid);
             }
         });
     }

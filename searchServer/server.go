@@ -97,7 +97,7 @@ func loadIndexAndServe(indexDir, bindAddr string) {
 	docDeleteHandler := bleveHttp.NewDocDeleteHandler("")
 	docDeleteHandler.IndexNameLookup = indexNameLookup
 	docDeleteHandler.DocIDLookup = docIDLookup
-	router.Handle("/api/search/v2/index/{indexName}/docuemnt/{docID}", docDeleteHandler).Methods("DELETE")
+	router.Handle("/api/search/v2/index/{indexName}/document/{docID}", docDeleteHandler).Methods("DELETE")
 
 	searchHandler := bleveHttp.NewSearchHandler("")
 	searchHandler.IndexNameLookup = indexNameLookup
