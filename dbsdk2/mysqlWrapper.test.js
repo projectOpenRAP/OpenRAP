@@ -26,14 +26,14 @@ const db = require('./mysqlWrapper.js');
 //     );
 
 
-// db.deleteDatabase({ db : { name : 'test' } })
+// db.deleteDatabase({ db : { name : 'test2' } })
 //     .then(
 //         (response) => {
 //             console.log(response);
 //         },
 //         (error) => {
-//         }
 //             console.log(error);
+//         }
 //     );
 
 
@@ -107,7 +107,7 @@ const db = require('./mysqlWrapper.js');
 //     table : {
 //         name : 'Orders',
 //         fields : ['OrderNumber', 'OrderID'],
-//         values : ['107','44']
+//         values : ['1','1']
 //     }
 // }
 //
@@ -225,7 +225,7 @@ const db = require('./mysqlWrapper.js');
 //     }
 // }
 //
-// db.deleteRecord(toDelete)
+// db.deleteRecords(toDelete)
 //     .then(
 //         (response) => {
 //             console.log(response);
