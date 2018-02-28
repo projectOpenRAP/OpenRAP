@@ -196,7 +196,7 @@ let listTables = (params) => {
         } else {
             let tableList = results.map(row => { /*returns table name*/ for(key in row) return row[key]; });
 
-            response = { ...response, success : true, message : 'List fetched.' };
+            response = { ...response, success : true, message : 'List fetched.', results : tableList };
             defer.resolve(response);
         }
     });
