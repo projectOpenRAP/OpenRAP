@@ -12,7 +12,7 @@ let createDatabase = (params) => {
     let response = {
         success : false,
         message : '',
-        results : ''
+        results : []
     }
 
     let query = mysql.format('CREATE DATABASE IF NOT EXISTS ??', [params.db.name]);
@@ -41,7 +41,7 @@ let listDatabases = () => {
     let response = {
         success : false,
         message : '',
-        results : ''
+        results : []
     }
 
     let query = 'SHOW DATABASES';
@@ -72,7 +72,7 @@ let deleteDatabase = (params) => {
     let response = {
         success : false,
         message : '',
-        results : ''
+        results : []
     }
 
     let query = mysql.format('DROP DATABASE ??', [params.db.name]);
@@ -136,7 +136,7 @@ let createTable = (params) => {
     let response = {
         success : false,
         message : '',
-        results : ''
+        results : []
     }
 
     let query = '';
@@ -184,7 +184,7 @@ let listTables = (params) => {
     let response = {
         success : false,
         message : '',
-        results : ''
+        results : []
     }
 
     let query = 'SHOW TABLES';
@@ -216,7 +216,7 @@ let deleteTable = (params) => {
     let response = {
         success : false,
         message : '',
-        results : ''
+        results : []
     }
 
     let query = mysql.format('DROP TABLE ??', [params.table.name]);
@@ -259,7 +259,7 @@ let addRecord = (params) => {
     let response = {
         success : false,
         message : '',
-        results : ''
+        results : []
     }
 
     let query = [
@@ -329,7 +329,7 @@ let readRecords = (params) => {
     let response = {
         success : false,
         message : '',
-        results : ''
+        results : []
     }
 
     let query = [
@@ -446,7 +446,7 @@ let updateRecords = (params) => {
     let response = {
         success : false,
         message : '',
-        results : ''
+        results : []
     }
 
     let query = mysql.format('UPDATE ??', params.table.name);
@@ -535,7 +535,7 @@ let deleteRecords = (params) => {
     let response = {
         success : false,
         message : '',
-        results : ''
+        results : []
     }
 
     let query = [
@@ -591,7 +591,7 @@ let clearRecords = (params) => {
     let response = {
         success : false,
         message : '',
-        results : ''
+        results : []
     }
 
     let query = mysql.format('TRUNCATE TABLE ??', [params.table.name]);
