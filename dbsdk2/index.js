@@ -1,5 +1,8 @@
 'user strict'
 
+// TODO Write test!
+// TODO Update the jSON structure
+
 const mysql                 =   require('mysql');
 const q                     =   require('q');
 const { getDbCredentials }  =   require('./config');
