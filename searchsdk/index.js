@@ -36,6 +36,7 @@ let init = () => {
     }
     request(options, (err, res, body) => {
         if (err) {
+            console.log(err);
             return defer.reject({err, at : "init"});
         } else {
             return defer.resolve({body, success : true})

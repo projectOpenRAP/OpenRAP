@@ -1,0 +1,23 @@
+{
+    "id": "ekstep.composite-search.search",
+    "ver": "2.0",
+    "ts": "2017-06-21T08:45:23ZZ",
+    "params": {
+        "resmsgid": "0211201a-c91e-41d6-ad25-392de813124c",
+        "msgid": null,
+        "err": null,
+        "status": "successful",
+        "errmsg": null
+    },
+    "responseCode": "OK",
+    "result": {
+        "count": 0,
+        "content": [],
+        "facets": [
+            {
+                "values": [],
+                "name": ""
+            }
+        ]
+    }
+}
