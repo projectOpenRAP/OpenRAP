@@ -161,7 +161,7 @@ let createTable = (params) => {
         }
     });
 
-    query = mysql.format('CREATE TABLE ?? (', params.table.name) + query + ')';
+    query = mysql.format('CREATE TABLE IF NOT EXISTS ?? (', params.table.name) + query + ')';
 
     connection.query(query, (error, results, fields) => {
         if(error) {
