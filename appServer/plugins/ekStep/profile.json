@@ -1,0 +1,69 @@
+{
+    "active_profile": "ekstep", 
+    "available_profiles": {
+        "ekstep": {
+            "accepted_extensions": [
+                ".ecar", 
+                ".json"
+            ], 
+            "cdn_scripts_dir": "/opt/opencdn/CDN/", 
+            "cdn_url": "http://cdn.ekstep.com", 
+            "config_json_dir": "/var/www/ekstep/config_json/", 
+            "config_json_name": "config.json", 
+            "content_root": "/var/www/ekstep/ecar_files/", 
+            "json_dir": "/var/www/ekstep/json_dir/", 
+            "media_root": "/var/www/ekstep/", 
+            "profile_name": "ekstep", 
+            "server_root": "/opt/opencdn/devmgmt/file_upload/", 
+            "telemetry": "/var/www/ekstep/telemetry/", 
+            "unzip_content": "/var/www/ekstep/xcontent/", 
+            "unzip_contentdir_name": "xcontent", 
+            "usb_dir": "ecar_files", 
+            "usb_on_automount": "/media/"
+        }, 
+        "meghshala": {
+            "accepted_extensions": [
+                ".data", 
+                ".json"
+            ], 
+            "cdn_scripts_dir": "/opt/opencdn/CDN/", 
+            "cdn_url": "http://edge.meghshala.com", 
+            "config_json_dir": "/var/www/meghshala/config_json/", 
+            "config_json_name": "config.json", 
+            "content_root": "/var/www/meghshala/content/", 
+            "json_dir": "/var/www/meghshala/json_dir/", 
+            "media_root": "/var/www/meghshala/", 
+            "profile_name": "meghshala", 
+            "server_root": "/opt/opencdn/devmgmt/file_upload/", 
+            "telemetry": "/var/www/meghshala/telemetry/", 
+            "unzip_content": "/var/www/meghshala/content/", 
+            "unzip_contentdir_name": "content", 
+            "usb_dir": "data_files", 
+            "usb_on_automount": "/media/"
+        }, 
+        "pinut": {
+            "accepted_extensions": [
+                ".mp4", 
+                ".mov", 
+                ".mp3", 
+                ".png", 
+                ".jpeg", 
+                ".pdf"
+            ], 
+            "cdn_scripts_dir": "/opt/opencdn/CDN/", 
+            "cdn_url": "http://app.pinut.in", 
+            "config_json_dir": "/var/www/pinut_data/config_json/", 
+            "config_json_name": "config.json", 
+            "content_root": "/var/www/pinut_data/content/", 
+            "json_dir": "/var/www/pinut_data/json_dir/", 
+            "media_root": "/var/www/pinut_data/", 
+            "profile_name": "pinut", 
+            "server_root": "/opt/opencdn/devmgmt/file_upload/", 
+            "telemetry": "/var/www/pinut_data/telemetry/", 
+            "unzip_content": "/var/www/pinut_data/content/", 
+            "unzip_contentdir_name": "content", 
+            "usb_dir": "pinut_data", 
+            "usb_on_automount": "/media/"
+        }
+    }
+}

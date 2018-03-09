@@ -1,11 +1,14 @@
-let request = require('request');
 let q  = require('q');
 let FormData = require('form-data');
+let { extractZip, deleteDir } = require('../../../filesdk');
 let fs = require('fs');
 let { BASE_URL, HOME_EXT, SEARCH_EXT, ID_MIDDLE, TELEMETRY_EXT, ECAR_MIDDLE } = require('./config.js');
 let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices } = require('../../../searchsdk/index.js');
 let baseInt = 0;
 
+/*
+    Loads the response structure skeleton of each and every file
+*/
 let loadSkeletonJson = (jsonFileName) => {
     let defer = q.defer();
     fs.readFile(`./plugins/ekStep/${jsonFileName}.json`, (err, data) => {
@@ -19,7 +22,9 @@ let loadSkeletonJson = (jsonFileName) => {
     return defer.promise;
 }
 
-
+/*
+    Removes the preceding attributes from the keys to conform to response structure
+*/
 let cleanKeys = (fieldList) => {
     let defer = q.defer();
     let newFieldList = {};
@@ -31,6 +36,9 @@ let cleanKeys = (fieldList) => {
     return defer.promise;
 }
 
+/*
+    Combines all the results and sends them for cleaning
+*/
 let parseResults = (values) => {
     let defer = q.defer();
     let fields = values.map(value => (JSON.parse(values[0].value.body).fields));
@@ -40,12 +48,13 @@ let parseResults = (values) => {
     }
     q.allSettled(fieldPromises).then(values => {
         return defer.resolve({responses : values.map(value => value.value)});
-    }, issues => {
-        return defer.reject({bad : issues});
     });
     return defer.promise;
 }
 
+/*
+    Identifies the documents that solve a query and extracts all metadata from them
+*/
 let doThoroughSearch = (queryString) => {
     let defer = q.defer();
     search({indexName : 'es.db', searchString : queryString})
@@ -67,6 +76,9 @@ let doThoroughSearch = (queryString) => {
     return defer.promise;
 }
 
+/*
+    Grabs data pertaining to facets and processes them in order to conform to standards
+*/
 let crunchFacets = (facets) => {
     let defer = q.defer();
     let facetResult = {}
@@ -82,24 +94,24 @@ let crunchFacets = (facets) => {
         }
         facetResult[key] = facetObject;
     }
-    console.log(facetResult);
     defer.resolve({facetResult});
     return defer.promise;
 }
 
+/*
+    Begins the facet crunching process by sorting results based on their values for each facet
+*/
 let performCounting = (results, facets) => {
     let defer = q.defer();
     let responseStructure = {};
     facets.forEach(facet => {
         responseStructure[facet] = [];
     });
-    console.log(responseStructure);
     results.forEach(result => {
         facets.forEach(facet => {
             responseStructure[facet].push(result[facet]);
         });
     });
-    console.log(responseStructure);
     crunchFacets(responseStructure).then(value => {
         let facetResult = value.facetResult;
         let facetResultAsList = [];
@@ -142,7 +154,6 @@ let getHomePage = (req, res) => {
         }
     */
     let parsedReq = req.body;
-    console.log(parsedReq);
     let deviceId = parsedReq.id;
     let ets = parsedReq.ets;
     let request = parsedReq.request;
@@ -161,20 +172,6 @@ let getHomePage = (req, res) => {
     loadSkeletonJson('homePageResponseSkeleton').then(value => {
         responseStructure = value.data;
         return doThoroughSearch(queryString);
-        /*
-        return search({indexName : 'es.db', searchString : queryString});
-    }).then(value => {
-        let defer = q.defer();
-        let hitPromises = [];
-        let hits = JSON.parse(value.body).hits;
-        for (let i in hits) {
-            let id = hits[i].id;
-            hitPromises.push(getDocument({indexName : 'es.db', documentID : id}));
-        }
-        q.allSettled(hitPromises).then(values => {
-            return defer.resolve((parseResults(values)));
-        });
-        return defer.promise; */
     }).then(value => {
         let responses = value.responses;
         responseStructure.result.page.sections[0].contents = responses[0];
@@ -195,7 +192,7 @@ let getHomePage = (req, res) => {
 
 let performSearch = (req, res) => {
     /*
-        request body structure : stringified
+        request body structure :
         {
            "request": {
             "facets": [
@@ -237,7 +234,6 @@ let performSearch = (req, res) => {
     let facets = request.facets;
     let responseStructure = {};
     let query = request.query;
-    console.log(query);
     loadSkeletonJson('searchResponseSkeleton')
     .then(value => {
         responseStructure = value.data;
@@ -258,7 +254,6 @@ let performSearch = (req, res) => {
 
 let getEcarById = (req, res) => {
     let contentID = req.params.contentID;
-    console.log(contentID);
     let responseStructure = {};
     loadSkeletonJson('searchIdResponseSkeleton')
     .then(value => {
@@ -303,98 +298,150 @@ let telemetryData = (req, res) => {
 
 // Custom Extract BEHAVIOR
 
-let createFolderIfNotExists = (folderName) => {
-  let defer = q.defer();
-  fs.stat(folderName, (err, stats) => {
-    if (err || !(stats.isDirectory())) {
-      fs.mkdir(folderName, (err) => {
-        if (err) {
-          console.log(err);
-          return defer.reject(err);
+/*
+    Moves a file with a promise wrapper; deletes any older file present with the same name.
+*/
+let moveFileWithPromise = (source, destination) => {
+    let defer = q.defer();
+    fs.rename(source, destination, (err) => {
+        if (err && err.code === 'ENOTEMPTY') {
+            deleteDir(destination)
+            .then(value => {
+                fs.rename(source, destination, (err) => {
+                    if (err) {
+                        return defer.reject(err);
+                    } else {
+                        return defer.resolve(destination);
+                    }
+                });
+            });
+        } else if (err) {
+            return defer.reject(err);
         } else {
-          return defer.resolve();
+            return defer.resolve(destination);
         }
-      })
-    } else {
-      return defer.resolve();
-    }
-  })
-  return defer.promise;
+    });
+    return defer.promise;
 }
 
+/*
+    Creates a folder if it does not exist. Essentially an internal handler
+*/
+
+let createFolderIfNotExists = (folderName) => {
+    let defer = q.defer();
+    fs.stat(folderName, (err, stats) => {
+        if (err || !(stats.isDirectory())) {
+            fs.mkdir(folderName, (err) => {
+                if (err) {
+                    console.log(err);
+                    return defer.reject({err : 'Cannot create folder'});
+                } else {
+                    return defer.resolve();
+                }
+            })
+        } else {
+            return defer.resolve();
+        }
+    });
+    return defer.promise;
+}
+
+/*
+    Post extraction methods, called if extraction is successful and data needs to be post-processed.
+*/
 let doPostExtraction = (dir, file) => {
-  let defer = q.defer();
-  let extension = file.slice(file.lastIndexOf('.') + 1);
-  switch (extension) {
-    case "ecar" :
+    let defer = q.defer();
+    let extension = file.slice(file.lastIndexOf('.') + 1);
+    let fileNameAsFolder = file.slice(0, file.lastIndexOf('.')) + '/';
+    switch (extension) {
+        case "ecar" :
       /*
         1. Transfer the ecar file to ecar_files Directory
         2. Rename manifest.json to name of ecar file and sent to json_files
         3. Transfer the do_whatever folder to xcontent
       */
-      createFolderIfNotExists(dir + 'ecar_files/').then(resolve => {
-        return moveFileWithPromise(dir + file, dir + 'ecar_files/' + file);
-      }).then(resolve => {
-        return createFolderIfNotExists(dir + 'json_dir/')
-      }).then(resolve => {
-        let jsonFile = dir + file.slice(0,file.lastIndexOf('.')) + '/manifest.json';
-        return moveFileWithPromise(dir + file, dir + 'json_files/' + file + '.json');
-      }).then(resolve => {
-        return createFolderIfNotExists(dir + 'xcontent/');
-      }).then(resolve => {
-        let folderName = file.match(/do_\d+_/);
-        console.log(folderName);
-        return moveFileWithPromise(dir + folderName, dir + 'xcontent/' + folderName);
-      }, reject => {
-        return defer.reject(reject);
-      });
-  }
+            createFolderIfNotExists(dir + 'ecar_files/').then(resolve => {
+                return moveFileWithPromise(dir + file, dir + 'ecar_files/' + file);
+            }).then(resolve => {
+                return createFolderIfNotExists(dir + 'json_dir/');
+            }).then(resolve => {
+                let jsonFile = dir + file.slice(0,file.lastIndexOf('.')) + '/manifest.json';
+                return moveFileWithPromise(jsonFile, dir + 'json_dir/' + file + '.json');
+            }).then(resolve => {
+                return createFolderIfNotExists(dir + 'xcontent/');
+            }).then(resolve => {
+                let folderName = file.match(/do_\d+/);
+                return moveFileWithPromise(dir + fileNameAsFolder + folderName[0], dir + 'xcontent/' + folderName[0]);
+            }).then(value => {
+                return deleteDir(dir + fileNameAsFolder);
+            }).then(value => {
+                return defer.resolve(value);
+            }).catch(e => {
+                console.log(e);
+                return defer.reject({err : e});
+            });
+    }
+    return defer.promise;
 }
 
 let performExtraction = (parentDir, fileName, folderName) => {
-  let defer = q.defer();
-  fs.createReadStream(parentDir + fileName).pipe(unzip.Extract({path : parentDir+folderName}));
-  fs.readdir(parentDir + folderName, (err, files) => {
-    if (err) {
-      return defer.reject(err);
-    } else {
-      return defer.resolve(files);
-    }
-  })
-  return defer.promise;
+    let defer = q.defer();
+    extractZip(parentDir + fileName, parentDir + folderName)
+    .then(value => {
+        return defer.resolve(value);
+    }, reason => {
+        //console.log(reason);
+        return defer.reject({err : 'Cannot extract this file'});
+    });
+    return defer.promise;
 }
 
+/*
+    Does pre-extraction, extraction, and post extraction
+*/
 let extractFile = (dir, file) => {
-  let defer = q.defer();
-  createFolderToExtractFiles(dir, file).then(resolve => {
-    return performExtraction(dir, file, resolve);
-  }).then(resolve => {
-    return doPostExtraction(dir, file);
-  }).then(resolve => {
-    return defer.resolve(resolve);
-  }, reject => {
-    return defer.reject(reject);
-  });
-  return defer.promise;
+    let defer = q.defer();
+    let folderName = '';
+    createFolderToExtractFiles(dir, file).then(value => {
+        folderName = value;
+        return performExtraction(dir, file, folderName);
+    }).then(value => {
+        return doPostExtraction(dir, file);
+    }).then(value => {
+        return defer.resolve(value);
+    }).catch(e => {
+        if (e.err && e.err === 'Cannot extract this file') {
+            deleteDir(dir + folderName)
+            .then(value => {
+                return defer.reject(e);
+            }).catch(e2 => {
+                return defer.reject(e2);
+            })
+        } else {
+            return defer.reject(e);
+        }
+    });
+    return defer.promise;
 }
 
 let createFolderToExtractFiles = (dir, file) => {
-  let defer = q.defer();
-  let newFolderName = file.slice(0, file.lastIndexOf("."));
-  fs.stat(dir + newFolderName, (err, stats) => {
-    if (err) {
-      fs.mkdir(dir + newFolderName, (err, stats) => {
-        if(err) {
-          return defer.reject(err);
+    let defer = q.defer();
+    let newFolderName = file.slice(0, file.lastIndexOf("."));
+    fs.stat(dir + newFolderName, (err, stats) => {
+        if (err) {
+            fs.mkdir(dir + newFolderName, (err, stats) => {
+                if(err) {
+                    return defer.reject({err : 'Cannot create folder'});
+                } else {
+                    return defer.resolve(newFolderName);
+                }
+            });
         } else {
-          return defer.resolve(newFolderName);
+            return defer.resolve(newFolderName);
         }
-      });
-    } else {
-      return defer.resolve(newFolderName);
-    }
-  })
-  return defer.promise;
+    });
+    return defer.promise;
 }
 
 

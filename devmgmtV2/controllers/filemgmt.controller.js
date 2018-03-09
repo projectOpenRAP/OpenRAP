@@ -154,7 +154,7 @@ let doPostExtraction = (dir, file) => {
     case "ecar" :
       /*
         1. Transfer the ecar file to ecar_files Directory
-        2. Rename manifest.json to name of ecar file and sent to json_files
+        2. Rename manifest.json to name of ecar file and send to json_files
         3. Transfer the do_whatever folder to xcontent
       */
       createFolderIfNotExists(dir + 'ecar_files/').then(resolve => {
@@ -190,17 +190,19 @@ let performExtraction = (parentDir, fileName, folderName) => {
 }
 
 let extractFile = (dir, file) => {
-  let defer = q.defer();
-  createFolderToExtractFiles(dir, file).then(resolve => {
-    return performExtraction(dir, file, resolve);
-  }).then(resolve => {
-    return doPostExtraction(dir, file);
-  }).then(resolve => {
-    return defer.resolve(resolve);
-  }, reject => {
-    return defer.reject(reject);
-  });
-  return defer.promise;
+    let defer = q.defer();
+    createFolderToExtractFiles(dir, file).then(resolve => {
+        console.log("File will be extracted to " + resolve)
+        return performExtraction(dir, file, resolve);
+    }).then(resolve => {
+        return doPostExtraction(dir, file);
+    }).then(resolve => {
+        return defer.resolve(resolve);
+    }, reject => {
+        console.log(reject);
+        return defer.reject(reject);
+    });
+    return defer.promise;
 }
 
 let createFolderToExtractFiles = (dir, file) => {

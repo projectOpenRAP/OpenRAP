@@ -37,6 +37,11 @@ module.exports = app => {
         Init functions for ekStep plugin that are called explicitly by routes
     */
 
+
+    /*
+        Initializes all metadata from profile.json
+    */
+
     let initializeEkstepData = (path) => {
         let defer = q.defer();
         fs.readFile(path, (err, data) => {
@@ -58,6 +63,10 @@ module.exports = app => {
         return defer.promise;
     }
 
+    /*
+        Reads ecar files from the location defined in profile.json and extracts them
+    */
+
     let processEcarFiles = (filePath) => {
         let defer = q.defer();
         fs.readdir(filePath, (err, files) => {
@@ -65,22 +74,28 @@ module.exports = app => {
                 console.log(err);
                 return defer.reject(err);
             }
-            console.log(files);
-            console.log(filePath);
             let extractPromises = [];
             files.forEach(file => {
-                console.log(filePath + file);
                 if (file.slice(file.lastIndexOf(".") + 1) === 'ecar') {
                     extractPromises.push(extractFile(filePath, file));
                 }
             });
             q.allSettled(extractPromises).then(values => {
-                return defer.resolve(values);
-            }, reasons => {
-                return defer.reject(values);
+                let statuses = values.map((value, index) => value.state);
+                let failIndex = statuses.indexOf("rejected");
+                if (failIndex > -1) {
+                    return defer.reject(values[failIndex]);
+                } else {
+                    return defer.resolve(values);
+                }
             });
         });
+        return defer.promise;
     }
+
+    /*
+        Adds the JSON files to BleveSearch Database
+    */
 
     let jsonDocsToDb = (dir) => {
         let defer = q.defer();
@@ -126,16 +141,23 @@ module.exports = app => {
         /*
             read all ecars and add to search index
         */
-        initializeEkstepData('/opt/opencdn/CDN/profile.json').then(value => {
+        initializeEkstepData('plugins/ekStep/profile.json').then(value => {
             let dir = value.jsonDir;
             return processEcarFiles(ekStepData.media_root);
+        }, reason => {
+            console.log("Corrupt/Missing JSON File!");
         }).then(value => {
+            return jsonDocsToDb(ekStepData.json_dir);
+        }, reason => {
+            console.log("There seem to be corrupt ecar files in the directory.");
             return jsonDocsToDb(ekStepData.json_dir);
         }).then(value => {
             console.log("Initialized API Server");
         }).catch(e => {
-            console.log(e);
-            console.log("Could not initialize API Server");
+            if (typeof e.state === 'undefined') {
+                console.log(e);
+                console.log("Could not initialize API Server");
+            }
         });
 
     }
