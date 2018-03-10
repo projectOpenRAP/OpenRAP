@@ -24,15 +24,46 @@ let loadSkeletonJson = (jsonFileName) => {
 
 /*
     Removes the preceding attributes from the keys to conform to response structure
+    Also modifies cdn url to point to appropriate location for resources
 */
 let cleanKeys = (fieldList) => {
     let defer = q.defer();
+    let keysPointingToUrls = [
+        'appIcon',
+        'artifactUrl',
+        'downloadUrl',
+        'posterImage'
+    ];
+
+    let keysWIthListValues = [
+        'ageGroup',
+        'domain',
+        'gradeLevel',
+        'language',
+        'organization',
+        'os',
+    ]
     let newFieldList = {};
-    for (let key in fieldList) {
-        let newKey = key.slice(key.lastIndexOf(".") + 1);
-        newFieldList[newKey] = fieldList[key];
-    }
-    defer.resolve(newFieldList);
+    loadSkeletonJson('profile')
+    .then(value => {
+        let currentProfile = value.data.active_profile;
+        let cdnUrl = value.data.available_profiles[currentProfile].cdn_url;
+        for (let key in fieldList) {
+            let newKey = key.slice(key.lastIndexOf(".") + 1);
+            if (keysWIthListValues.indexOf(newKey) !== -1 && typeof fieldList[key] !== 'object') {
+                newFieldList[newKey] = [fieldList[key]];
+            } else if (keysPointingToUrls.indexOf(newKey) !== -1) {
+                let value = fieldList[key];
+                let newValue = value.replace(/http:\/\/(((\w|\d)+)\.)+(\w|\d)+/, cdnUrl);
+                newFieldList[newKey] = newValue;
+            } else {
+                newFieldList[newKey] = fieldList[key];
+            }
+        }
+        defer.resolve(newFieldList);
+    }).catch(e => {
+        defer.reject(e);
+    })
     return defer.promise;
 }
 
@@ -352,36 +383,32 @@ let createFolderIfNotExists = (folderName) => {
 */
 let doPostExtraction = (dir, file) => {
     let defer = q.defer();
-    let extension = file.slice(file.lastIndexOf('.') + 1);
     let fileNameAsFolder = file.slice(0, file.lastIndexOf('.')) + '/';
-    switch (extension) {
-        case "ecar" :
       /*
         1. Transfer the ecar file to ecar_files Directory
         2. Rename manifest.json to name of ecar file and sent to json_files
         3. Transfer the do_whatever folder to xcontent
       */
-            createFolderIfNotExists(dir + 'ecar_files/').then(resolve => {
-                return moveFileWithPromise(dir + file, dir + 'ecar_files/' + file);
-            }).then(resolve => {
-                return createFolderIfNotExists(dir + 'json_dir/');
-            }).then(resolve => {
-                let jsonFile = dir + file.slice(0,file.lastIndexOf('.')) + '/manifest.json';
-                return moveFileWithPromise(jsonFile, dir + 'json_dir/' + file + '.json');
-            }).then(resolve => {
-                return createFolderIfNotExists(dir + 'xcontent/');
-            }).then(resolve => {
-                let folderName = file.match(/do_\d+/);
-                return moveFileWithPromise(dir + fileNameAsFolder + folderName[0], dir + 'xcontent/' + folderName[0]);
-            }).then(value => {
-                return deleteDir(dir + fileNameAsFolder);
-            }).then(value => {
-                return defer.resolve(value);
-            }).catch(e => {
-                console.log(e);
-                return defer.reject({err : e});
-            });
-    }
+    createFolderIfNotExists(dir + 'ecar_files/').then(resolve => {
+        return moveFileWithPromise(dir + file, dir + 'ecar_files/' + file);
+    }).then(resolve => {
+        return createFolderIfNotExists(dir + 'json_dir/');
+    }).then(resolve => {
+        let jsonFile = dir + file.slice(0,file.lastIndexOf('.')) + '/manifest.json';
+        return moveFileWithPromise(jsonFile, dir + 'json_dir/' + file + '.json');
+    }).then(resolve => {
+        return createFolderIfNotExists(dir + 'xcontent/');
+    }).then(resolve => {
+        let folderName = file.match(/do_\d+/);
+        return moveFileWithPromise(dir + fileNameAsFolder + folderName[0], dir + 'xcontent/' + folderName[0]);
+    }).then(value => {
+        return deleteDir(dir + fileNameAsFolder);
+    }).then(value => {
+        return defer.resolve(value);
+    }).catch(e => {
+        console.log(e);
+        return defer.reject({err : e});
+    });
     return defer.promise;
 }
 

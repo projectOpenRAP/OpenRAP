@@ -4,9 +4,7 @@ let fs = require('fs');
 let q = require('q');
 let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices } = require('../../../searchsdk/index.js');
 
-/*
-    EkStep routes as defined in apiserver/ekstep/esInit.go
-*/
+
 let { getHomePage, getEcarById,  performSearch, telemetryData, extractFile} = require('./ekstep.controller.js');
 
 module.exports = app => {
@@ -16,6 +14,11 @@ module.exports = app => {
         req.ekStepData = ekStepData;
         next();
     }
+
+    /*
+        EkStep routes as defined in apiserver/ekstep/esInit.go
+    */
+
 
     app.post('/api/page/v1/assemble/org.ekstep.genie.content.home', getHomePage);
     app.post('/data/v3/pageApi/assemble/org.ekstep.genie.content.home', getHomePage);
@@ -73,22 +76,23 @@ module.exports = app => {
             if(err) {
                 console.log(err);
                 return defer.reject(err);
+            } else {
+                let extractPromises = [];
+                files.forEach(file => {
+                    if (file.slice(file.lastIndexOf(".") + 1) === 'ecar') {
+                        extractPromises.push(extractFile(filePath, file));
+                    }
+                });
+                q.allSettled(extractPromises).then(values => {
+                    let statuses = values.map((value, index) => value.state);
+                    let failIndex = statuses.indexOf("rejected");
+                    if (failIndex > -1) {
+                        return defer.reject(values[failIndex]);
+                    } else {
+                        return defer.resolve(values);
+                    }
+                });
             }
-            let extractPromises = [];
-            files.forEach(file => {
-                if (file.slice(file.lastIndexOf(".") + 1) === 'ecar') {
-                    extractPromises.push(extractFile(filePath, file));
-                }
-            });
-            q.allSettled(extractPromises).then(values => {
-                let statuses = values.map((value, index) => value.state);
-                let failIndex = statuses.indexOf("rejected");
-                if (failIndex > -1) {
-                    return defer.reject(values[failIndex]);
-                } else {
-                    return defer.resolve(values);
-                }
-            });
         });
         return defer.promise;
     }
