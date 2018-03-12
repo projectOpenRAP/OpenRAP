@@ -1,0 +1,13 @@
+[Unit]
+Description=API server
+#After=network.target
+Before=udev-finish.service
+
+[Service]
+Type=simple
+ExecStart=/opt/opencdn/CDN/searchServer -http ":9095"
+PIDFile=/tmp/opencdn/apiserver.pid
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
