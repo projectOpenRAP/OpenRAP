@@ -5,7 +5,7 @@ Before=udev-finish.service
 
 [Service]
 Type=simple
-ExecStart=/opt/opencdn/CDN/apiserver -http ":9000"
+ExecStart=/opt/opencdn/CDN/searchServer -http ":9095"
 PIDFile=/tmp/opencdn/apiserver.pid
 Restart=always
 
