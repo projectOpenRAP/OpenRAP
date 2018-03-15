@@ -29,6 +29,10 @@ post_install()
 {
 echo "Running post install scripts"
 restore_files
+# Create a dir for searchdb (if not present)
+mkdir -p /opt/searchEngine/bleveDbDir/
+systemctl enable searchserver
+systemctl restart searchserver
 exit 0
 
 }

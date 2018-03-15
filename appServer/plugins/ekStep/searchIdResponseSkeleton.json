@@ -1,0 +1,17 @@
+{
+    "id": "ekstep.content.find",
+    "params": {
+        "err": "",
+        "errmsg": "",
+        "msgid": "",
+        "resmsgid": "fecdd171-826b-4287-b6a4-8b136b94bc48",
+        "status": "successful"
+    },
+    "responseCode": "OK",
+    "result": {
+        "content": {},
+        "count": 0
+    },
+    "ts": "",
+    "ver": "3"
+}

@@ -111,7 +111,7 @@ module.exports = {
     deleteDir,
     copy,
     move,
-    rename,
+    //rename,
     readdir,
     getInfo,
     extractZip,
