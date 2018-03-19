@@ -23,6 +23,10 @@ apiserver_parent_dir = gopath + "src/github.com/projectOpenRAP/OpenRAP/"
 # Device management server
 dmserver_dir = base_dir + 'devmgmtV2'
 dbsdk_dir = base_dir + 'dbsdk'
+dbsdk2_dir = base_dir + 'dbsdk2'
+filesdk_dir = base_dir + 'filesdk'
+searchsdk_dir = base_dir + 'searchsdk'
+appServer_dir = base_dir + 'appServer'
 #############
 
 def version_get(vf):
@@ -286,6 +290,22 @@ class Device(object):
 
         # copy dbsdk
         cmd = "cp -r " + dbsdk_dir + " " + self.imgdir
+        run_cmd(cmd)
+
+        # copy dbsdk
+        cmd = "cp -r " + dbsdk2_dir + " " + self.imgdir
+        run_cmd(cmd)
+
+        # copy dbsdk
+        cmd = "cp -r " + filesdk_dir + " " + self.imgdir
+        run_cmd(cmd)
+
+        # copy dbsdk
+        cmd = "cp -r " + searchsdk_dir + " " + self.imgdir
+        run_cmd(cmd)
+
+        # copy dbsdk
+        cmd = "cp -r " + appServer_dir + " " + self.imgdir
         run_cmd(cmd)
 
         # copy devmgmt/file-upload dir
