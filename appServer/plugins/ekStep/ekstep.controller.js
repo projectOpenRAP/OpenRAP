@@ -28,6 +28,15 @@ let loadSkeletonJson = (jsonFileName) => {
 */
 let cleanKeys = (fieldList) => {
     let defer = q.defer();
+    let plurals = {
+	Story : "Stories",
+	Collection : "Collections",
+	Game : "Games",
+	Worksheet : "Worksheets",
+	Plugin : "Plugins",
+	Template : "Templates",	
+    }
+    
     let remainingAllowedKeys = [
 	"code",
 	"compatibilityLevel",
@@ -96,22 +105,23 @@ let cleanKeys = (fieldList) => {
                newFieldList[newKey] = [fieldList[key]];
            } else if (keysPointingToUrls.indexOf(newKey) !== -1) {
                let value = fieldList[key];
-	           let newValue = value;
-		       if (value.search('https://www.youtube.com') !== -1)  {
+	       let newValue = value;
+	       if (value === null || value.search('https://www.youtube.com') !== -1)  {
                    newValue = value;
-		       } else if (value.search(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/) !== -1){
+	       }
+	        else if (value.search(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/) !== -1){
                    newValue = value.replace(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/, cdnUrl);
                } else if (newKey === 'posterImage' || newKey === 'appIcon' || newKey === 'artifactUrl' || newKey === 'downloadUrl') {
-	               newValue = cdnUrl + '/xcontent/' + value;
-		       } else {
-		           newValue = cdnUrl + '/' + value;
-		       }
-		       newFieldList[newKey] = newValue;
-           } else if (remainingAllowedKeys.indexOf(newKey) !== -1) {
+	           newValue = cdnUrl + '/xcontent/' + value;
+	       } else {
+		  newValue = cdnUrl + '/' + value;
+	       }
+	       newFieldList[newKey] = newValue;
+           } else  {
                newFieldList[newKey] = fieldList[key];
            }
         }
-        contentType = newFieldList.contentType;
+        contentType = plurals[newFieldList.contentType];
         return defer.resolve({fields : newFieldList, contentType});
     }).catch(err => {
         return defer.reject({err});
@@ -400,6 +410,7 @@ let performSearch = (req, res) => {
     }).then(value => {
         responseStructure.result.count = value.results.length;
         responseStructure.result.content = value.results;
+	console.log(value.results.downloadUrl);
         responseStructure.result.facets = value.facets;
 	console.log(responseStructure);
         return res.status(200).json(responseStructure);
@@ -514,14 +525,19 @@ let modifyJsonData = (jsonFile, file) => {
             jsonData = JSON.parse(data);
             let downloadUrl = jsonData.archive.items[0].downloadUrl;
             console.log(downloadUrl);
-            let website = downloadUrl.match(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/);
-            if (website !== null) {
-                console.log("Nubia");
-                downloadUrl = downloadUrl.slice(0, downloadUrl.indexOf(website) + website.length) + '/ecar_files/' + file;
-            } else {
-                downloadUrl = 'http://www.openrap.com/ecar_files/' + file;
-            }
-            jsonData.archive.items[0].downloadUrl = downloadUrl;
+	    if (downloadUrl !== null) {
+            	let website = downloadUrl.match(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/);
+            	if (website !== null) {
+                    console.log("Nubia");
+                    downloadUrl = downloadUrl.slice(0, downloadUrl.indexOf(website) + website.length) + '/ecar_files/' + file;
+                } else {
+                    downloadUrl = 'http://www.openrap.com/ecar_files/' + file;
+                }
+                jsonData.archive.items[0].downloadUrl = downloadUrl;
+	    } else {
+		downloadUrl = 'http://www.openrap.com/ecar_files/' + file;
+		jsonData.archive.items[0].downloadUrl = downloadUrl;
+	    }
             return defer.resolve({jsonData});
         }
     });
