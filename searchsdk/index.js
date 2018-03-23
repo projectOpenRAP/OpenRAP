@@ -221,11 +221,11 @@ let count = (params) => {
 let search = (params) => {
     let defer = q.defer();
     let indexName = params.indexName;
-    let searchString = params.searchString;
+    let searchString = JSON.parse(params.searchString);
     let options = {
         url : `${SEARCH_SERVER}/${INDEX_BASE_URL}/${indexName}/_search`,
         method : 'POST',
-        body : JSON.stringify({"query" : {"query" : searchString}}),
+        body : JSON.stringify({"query" : searchString}),
     }
     request(options, (err, res, body) => {
         if (err) {
