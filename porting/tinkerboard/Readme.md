@@ -1,1 +1,1 @@
-Contains scritps and docs for porting openRAP to tinkerboard (asus)
+Contains scritps and docs for porting openRAP to Asus tinkerboard 
