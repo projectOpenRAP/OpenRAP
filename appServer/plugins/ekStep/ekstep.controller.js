@@ -34,9 +34,9 @@ let cleanKeys = (fieldList) => {
 	Game : "Games",
 	Worksheet : "Worksheets",
 	Plugin : "Plugins",
-	Template : "Templates",	
+	Template : "Templates",
     }
-    
+
     let remainingAllowedKeys = [
 	"code",
 	"compatibilityLevel",
@@ -134,9 +134,6 @@ let cleanKeys = (fieldList) => {
 */
 let parseResults = (values) => {
     let defer = q.defer();
-    for (i in values) {
-        console.log(values[i]);
-    }
     let fields = values.map(value => (JSON.parse(value.value.body).fields));
    // console.log("Parsing");
     //console.log("-----------");
@@ -271,6 +268,38 @@ let generateResponseStructure = (rSt, rsps) => {
     return defer.promise;
 }
 
+let doPrebuiltSearch = (requestSkeletons, query) => {
+    let defer = q.defer();
+    let bulkedResponses = {};
+    let bulkedResponsePromises = [];
+    let sectionNames = [];
+    let keys = Object.keys(requestSkeletons);
+    keys.forEach(key => {
+        console.log("Started " + key);
+        console.log("Must search with " + requestSkeletons[key]);
+        if (typeof requestSkeletons[key] === 'undefined' || requestSkeletons[key] === null) {
+            console.log("Je suis napoleon");
+        } else {
+            reqSkel = requestSkeletons[key];
+            reqSkel.query = query;
+            sectionNames.push(key);
+            bulkedResponsePromises.push(doThoroughSearch(JSON.stringify(reqSkel)));
+        }
+    });
+    q.allSettled(bulkedResponsePromises).then(values => {
+        console.log(values[0].value);
+        let responses = {};
+        for (let i = 0 ; i < sectionNames.length ; i++) {
+            responses[sectionNames[i]] = values[i].value.responses.map(response => response.fields);
+        }
+        return defer.resolve({responses});
+    }).catch(e => {
+        console.log(e);
+        return defer.reject(e);
+    });
+    return defer.promise;
+}
+
 let getHomePage = (req, res) => {
     /*
         request body structure :
@@ -301,9 +330,14 @@ let getHomePage = (req, res) => {
     let responseStructure = {};
     let query = {};
     let section = [];
+    let prebuiltQueryStructures = {};
     loadSkeletonJson('ekstep_config')
     .then(value => {
         loadedJson = value.data;
+        loadedJson.page.sections.forEach(section => {
+            prebuiltQueryStructures[section.display.name.en] = section.search;
+        });
+        console.log(prebuiltQueryStructures);
         let sections = loadedJson.page.sections;
         for (let i in sections) {
             if (sections[i].display.name.en === "Stories") {
@@ -332,6 +366,10 @@ let getHomePage = (req, res) => {
         }
         query.query = queryString;
         console.log(query);
+        return doPrebuiltSearch(prebuiltQueryStructures, queryString);
+    }).then(value => {
+        let responses = value.responses;
+        responseStructure['Best of Genie'] = responses['Best of Genie'];
         return loadSkeletonJson('homePageResponseSkeleton');
     }).then(value => {
         responseStructure = value.data;
@@ -343,9 +381,9 @@ let getHomePage = (req, res) => {
     }).then(value => {
         responseStructure = value.responseStructure;
         //responseStructure.result.page.sections[i].contents = responses;
-        responseStructure.ts = "0001-01-01T00:00:00Z";
-        responseStructure.ver = "ver";
-        responseStructure.id = "org.ekstep.genie.boota";
+        responseStructure.ts = new Date();
+        responseStructure.ver = parsedReq.ver;
+        responseStructure.id = parsedReq.id;
         responseStructure.resmsgid = '0211201a-c91e-41d6-ad25-392de813124c';
         return res.status(200).json(responseStructure);
     }).catch(e => {
@@ -395,24 +433,30 @@ let performSearch = (req, res) => {
 
     */
     let request = req.body.request;
+    console.log(request);
     let facets = request.facets;
     let responseStructure = {};
-    let query = request.query || request.filters.identifier[0];
+    let secondaryQuery = request.filters.identifier || request.filters.contentType;
+
+    let query = request.query || secondaryQuery.join(' ');
+    if (query.length < 1) {
+	query = request.filters.identifier[0];
+    }
     console.log(request);
-    loadSkeletonJson('searchResponseSkeleton')
-    .then(value => {
+    console.log(query);
+    loadSkeletonJson('searchResponseSkeleton').then(value => {
         responseStructure = value.data;
         return doThoroughSearch(JSON.stringify({query}));
     }).then(value => {
         //console.log(value);
-	let mappedValues = value.responses.map(val => val.fields);
-	return performCounting(mappedValues, facets);
+	    let mappedValues = value.responses.map(val => val.fields);
+	    return performCounting(mappedValues, facets);
     }).then(value => {
         responseStructure.result.count = value.results.length;
         responseStructure.result.content = value.results;
-	console.log(value.results.downloadUrl);
+	    console.log(value.results.downloadUrl);
         responseStructure.result.facets = value.facets;
-	console.log(responseStructure);
+	    console.log(responseStructure);
         return res.status(200).json(responseStructure);
     }).catch(e => {
         console.log(e);
@@ -527,8 +571,7 @@ let modifyJsonData = (jsonFile, file) => {
             console.log(downloadUrl);
 	    if (downloadUrl !== null) {
             	let website = downloadUrl.match(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/);
-            	if (website !== null) {
-                    console.log("Nubia");
+            	if (website !== null && downloadUrl.indexOf("youtube") !== -1) {
                     downloadUrl = downloadUrl.slice(0, downloadUrl.indexOf(website) + website.length) + '/ecar_files/' + file;
                 } else {
                     downloadUrl = 'http://www.openrap.com/ecar_files/' + file;
@@ -536,7 +579,7 @@ let modifyJsonData = (jsonFile, file) => {
                 jsonData.archive.items[0].downloadUrl = downloadUrl;
 	    } else {
 		downloadUrl = 'http://www.openrap.com/ecar_files/' + file;
-		jsonData.archive.items[0].downloadUrl = downloadUrl;
+		      jsonData.archive.items[0].downloadUrl = downloadUrl;
 	    }
             return defer.resolve({jsonData});
         }
