@@ -1,0 +1,25 @@
+{
+    "active_profile": "ekstep",
+    "available_profiles": {
+        "ekstep": {
+            "accepted_extensions": [
+                ".ecar",
+                ".json"
+            ],
+            "cdn_scripts_dir": "/opt/opencdn/CDN/",
+            "cdn_url": "http://www.openrap.com",
+            "config_json_dir": "/home/admin/ekstep/config_json/",
+            "config_json_name": "config.json",
+            "content_root": "/home/admin/ekstep/ecar_files/",
+            "json_dir": "/home/admin/ekstep/json_dir/",
+            "media_root": "/home/admin/ekstep/",
+            "profile_name": "ekstep",
+            "server_root": "/opt/opencdn/devmgmt/file_upload/",
+            "telemetry": "/home/admin/ekstep/telemetry/",
+            "unzip_content": "/home/admin/ekstep/xcontent/",
+            "unzip_contentdir_name": "xcontent",
+            "usb_dir": "ecar_files",
+            "usb_on_automount": "/media/"
+        }
+    }
+}

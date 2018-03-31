@@ -23,6 +23,10 @@ apiserver_parent_dir = gopath + "src/github.com/projectOpenRAP/OpenRAP/"
 # Device management server
 dmserver_dir = base_dir + 'devmgmtV2'
 dbsdk_dir = base_dir + 'dbsdk'
+dbsdk2_dir = base_dir + 'dbsdk2'
+filesdk_dir = base_dir + 'filesdk'
+searchsdk_dir = base_dir + 'searchsdk'
+appServer_dir = base_dir + 'appServer'
 #############
 
 def version_get(vf):
@@ -111,14 +115,36 @@ def golang_init():
         except OSError:
             log.info("Error creating gopath directories...")
         # Install go dep
-        cmd = "go get -u github.com/golang/dep/cmd/dep" 
+        cmd = "go get -u github.com/golang/dep/cmd/dep"
         run_cmd(cmd)
 
-        cmd = "cd " + apiserver_parent_dir + " && ln -s ../../../../../../apiserver" 
+        cmd = "cd " + apiserver_parent_dir + " && ln -s ../../../../../../searchServer"
         run_cmd(cmd)
 
         # dep ensure
-        cmd = "cd " + apiserver_parent_dir + "apiserver"  + " && dep ensure"
+        #cmd = "cd " + apiserver_parent_dir + "searchServer"  + " && dep ensure"
+        #run_cmd(cmd)
+
+        cmd = "go get github.com/gorilla/mux"
+        run_cmd(cmd)
+        cmd = "go get github.com/blevesearch/bleve"
+        run_cmd(cmd)
+        cmd = "go get github.com/blevesearch/bleve-mapping-ui"
+        run_cmd(cmd)
+        cmd = "go get github.com/blevesearch/snowballstem"
+        run_cmd(cmd)
+        cmd = "go get github.com/couchbase/moss"
+        run_cmd(cmd)
+        cmd = "go get github.com/syndtr/goleveldb/leveldb"
+        run_cmd(cmd)
+        cmd = "go get golang.org/x/text/unicode/norm"
+        run_cmd(cmd)
+
+        cmd = "go get github.com/willf/bitset"
+        run_cmd(cmd)
+
+
+        cmd = "go get github.com/mohae/deepcopy"
         run_cmd(cmd)
 
     return
@@ -199,20 +225,20 @@ class Device(object):
     def logging_init(self):
         self.log = logging.getLogger('ORAP')
         self.log.setLevel(logging.DEBUG)
-    
+
         # create formatter and add it to the handlers
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         build_logfilename = self.build_output_dir + build_logfile
-    
+
         #Needed to log output of subprocess.Popen
         self.logfd = open(build_logfilename, "a")
-    
+
         # create file handler which logs even debug messages
         fh = logging.FileHandler(build_logfilename)
         fh.setLevel(logging.DEBUG)
         fh.setFormatter(formatter)
         self.log.addHandler(fh)
-        
+
         # create console handler with a higher log level
         ch = logging.StreamHandler()
         ch.setLevel(logging.INFO)
@@ -266,6 +292,22 @@ class Device(object):
         cmd = "cp -r " + dbsdk_dir + " " + self.imgdir
         run_cmd(cmd)
 
+        # copy dbsdk
+        cmd = "cp -r " + dbsdk2_dir + " " + self.imgdir
+        run_cmd(cmd)
+
+        # copy dbsdk
+        cmd = "cp -r " + filesdk_dir + " " + self.imgdir
+        run_cmd(cmd)
+
+        # copy dbsdk
+        cmd = "cp -r " + searchsdk_dir + " " + self.imgdir
+        run_cmd(cmd)
+
+        # copy dbsdk
+        cmd = "cp -r " + appServer_dir + " " + self.imgdir
+        run_cmd(cmd)
+
         # copy devmgmt/file-upload dir
         cmd = "cp -r " + dmserver_dir + " " + self.imgdir
         run_cmd(cmd)
@@ -284,7 +326,7 @@ class Device(object):
 
         # Compile golang apiserver; create the executable in CDN directory
         log.info("go env path " + os.environ['GOPATH'])
-        cmd = "cd " + self.imgdir + "CDN/"  + " && env CGO_ENABLED=0 GOOS=linux GOARCH=arm go build github.com/projectOpenRAP/OpenRAP/apiserver"
+        cmd = "cd " + self.imgdir + "CDN/"  + " && env CGO_ENABLED=0 GOOS=linux " + ("GOARCH=arm go build github.com/projectOpenRAP/OpenRAP/searchServer" if self.boardtype == 'rpi' else "go build github.com/projectOpenRAP/OpenRAP/searchServer")
         run_cmd(cmd)
 
         #TODO: Copy the devicemgmt code
@@ -372,8 +414,8 @@ def run_cmd(cmd):
 
 ##########################################################
 
-boardlist = ["rpi", "opi"]
-platformlist = ["raspbian", "armbian"]
+boardlist = ["rpi", "opi", "minipc"]
+platformlist = ["raspbian", "armbian", "ubuntu"]
 devicelist = ["openrap"]
 profilelist = ["meghshala", "ekstep"]
 

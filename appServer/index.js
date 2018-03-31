@@ -6,7 +6,11 @@
 'use strict';
 
 const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
+//app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(bodyParser.raw());
+app.use(bodyParser.json());
 const glob = require('glob');
 const pluginPath = './plugins';
 /*
@@ -17,7 +21,7 @@ glob(pluginPath + "/**/*.routes.js", function (er, files) {
     for (let i = 0; i < files.length; i++) {
         require(files[i])(app);
     }
-})
+});
 
 /*
     Starting the server on port 9090.
@@ -28,5 +32,5 @@ app.listen(9090, err => {
     if (err)
         console.log(err);
     else
-        console.log("listening on 9090");
+        console.log("listening on 9998");
 })
