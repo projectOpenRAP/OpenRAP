@@ -119,6 +119,20 @@ class FileUploadComponent extends Component {
           onChange={(e) => this.handleFileInputChange(e.target.files)} multiple/>
         </span>
         <span>
+          <Button animated color='blue' onClick = {() => {
+            document.getElementById("folderinput").click();
+          }}>
+            <Button.Content visible>
+              Choose folder(s) to upload
+            </Button.Content>
+            <Button.Content hidden>
+              <Icon name='upload' />
+            </Button.Content>
+          </Button>
+          <input type='file' id='folderinput' style = {{display : 'None'}}
+          onChange={(e) => this.handleFileInputChange(e.target.files)} multiple='' webkitdirectory='' mozdirectory='' directory=''/>
+        </span>
+        <span>
         { this.props.filemgmt.uploadableFiles.length > 0 ? <Button animated color='green' onClick = {this.enableAutomaticUpload.bind(this)}>
           <Button.Content visible>
             Upload all files
