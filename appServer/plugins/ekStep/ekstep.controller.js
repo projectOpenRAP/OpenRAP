@@ -275,10 +275,7 @@ let doPrebuiltSearch = (requestSkeletons, query) => {
     let sectionNames = [];
     let keys = Object.keys(requestSkeletons);
     keys.forEach(key => {
-        console.log("Started " + key);
-        console.log("Must search with " + requestSkeletons[key]);
         if (typeof requestSkeletons[key] === 'undefined' || requestSkeletons[key] === null) {
-            console.log("Je suis napoleon");
         } else {
             reqSkel = requestSkeletons[key];
             reqSkel.query = query;
@@ -287,7 +284,6 @@ let doPrebuiltSearch = (requestSkeletons, query) => {
         }
     });
     q.allSettled(bulkedResponsePromises).then(values => {
-        console.log(values[0].value);
         let responses = {};
         for (let i = 0 ; i < sectionNames.length ; i++) {
             responses[sectionNames[i]] = values[i].value.responses.map(response => response.fields);
@@ -331,13 +327,13 @@ let getHomePage = (req, res) => {
     let query = {};
     let section = [];
     let prebuiltQueryStructures = {};
+    let genieResponses = [];
     loadSkeletonJson('ekstep_config')
     .then(value => {
         loadedJson = value.data;
         loadedJson.page.sections.forEach(section => {
             prebuiltQueryStructures[section.display.name.en] = section.search;
         });
-        console.log(prebuiltQueryStructures);
         let sections = loadedJson.page.sections;
         for (let i in sections) {
             if (sections[i].display.name.en === "Stories") {
@@ -365,11 +361,10 @@ let getHomePage = (req, res) => {
     	   }
         }
         query.query = queryString;
-        console.log(query);
         return doPrebuiltSearch(prebuiltQueryStructures, queryString);
     }).then(value => {
         let responses = value.responses;
-        responseStructure['Best of Genie'] = responses['Best of Genie'];
+        genieResponses = responses['Best of Genie'];
         return loadSkeletonJson('homePageResponseSkeleton');
     }).then(value => {
         responseStructure = value.data;
@@ -381,6 +376,7 @@ let getHomePage = (req, res) => {
     }).then(value => {
         responseStructure = value.responseStructure;
         //responseStructure.result.page.sections[i].contents = responses;
+        responseStructure.result.page.sections[0].contents = genieResponses;
         responseStructure.ts = new Date();
         responseStructure.ver = parsedReq.ver;
         responseStructure.id = parsedReq.id;
@@ -433,7 +429,6 @@ let performSearch = (req, res) => {
 
     */
     let request = req.body.request;
-    console.log(request);
     let facets = request.facets;
     let responseStructure = {};
     let secondaryQuery = request.filters.identifier || request.filters.contentType;
@@ -442,8 +437,6 @@ let performSearch = (req, res) => {
     if (query.length < 1) {
 	query = request.filters.identifier[0];
     }
-    console.log(request);
-    console.log(query);
     loadSkeletonJson('searchResponseSkeleton').then(value => {
         responseStructure = value.data;
         return doThoroughSearch(JSON.stringify({query}));
@@ -454,9 +447,7 @@ let performSearch = (req, res) => {
     }).then(value => {
         responseStructure.result.count = value.results.length;
         responseStructure.result.content = value.results;
-	    console.log(value.results.downloadUrl);
         responseStructure.result.facets = value.facets;
-	    console.log(responseStructure);
         return res.status(200).json(responseStructure);
     }).catch(e => {
         console.log(e);
@@ -481,18 +472,24 @@ let getEcarById = (req, res) => {
 
 let telemetryData = (req, res) => {
     //console.log(req.files);
-    return res.status(200).json({success: true});
-    let fileData = req.files;
-    let oldPath = fileData.file.path;
+    let body = JSON.stringify(req.body);
+    //return res.status(200).json({success: true});
+    //let fileData = req.files;
+    //let oldPath = fileData.file.path;
     let telemetryDir = req.ekStepData.telemetry;
     let now = new Date().getTime();
     baseInt++;
     let responseStructure = {};
-    let newFileName = baseInt + '_' + 'tm_' + now;
-    loadSkeletonJson('telemetryResponseSkeleton')
+    let newFileName = baseInt + '_' + 'tm_' + now + '.gz';
+    createFolderIfNotExists(telemetryDir)
+    .then(value => {
+        let newFile = fs.createWriteStream(telemetryDir + newFileName);
+        newFile.end();
+        return loadSkeletonJson('telemetryResponseSkeleton');
+    })
     .then(value => {
         responseStructure = value.data;
-        fs.rename(oldPath, telemetryDir + newFileName, (err) => {
+        fs.writeFile(telemetryDir + newFileName, body, (err) => {
             responseStructure.ts = new Date();
             if (err) {
                 responseStructure.status = "error";
@@ -504,7 +501,7 @@ let telemetryData = (req, res) => {
         });
     }).catch(e => {
         responseStructure.status = "error";
-        responseStructure.errmsg = err;
+        responseStructure.errmsg = e;
         return res.status(500).json(responseStructure);
     });
 }
@@ -558,6 +555,16 @@ let createFolderIfNotExists = (folderName) => {
         }
     });
     return defer.promise;
+}
+
+let performRecommendation = (req, res) => {
+    let body = req.body;
+    let query = req.query;
+    let params = req.params;
+    console.log(body);
+    console.log(query);
+    console.log(params);
+    return res.status(200).json({ok : 'ok'});
 }
 
 let modifyJsonData = (jsonFile, file) => {
@@ -715,5 +722,6 @@ module.exports = {
     performSearch,
     getEcarById,
     telemetryData,
-    extractFile
+    extractFile,
+    performRecommendation
 }

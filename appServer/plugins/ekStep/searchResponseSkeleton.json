@@ -4,10 +4,10 @@
     "ts": "2017-06-21T08:45:23ZZ",
     "params": {
         "resmsgid": "0211201a-c91e-41d6-ad25-392de813124c",
-        "msgid": null,
-        "err": null,
+        "msgid": "",
+        "err": "",
         "status": "successful",
-        "errmsg": null
+        "errmsg": ""
     },
     "responseCode": "OK",
     "result": {
