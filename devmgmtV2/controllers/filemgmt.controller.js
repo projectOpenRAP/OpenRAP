@@ -59,13 +59,13 @@ let extractUSBDeviceFromList = (output, dir) => {
             return defer.reject(err);
           } else {
             usbDeviceFound = true;
-            return defer.resolve({dir : directoryToRead, files});
+            return defer.resolve({ dir: directoryToRead, files });
           }
         })
       }, reject => {
         return defer.reject(reject);
       });
-      if(usbDeviceFound) {
+      if (usbDeviceFound) {
         break;
       }
     }
@@ -94,21 +94,21 @@ let getUSB = (req, res) => {
   getConnectedDevice(dir).then(resolve => {
     return res.status(200).json(resolve);
   }, reject => {
-    return res.status(500).json({'msg' : reject});
+    return res.status(500).json({ 'msg': reject });
   })
 
 }
 
 let classify = (dir, file) => {
   let defer = q.defer();
-  fs.stat(dir + file, (err, stats)  => {
+  fs.stat(dir + file, (err, stats) => {
     if (err) {
       console.log(err);
       return defer.reject(err);
     } else if (stats.isDirectory()) {
-        return defer.resolve({'name' : file, 'type' : 'dir', 'size' : stats.size})
+      return defer.resolve({ 'name': file, 'type': 'dir', 'size': stats.size })
     } else if (stats.isFile()) {
-        return defer.resolve({'name' : file, 'type' : 'file', 'size' : stats.size})
+      return defer.resolve({ 'name': file, 'type': 'file', 'size': stats.size })
     }
   });
   return defer.promise;
@@ -133,9 +133,9 @@ let checkIfIsFolder = (dir) => {
   fs.stat(dir, (err, stats) => {
     if (err || !(stats.isDirectory())) {
       console.log(err);
-      return defer.reject({success : false});
+      return defer.reject({ success: false });
     } else {
-      return defer.resolve({success : true});
+      return defer.resolve({ success: true });
     }
   });
   return defer.promise;
@@ -144,10 +144,10 @@ let checkIfIsFolder = (dir) => {
 let openDirectory = (req, res) => {
   let currentPath = decodeURIComponent(req.query.path);
   let responseStructure = {
-    success : false,
-    msg : '',
-    fileList : [],
-    folderList : []
+    success: false,
+    msg: '',
+    fileList: [],
+    folderList: []
   };
   checkIfIsFolder(currentPath).then(response => {
     if (response.success) {
@@ -163,10 +163,10 @@ let openDirectory = (req, res) => {
     return q.allSettled(taskArray);
   }).then(response => {
     let responseStructure = {
-      children : []
+      children: []
     }
     for (let i = 0; i < response.length; i++) {
-      responseStructure.children.push({'name' : response[i].value.name, 'type' : response[i].value.type, 'size' : response[i].value.size});
+      responseStructure.children.push({ 'name': response[i].value.name, 'type': response[i].value.type, 'size': response[i].value.size });
     }
     return res.status(200).json(responseStructure);
   }).catch(e => {
@@ -179,10 +179,10 @@ let openDirectory = (req, res) => {
 let deleteFileFromDisk = (req, res) => {
   let fileToDelete = decodeURIComponent(req.query.path);
   let responseStructure = {
-    success : false,
-    msg : ''
+    success: false,
+    msg: ''
   }
-  exec ("rm -rf '" + fileToDelete + "'", (err, stdout, stderr) => {
+  exec("rm -rf '" + fileToDelete + "'", (err, stdout, stderr) => {
     if (err) {
       console.log(err);
       responseStructure.msg = "Cannot delete this file!";
@@ -197,8 +197,8 @@ let deleteFileFromDisk = (req, res) => {
 let createNewFolder = (req, res) => {
   let newFolder = decodeURIComponent(req.body.path);
   let responseStructure = {
-    success : false,
-    msg : ''
+    success: false,
+    msg: ''
   }
   fs.mkdir(newFolder, (err) => {
     if (err) {
@@ -216,10 +216,10 @@ let copyFile = (req, res) => {
   let oldFile = decodeURIComponent(req.body.old);
   let newFile = decodeURIComponent(req.body.new);
   let responseStructure = {
-    success : false,
-    msg : ''
+    success: false,
+    msg: ''
   }
-  exec ('cp -r "' + oldFile + '" "' + newFile + '"', (err, stdout, stderr) => {
+  exec('cp -r "' + oldFile + '" "' + newFile + '"', (err, stdout, stderr) => {
     if (err) {
       console.log(err);
       responseStructure.msg = "Cannot copy file!";
@@ -235,8 +235,8 @@ let moveFile = (req, res) => {
   let oldFile = req.body.old;
   let newFile = req.body.new;
   let responseStructure = {
-    success : false,
-    msg : ''
+    success: false,
+    msg: ''
   }
   fs.rename(oldFile, newFile, (err) => {
     if (err) {
@@ -254,29 +254,60 @@ let writeFileToDisk = (req, res) => {
   let temporaryPath = req.files.file.path
   let actualPathPrefix = req.body.prefix;
   let actualFileName = req.files.file.originalFilename;
-  let actualFileType = actualFileName.slice(actualFileName.lastIndexOf('.')+1);
-  fs.rename(temporaryPath, actualPathPrefix + actualFileName, (err) => {
+
+  let filePathArr = actualFileName.split('/');
+
+  if (filePathArr.length > 1) {
+    console.log(filePathArr);
+    // console.log(filePathArr.splice(0, filePathArr.length - 1).join('/'));
+    let temp = filePathArr.splice(0, filePathArr.length - 1).join('/');
+    console.log(temp);
+    actualPathPrefix = actualPathPrefix + "" + temp
+    mkdirPathPrefix = '"' + actualPathPrefix+ '"';
+    console.log(actualPathPrefix);
+    actualFileName = "/" + filePathArr.splice(-1,1)[0];
+  }
+  
+  console.log(`mkdir -p ${mkdirPathPrefix}`)
+  exec(`mkdir -p ${mkdirPathPrefix}`, (err, stdout, stderr) => {
     if (err) {
       console.log(err);
-      res.status(500).json({success : false});
+      console.log("error");
     } else {
-      return res.status(200).json({success : true});
+      console.log(stdout);
+      fs.copyFile(temporaryPath, actualPathPrefix + actualFileName, (err) => {
+        if (err) {
+          console.log(err);
+          res.status(500).json({ success: false });
+        } else {
+          return res.status(200).json({ success: true });
+        }
+      });
     }
   });
+  let actualFileType = actualFileName.slice(actualFileName.lastIndexOf('.') + 1);
+  // fs.copyFile(temporaryPath, actualPathPrefix + actualFileName, (err) => {
+  //   if (err) {
+  //     console.log(err);
+  //     res.status(500).json({ success: false });
+  //   } else {
+  //     return res.status(200).json({ success: true });
+  //   }
+  // });
 }
 
 // Middleware to write content refresh time to a file
 let storeTimestamp = (req, res, next) => {
-    let timestamp = req.body.timestamp || req.query.timestamp;
+  let timestamp = req.body.timestamp || req.query.timestamp;
 
-    fs.writeFile("/home/admin/meta", timestamp, function(err) {
-        if(err) {
-            return console.log(err);
-        }
+  fs.writeFile("/home/admin/meta", timestamp, function (err) {
+    if (err) {
+      return console.log(err);
+    }
 
-        next();
-        console.log("Timestamp stored.");
-    });
+    next();
+    console.log("Timestamp stored.");
+  });
 }
 
 module.exports = {
