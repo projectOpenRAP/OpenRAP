@@ -5,7 +5,7 @@ let q = require('q');
 let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices } = require('../../../searchsdk/index.js');
 
 
-let { getHomePage, getEcarById,  performSearch, telemetryData, extractFile} = require('./ekstep.controller.js');
+let { getHomePage, getEcarById,  performSearch, telemetryData, extractFile, performRecommendation } = require('./ekstep.controller.js');
 
 module.exports = app => {
 
@@ -28,13 +28,15 @@ module.exports = app => {
     app.get('/content/v3/read/:contentID', getEcarById);
     app.get('/api/content/v3/read/:contentID', getEcarById);
 
-    app.post('/api/telemetry/v1/telemetry', multipartMiddle, addEkStepData, telemetryData);
-    app.post('/data/v3/telemetry', multipartMiddle, addEkStepData, telemetryData);
-    app.post('/api/data/v3/telemetry', multipartMiddle, addEkStepData, telemetryData);
+    app.post('/api/telemetry/v1/telemetry', addEkStepData, telemetryData);
+    app.post('/data/v3/telemetry', addEkStepData, telemetryData);
+    app.post('/api/data/v3/telemetry', addEkStepData, telemetryData);
 
     app.post('/api/search/v2/search', performSearch);
     app.post('/composite/v3/search', performSearch);
     app.post('/api/composite/v3/search', performSearch);
+
+    app.post('/api/content/v3/recommend', performRecommendation);
 
     /*
         Init functions for ekStep plugin that are called explicitly by routes
