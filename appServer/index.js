@@ -12,7 +12,7 @@ const app = express();
 //app.use(bodyParser.raw());
 app.use(bodyParser.json());
 const glob = require('glob');
-const pluginPath = './plugins';
+const pluginPath = '/opt/opencdn/appServer/plugins';
 /*
     Loading all the plugins from plugin directory
 */
