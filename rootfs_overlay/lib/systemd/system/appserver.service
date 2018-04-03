@@ -1,0 +1,13 @@
+[Unit]
+Description=App Server 
+#After=network.target
+
+[Service]
+Type=simple
+Environment="NODE_PATH=$NODE_PATH:/opt/opencdn/"
+ExecStart=/usr/bin/node /opt/opencdn/appServer/index.js
+PIDFile=/tmp/opencdn/appserver.pid
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
