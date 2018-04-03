@@ -1,0 +1,201 @@
+{
+  "page": {
+    "id": "org.ekstep.genie.content.home",
+    "sections": [
+      {
+        "display": {
+          "name": {
+            "en": "Best of Genie",
+            "hn": "लोकप्रिय कहानियां"
+          }
+        },
+        "search": {
+          "facets": [
+            "contentType",
+            "domain",
+            "ageGroup",
+            "language",
+            "gradeLevel"
+          ],
+          "limit": 5,
+          "filters": {
+            "contentType": [
+              "Story",
+              "Worksheet",
+              "Game",
+              "Collection",
+              "TextBook"
+            ],
+            "objectType": [
+              "Content"
+            ],
+            "genieScore": {"min": 0},
+            "status": [
+              "Live"
+            ]
+          },
+          "mode": "soft",
+          "sort_by": {
+            "genieScore": "desc"
+          }
+        },
+        "filterModifiable" : true
+      },
+      {
+        "display": {
+          "name": {
+            "en": "Recommended",
+            "hn": "सलाह"
+          }
+        },
+        "recommend": {
+          "context": {
+            "did": "",
+            "dlang": ""
+          }
+        },
+        "filterModifiable" : false
+      },
+      {
+        "display": {
+          "name": {
+            "en": "Collections",
+            "hn": "सबसे लोकप्रिय"
+          }
+        },
+        "search": {
+          "query": "",
+          "limit": "200",
+          "filters": {
+            "contentType": [
+              "Collection"
+            ],
+            "objectType": [
+              "Content"
+            ],
+            "status": [
+              "Live"
+            ]
+          },
+          "sort_by": {
+            "popularity": "desc"
+          },
+          "mode": "soft",
+          "facets": [
+            "contentType",
+            "domain",
+            "ageGroup",
+            "language",
+            "gradeLevel"
+          ]
+        },
+        "filterModifiable" : true
+      },
+      {
+        "display": {
+          "name": {
+            "en": "Worksheets",
+            "hn": "सबसे नए"
+          }
+        },
+        "search": {
+          "query": "",
+          "limit": 200,
+          "filters": {
+            "contentType": [
+              "Worksheet"
+            ],
+            "objectType": [
+              "Content"
+            ],
+            "status": [
+              "Live"
+            ]
+          },
+          "sort_by": {
+            "lastPublishedOn": "desc"
+          },
+          "mode": "soft",
+          "facets": [
+            "contentType",
+            "domain",
+            "ageGroup",
+            "language",
+            "gradeLevel"
+          ]
+        },
+        "filterModifiable" : true
+      },
+      {
+        "display": {
+          "name": {
+            "en": "Stories",
+            "hn": "लोकप्रिय कहानियां"
+          }
+        },
+        "search": {
+          "query": "",
+          "limit": 200,
+          "filters": {
+            "contentType": [
+              "Story"
+            ],
+            "objectType": [
+              "Content"
+            ],
+            "status": [
+              "Live"
+            ]
+          },
+          "sort_by": {
+            "popularity": "desc"
+          },
+          "mode": "soft",
+          "facets": [
+            "contentType",
+            "domain",
+            "ageGroup",
+            "language",
+            "gradeLevel"
+          ]
+        },
+        "filterModifiable" : true
+      },
+      {
+        "display": {
+          "name": {
+            "en": "Activities",
+            "hn": "लोकप्रिय कहानियां"
+          }
+        },
+        "search": {
+          "query": "",
+          "limit": 200,
+          "filters": {
+            "contentType": [
+              "Game"
+            ],
+            "objectType": [
+              "Content"
+            ],
+            "status": [
+              "Live"
+            ]
+          },
+          "sort_by": {
+            "popularity": "desc"
+          },
+          "mode": "soft",
+          "facets": [
+            "contentType",
+            "domain",
+            "ageGroup",
+            "language",
+            "gradeLevel"
+          ]
+        },
+        "filterModifiable" : true
+      }
+    ]
+  }
+}
