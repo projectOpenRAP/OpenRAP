@@ -11,6 +11,7 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "connect-multiparty": "^2.1.0",
+    "cors": "^2.8.4",
     "express": "^4.16.2",
     "form-data": "^2.3.2",
     "glob": "^7.1.2",

@@ -256,7 +256,7 @@ let writeFileToDisk = (req, res) => {
   let actualFileName = req.files.file.originalFilename;
 
   let filePathArr = actualFileName.split('/');
-
+  let mkdirPathPrefix = "/home/admin/tmp";
   if (filePathArr.length > 1) {
     console.log(filePathArr);
     // console.log(filePathArr.splice(0, filePathArr.length - 1).join('/'));

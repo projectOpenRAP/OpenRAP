@@ -31,8 +31,16 @@ echo "Running post install scripts"
 restore_files
 # Create a dir for searchdb (if not present)
 mkdir -p /opt/searchEngine/bleveDbDir/
+mkdir -p /home/admin/GoK/
 systemctl enable searchserver
 systemctl restart searchserver
+
+systemctl enable appserver
+systemctl restart appserver
+
+systemctl enable devmgmt
+systemctl restart devmgmt
+
 exit 0
 
 }
