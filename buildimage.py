@@ -115,36 +115,14 @@ def golang_init():
         except OSError:
             log.info("Error creating gopath directories...")
         # Install go dep
-        cmd = "go get -u github.com/golang/dep/cmd/dep"
+        cmd = "go get -u github.com/golang/dep/cmd/dep" 
         run_cmd(cmd)
 
-        cmd = "cd " + apiserver_parent_dir + " && ln -s ../../../../../../searchServer"
+        cmd = "cd " + apiserver_parent_dir + " && ln -s ../../../../../../apiserver" 
         run_cmd(cmd)
 
         # dep ensure
-        #cmd = "cd " + apiserver_parent_dir + "searchServer"  + " && dep ensure"
-        #run_cmd(cmd)
-
-        cmd = "go get github.com/gorilla/mux"
-        run_cmd(cmd)
-        cmd = "go get github.com/blevesearch/bleve"
-        run_cmd(cmd)
-        cmd = "go get github.com/blevesearch/bleve-mapping-ui"
-        run_cmd(cmd)
-        cmd = "go get github.com/blevesearch/snowballstem"
-        run_cmd(cmd)
-        cmd = "go get github.com/couchbase/moss"
-        run_cmd(cmd)
-        cmd = "go get github.com/syndtr/goleveldb/leveldb"
-        run_cmd(cmd)
-        cmd = "go get golang.org/x/text/unicode/norm"
-        run_cmd(cmd)
-
-        cmd = "go get github.com/willf/bitset"
-        run_cmd(cmd)
-
-
-        cmd = "go get github.com/mohae/deepcopy"
+        cmd = "cd " + apiserver_parent_dir + "apiserver"  + " && dep ensure"
         run_cmd(cmd)
 
     return
@@ -225,20 +203,20 @@ class Device(object):
     def logging_init(self):
         self.log = logging.getLogger('ORAP')
         self.log.setLevel(logging.DEBUG)
-
+    
         # create formatter and add it to the handlers
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         build_logfilename = self.build_output_dir + build_logfile
-
+    
         #Needed to log output of subprocess.Popen
         self.logfd = open(build_logfilename, "a")
-
+    
         # create file handler which logs even debug messages
         fh = logging.FileHandler(build_logfilename)
         fh.setLevel(logging.DEBUG)
         fh.setFormatter(formatter)
         self.log.addHandler(fh)
-
+        
         # create console handler with a higher log level
         ch = logging.StreamHandler()
         ch.setLevel(logging.INFO)
@@ -326,7 +304,7 @@ class Device(object):
 
         # Compile golang apiserver; create the executable in CDN directory
         log.info("go env path " + os.environ['GOPATH'])
-        cmd = "cd " + self.imgdir + "CDN/"  + " && env CGO_ENABLED=0 GOOS=linux " + ("GOARCH=arm go build github.com/projectOpenRAP/OpenRAP/searchServer" if self.boardtype == 'rpi' else "go build github.com/projectOpenRAP/OpenRAP/searchServer")
+        cmd = "cd " + self.imgdir + "CDN/"  + " && env CGO_ENABLED=0 GOOS=linux GOARCH=arm go build github.com/projectOpenRAP/OpenRAP/apiserver"
         run_cmd(cmd)
 
         #TODO: Copy the devicemgmt code
@@ -414,8 +392,8 @@ def run_cmd(cmd):
 
 ##########################################################
 
-boardlist = ["rpi", "opi", "minipc"]
-platformlist = ["raspbian", "armbian", "ubuntu"]
+boardlist = ["rpi", "opi"]
+platformlist = ["raspbian", "armbian"]
 devicelist = ["openrap"]
 profilelist = ["meghshala", "ekstep"]
 
