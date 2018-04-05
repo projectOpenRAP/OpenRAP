@@ -11,7 +11,7 @@ let baseInt = 0;
 */
 let loadSkeletonJson = (jsonFileName) => {
     let defer = q.defer();
-    fs.readFile(`./plugins/ekStep/${jsonFileName}.json`, (err, data) => {
+    fs.readFile(`/opt/opencdn/appServer/plugins/ekStep/${jsonFileName}.json`, (err, data) => {
         if (err) {
             return defer.reject({err});
         } else {
