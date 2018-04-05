@@ -147,7 +147,7 @@ module.exports = app => {
         /*
             read all ecars and add to search index
         */
-        initializeEkstepData('plugins/ekStep/profile.json').then(value => {
+        initializeEkstepData('/opt/opencdn/appServer/plugins/ekStep/profile.json').then(value => {
             let dir = value.jsonDir;
             return processEcarFiles(ekStepData.media_root);
         }, reason => {
