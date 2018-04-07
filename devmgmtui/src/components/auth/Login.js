@@ -78,11 +78,9 @@ class Login extends Component {
             <div style={styles.loginForm}>
                 <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle'>
                     <Grid.Column style={styles.segment}>
-                        {/* <h1>Hello</h1> */}
                         <Segment raised onKeyPress={this.handleKeyPress}>
                             <Header as='h2' color='teal' textAlign='center'>
-                                {/* <Image src='/logo.png' /> */}
-                                {' '}Log-in to your account
+                                Log-in to your account
                             </Header>
                             <Input
                                 onChange={this.handleUserChange.bind(this)}
@@ -120,12 +118,6 @@ class Login extends Component {
             <div style={styles.loginForm}>
                 {this.renderLogin()}
             </div>
-            // <div>
-            //     {this.props.auth && <div>Auth</div>}
-            //     <input type="text" onChange={this.handleUserChange.bind(this)} value={this.state.user} />
-            //     <input type="text" onChange={this.handlePasswordChange.bind(this)} value={this.state.password} />
-            //     <button onClick={this.handleSubmit.bind(this)} >Submit</button>
-            // </div>
         )
     }
 
