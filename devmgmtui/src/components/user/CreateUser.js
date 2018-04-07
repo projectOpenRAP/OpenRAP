@@ -36,11 +36,13 @@ class CreateUser extends Component {
             user: e.target.value
         })
     }
+
     handlePasswordChange(e) {
         this.setState({
             password: e.target.value
         })
     }
+
     handleSubmit() {
         this.props.createUser(this.state.user, this.state.password, (err,msg)=>{
             if(err){
@@ -51,11 +53,22 @@ class CreateUser extends Component {
             }
         });
     }
+
+    handleKeyPress = (e) =>
+    {
+        console.log('Key pressed.');
+
+        if(e.key === 'Enter')
+        {
+            this.handleSubmit();
+        }
+    }
+
     renderCreateUser() {
         return (
             <Grid textAlign='center' style={{ height: '100%' }}>
                 <Grid.Column style={styles.segment}>
-                    <Segment raised >
+                    <Segment raised onKeyPress={this.handleKeyPress}>
                         <Header as='h2' color='teal' textAlign='center'>
                             <Icon name='add user' />
                             Create a new User
