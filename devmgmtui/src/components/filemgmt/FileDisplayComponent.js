@@ -52,6 +52,7 @@ class FileDisplayComponent extends Component {
         alert(res);
       } else {
         alert("Successfully created folder!");
+        this.setState({ newFolderName : '' });
         this.props.readFolder(this.props.filemgmt.currentDir);
       }
     });
@@ -130,7 +131,7 @@ class FileDisplayComponent extends Component {
         </span>
         <span style={{float:'right'}}>
           {this.props.auth.user.permissions.search(/UPLOAD_FILES|ALL/) >= 0 ? <span>
-            <Input action={{ color: 'twitter', labelPosition: 'right', icon: 'plus', content: 'Make New Folder', onClick : this.createNewFolder.bind(this)}} placeholder='Type name here...' onChange={this.handleFolderNameChange.bind(this)} />
+            <Input action={{ color: 'twitter', labelPosition: 'right', icon: 'plus', content: 'Make New Folder', onClick : this.createNewFolder.bind(this)}} placeholder='Type name here...' value={this.state.newFolderName} onChange={this.handleFolderNameChange.bind(this)} />
         </span> : null}
         </span>
       </span>
