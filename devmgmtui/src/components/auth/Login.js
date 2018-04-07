@@ -59,6 +59,16 @@ class Login extends Component {
         });
     }
 
+    handleKeyPress = (e) =>
+    {
+        console.log('Key pressed.');
+
+        if(e.key === 'Enter')
+        {
+            this.handleSubmit();
+        }
+    }
+
     componentWillMount() {
       document.title = "Login";
     }
@@ -69,7 +79,7 @@ class Login extends Component {
                 <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle'>
                     <Grid.Column style={styles.segment}>
                         {/* <h1>Hello</h1> */}
-                        <Segment raised >
+                        <Segment raised onKeyPress={this.handleKeyPress}>
                             <Header as='h2' color='teal' textAlign='center'>
                                 {/* <Image src='/logo.png' /> */}
                                 {' '}Log-in to your account
