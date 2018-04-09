@@ -72,7 +72,7 @@ class FolderUnitComponent extends Component {
     return (
       <div>
         { this.props.auth.user.permissions.search(/DELETE_FILES|ALL/) >= 0 ?  <span style={fileDisplayStyles.rightPadded}><Checkbox onClick = {() => this.toggleSelected(this)} checked={this.state.selected}/></span> : null}
-        <a href='javascript:void(0);' onClick={this.handleFolderClick.bind(this)} >
+        <a href='javascript:void(0);' style={{ color : 'black' }} onClick={this.handleFolderClick.bind(this)} >
           <span>
             <Icon name='folder' color='yellow' size='big'/>
               {this.shortenString(this.props.name)}

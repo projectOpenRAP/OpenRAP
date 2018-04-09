@@ -16,7 +16,7 @@ const colors = {
   'INACTIVE' : 'blue',
   'UPLOADING' : 'yellow',
   'UPLOADED' : 'green',
-  'ERROR' : 'red',
+  'ERROR' : 'orange',
 }
 
 const button_text = {
@@ -86,7 +86,6 @@ class SelectedFileShowComponent extends Component {
           break;
 
       case 'UPLOADED':
-          // this.handleDeleteClick();
           break;
 
       case 'ERROR' :
@@ -99,19 +98,37 @@ class SelectedFileShowComponent extends Component {
 
 
   renderSelectedFileShowComponent() {
+    let isUploading = this.state.uploadStatus === "UPLOADING"
     return (
       <div>
-          {this.state.uploadStatus === "UPLOADING" ? <Dimmer inverted active><Loader active /></Dimmer> : null}
+          {/*this.state.uploadStatus === "UPLOADING" ? <Dimmer inverted active><Loader active /></Dimmer> : null*/}
           <span style={selectedStyles.upload_wrapper}>{this.props.file.name}</span>
           <span style={{float : 'right'}}>
-            <Button animated color={colors[this.state.uploadStatus]} onClick={this.handleUploadClick.bind(this)}>
-            <Button.Content visible>{button_text[this.state.uploadStatus]}</Button.Content>
-            <Button.Content hidden><Icon name='checkmark' /></Button.Content>
-            </Button>
-            <Button animated color='red' onClick={this.handleDeleteClick.bind(this)}>
-            <Button.Content visible>{button_text[this.state.uploadStatus] === 'Uploaded!' ? 'Do not upload' : 'Remove from list'}</Button.Content>
-            <Button.Content hidden><Icon name='close' /></Button.Content>
-            </Button>
+            <Button.Group>
+                <Button
+                    basic
+                    icon='upload'
+                    color={colors[this.state.uploadStatus]}
+                    loading={isUploading}
+                    onClick={this.handleUploadClick.bind(this)}>
+                </Button>
+
+                <Button
+                    basic
+                    icon='repeat'
+                    corner='repeat'
+                    color='blue'
+                    onClick={this.initiateUpload.bind(this)}
+                    disabled={button_text[this.state.uploadStatus] !== 'Uploaded!'}>
+                </Button>
+
+                <Button
+                    basic
+                    icon='cancel'
+                    color='red'
+                    onClick={this.handleDeleteClick.bind(this)}>
+                </Button>
+            </Button.Group>
           </span>
           <br/>
           <br/>
