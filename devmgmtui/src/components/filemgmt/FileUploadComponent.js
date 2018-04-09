@@ -144,6 +144,7 @@ class FileUploadComponent extends Component {
         </span>
         <div className='ui divider'></div>
         {this.props.filemgmt.uploadableFiles.length > 0 ? <h2>Selected files for upload</h2> : null}
+        <br/>
         {fileNameDOMs}
         </Segment>
       </div>
