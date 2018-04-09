@@ -203,8 +203,8 @@ let createNewFolder = (req, res) => {
   fs.mkdir(newFolder, (err) => {
     if (err) {
       console.log(err);
-      responseStructure.msg = `Failed to create folder!`;
-      return res.status(500).json(responseStructure);
+      responseStructure.msg = err;
+      return res.status(200).json(responseStructure);
     } else {
       responseStructure.success = true;
       return res.status(200).json(responseStructure);

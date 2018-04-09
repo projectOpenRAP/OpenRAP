@@ -49,7 +49,11 @@ class FileDisplayComponent extends Component {
     }
     this.props.createFolder(this.props.filemgmt.currentDir, this.state.newFolderName, (err, res) => {
       if (err) {
-        alert(res);
+        if(res.includes('EEXIST')) {
+          alert('Folder already exists.');
+        } else {
+          alert(res);
+        }
       } else {
         alert("Successfully created folder!");
         this.setState({ newFolderName : '' });

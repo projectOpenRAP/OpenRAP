@@ -51,7 +51,7 @@ export const createFolder = (prefix, folderName, cb) => (dispatch) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
-      cb("Error", "Could Not Create New Folder!");
+      cb("Error", JSON.stringify(response.data.msg));
     }
   }, reject => {
     cb("Error", "Server Error")
