@@ -86,9 +86,9 @@ class FileUploadComponent extends Component {
 
   renderFileUploadComponent() {
     let fileNameDOMs = this.props.filemgmt.uploadableFiles.map((thing, index) =>
-        <div>
-          <SelectedFileShowComponent file = {thing} uploadStatus={this.state.autoUpload ? 'UPLOADING' : 'INACTIVE'} key={index}/>
-        </div>)
+        <Segment.Group>
+          <SelectedFileShowComponent file={thing} autoUpload={this.state.autoUpload} key={index}/>
+        </Segment.Group>)
     return (
       <div>
         <Segment>
@@ -144,7 +144,6 @@ class FileUploadComponent extends Component {
         </span>
         <div className='ui divider'></div>
         {this.props.filemgmt.uploadableFiles.length > 0 ? <h2>Selected files for upload</h2> : null}
-        <br/>
         {fileNameDOMs}
         </Segment>
       </div>
