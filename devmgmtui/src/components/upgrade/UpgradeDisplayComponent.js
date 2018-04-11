@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import * as actions from '../../actions/upgrade'
-import {Button, Icon, Segment, Loader, Dimmer} from 'semantic-ui-react'
+import {Button, Icon, Segment, Loader, Dimmer, Progress} from 'semantic-ui-react'
 
 const upgradeStyle = {
   outside : {
@@ -25,6 +25,7 @@ class UpgradeDisplayComponent extends Component {
       fileToAdd : null,
       fileName : '',
       fileUploadedStatus : "INACTIVE",
+      uploadProgress : 0
     }
     this.handleFileInputChange = this.handleFileInputChange.bind(this);
   }
@@ -35,15 +36,15 @@ class UpgradeDisplayComponent extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.fileUploadedStatus !== this.state.fileUploadedStatus && this.state.fileUploadedStatus === 'ACTIVE') {
-      console.log(this.state.fileUploadedStatus);
-      this.props.uploadFile(this.state.currentFolder, this.state.fileToAdd, (err, msg) => {
-        if (!err) {
+      this.props.uploadFile(this.state.currentFolder, this.state.fileToAdd, (err, res, uploading) => {
+        if (err) {
+          alert(res);
+          this.setState({fileUploadedStatus:"ERROR"});
+        } else if (uploading) {
+          this.setState({uploadProgress : res});
+        } else {
           alert('Successfully uploaded file!');
           this.setState({fileUploadedStatus:"DONE"});
-        }
-        else {
-          alert(msg);
-          this.setState({fileUploadedStatus:"ERROR"});
         }
       });
     }
@@ -59,12 +60,24 @@ class UpgradeDisplayComponent extends Component {
 
 
   renderUpgradeDisplayComponent() {
+    let isUploading = this.state.fileUploadedStatus === 'ACTIVE';
+
     return(
       <div style = {upgradeStyle.outside}>
         <Segment raised>
-        {this.state.fileUploadedStatus === "ACTIVE" ? <Dimmer active>
-          {this.state.fileUploadedStatus === 'ACTIVE' ? <Loader active/> : null}
-        </Dimmer> : null}
+        {
+          isUploading
+          ? (<Dimmer active inverted>
+              <span style={{ color : 'grey' }}>{Math.floor(this.state.uploadProgress) + '%'}</span>
+              <Loader active size='huge'/>
+            </Dimmer>)
+          : null
+        }
+        {
+          isUploading
+          ? <Progress active percent={this.state.uploadProgress} attached='top' color='blue'/>
+          : null
+        }
         <span>
           <Button animated color='blue' onClick = {() => {
             document.getElementById("fileinput").click();

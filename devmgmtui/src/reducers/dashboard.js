@@ -2,6 +2,8 @@ export default function (state={}, action) {
     switch(action.type) {
         case 'LAST_REFRESH_FETCH':
             return {...state, lastRefreshTime: action.payload}
+        case 'INTERNET_STATUS_FETCH':
+            return {...state, internetStatus : action.payload}
         case 'USERS_CONNECTED_FETCH':
             return {...state, usersConnected: action.payload}
         case 'SSID_FETCH':

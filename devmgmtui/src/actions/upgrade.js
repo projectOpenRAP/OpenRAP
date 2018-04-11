@@ -10,6 +10,13 @@ export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
   axios.post(`${BASE_URL}/upgrade`, data, {
     headers : {
       'Content-type' : 'multipart/form-data'
+    },
+    onUploadProgress : (progressEvent) => {
+        if (progressEvent.lengthComputable) {
+            let progress = (progressEvent.loaded * 100) / progressEvent.total;
+            // console.log(`Uploading : ${progress} %`);
+            cb(null, progress, true);
+        }
     }
   }).then((response) => {
     if(response.data.success) {

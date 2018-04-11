@@ -3,6 +3,13 @@ import { BASE_URL } from '../config/config';
 
 export const fetchSystemData = () => (dispatch) => {
 
+    axios.get(`${BASE_URL}/dashboard/system/internetStatus`)
+        .then((response) => {
+            dispatch({type: 'INTERNET_STATUS_FETCH', payload: response.data})
+        })
+        .catch((e) => {
+            console.log(e);
+        })
 
     axios.get(`${BASE_URL}/dashboard/system/lastRefresh`)
         .then((response) => {
