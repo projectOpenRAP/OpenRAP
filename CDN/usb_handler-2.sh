@@ -23,7 +23,7 @@ if [ "X_$ACTION" = "X_add" ]; then
    mkdir -p $mount_dir > /dev/null 2>&1
    #echo "mount -w /dev/$1 $mount_dir" >> $usb_logfile
    #/usr/bin/udisksctl mount -b /dev/$1
-   /bin/mount -r -o utf8 /dev/$1 $mount_dir >> $usb_logfile
+   /bin/mount -w -o utf8 /dev/$1 $mount_dir >> $usb_logfile
    status=$?
    if [ "$status" -ne "0" ]; then
        echo "failure($status): mount -w /dev/$1 $mount_dir" >> $usb_logfile
