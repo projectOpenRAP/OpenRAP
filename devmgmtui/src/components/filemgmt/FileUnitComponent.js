@@ -78,7 +78,7 @@ class FileUnitComponent extends Component {
       <div>
         <span>
         { this.props.auth.user.permissions.search(/DELETE_FILES|ALL/) >= 0 ?  <span style={fileDisplayStyles.rightPadded}><Checkbox onClick = {() => this.toggleSelected(this)} checked={this.state.selected}/></span> : null}
-          <Icon name='file' color='teal' size='big'/>
+          <Icon name='file' color='blue' size='big'/>
             {this.shortenString(this.props.name)}
         </span>
         <span>

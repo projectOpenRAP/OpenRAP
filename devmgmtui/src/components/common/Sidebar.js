@@ -53,7 +53,7 @@ class SideNav extends Component {
                       Modify Captive Portal
                     </Menu.Item> : null }
 
-                    <Menu.Item name='logout' as={Link} to={'/'}>
+                    <Menu.Item name='logout' as={Link} to={'/'} onClick={(dispatch) => dispatch({ type: "DISABLE_AUTH"})}>
                         <Icon name='log out' />
                         Logout
                     </Menu.Item>

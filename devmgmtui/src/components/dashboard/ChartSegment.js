@@ -42,7 +42,6 @@ const UserChart = ({ numberOfUsers }) => {
     );
 }
 
-
 class ChartSegment extends Component {
 
     renderData() {
@@ -51,6 +50,7 @@ class ChartSegment extends Component {
         let cpuData = this.props.dashboard.cpuData;
         let version = this.props.dashboard.version;
         let usersConnected = this.props.dashboard.usersConnected;
+        let internetStatus = this.props.dashboard.internetStatus;
         let lastRefreshTime = this.props.dashboard.lastRefreshTime;
 
         let data = [];
@@ -153,13 +153,13 @@ class ChartSegment extends Component {
 
                         <Grid centered columns='equal'>
                             <Grid.Row centered>
-                                <Grid.Column verticalAlign='left'>
+                                <Grid.Column>
                                     <UserChart
                                         numberOfUsers={numberOfUsersConnected}
                                     />
                                 </Grid.Column>
 
-                                <Grid.Column verticalAlign='left'>
+                                <Grid.Column>
                                     <Message
                                         icon='time'
                                         header='System Uptime'
@@ -167,7 +167,7 @@ class ChartSegment extends Component {
                                     />
                                 </Grid.Column>
 
-                                <Grid.Column verticalAlign='left'>
+                                <Grid.Column>
                                     <Message
                                         icon='tag'
                                         header='System Version'
@@ -176,7 +176,7 @@ class ChartSegment extends Component {
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row centered>
-                                <Grid.Column verticalAlign='left'>
+                                <Grid.Column>
                                     <Message
                                         icon='wifi'
                                         header='SSID'
@@ -184,20 +184,20 @@ class ChartSegment extends Component {
                                     />
                                 </Grid.Column>
 
-                                <Grid.Column verticalAlign='left'>
+                                <Grid.Column>
                                     <Message compact
                                         style={{width: '100%'}}
                                         icon='signal'
                                         header='Internet Connectivity'
-                                        content={''}
+                                        content={internetStatus.data ? 'Connected' : 'Not connected'}
                                     />
                                 </Grid.Column>
 
-                                <Grid.Column verticalAlign='left'>
+                                <Grid.Column>
                                     <Message
                                         icon='refresh'
                                         header='Last Content Refresh'
-                                        content={lastRefreshTime.data}
+                                        content={lastRefreshTime.data || 'Not refreshed yet'}
                                     />
                                 </Grid.Column>
                             </Grid.Row>
@@ -245,7 +245,16 @@ class ChartSegment extends Component {
 
         return (
             <div>
-                { dashboard.memoryData && dashboard.spaceData && dashboard.cpuData ? this.renderData() : this.renderLoader() }
+                {
+                    dashboard.memoryData
+                    && dashboard.spaceData
+                    && dashboard.cpuData
+                    && dashboard.version
+                    && dashboard.usersConnected
+                    && dashboard.internetStatus
+                    ? this.renderData()
+                    : this.renderLoader()
+                }
             </div>
         );
     }

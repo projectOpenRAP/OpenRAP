@@ -49,9 +49,14 @@ class FileDisplayComponent extends Component {
     }
     this.props.createFolder(this.props.filemgmt.currentDir, this.state.newFolderName, (err, res) => {
       if (err) {
-        alert(res);
+        if(res.includes('EEXIST')) {
+          alert('Folder already exists.');
+        } else {
+          alert(res);
+        }
       } else {
         alert("Successfully created folder!");
+        this.setState({ newFolderName : '' });
         this.props.readFolder(this.props.filemgmt.currentDir);
       }
     });
@@ -123,14 +128,14 @@ class FileDisplayComponent extends Component {
       <div>
       <span style={fileDisplayStyles.topBar}>
         <span>
-          <Button animated color='orange' disabled = {isDisabled} onClick={this.goBack.bind(this)}>
+          <Button animated color='blue' disabled = {isDisabled} onClick={this.goBack.bind(this)}>
             <Button.Content visible>Back</Button.Content>
             <Button.Content hidden><Icon name='left arrow' /></Button.Content>
           </Button>
         </span>
         <span style={{float:'right'}}>
           {this.props.auth.user.permissions.search(/UPLOAD_FILES|ALL/) >= 0 ? <span>
-            <Input action={{ color: 'twitter', labelPosition: 'right', icon: 'plus', content: 'Make New Folder', onClick : this.createNewFolder.bind(this)}} placeholder='Type name here...' onChange={this.handleFolderNameChange.bind(this)} />
+            <Input action={{ color: 'blue', labelPosition: 'right', icon: 'plus', content: 'Make New Folder', onClick : this.createNewFolder.bind(this)}} placeholder='Type name here...' value={this.state.newFolderName} onChange={this.handleFolderNameChange.bind(this)} />
         </span> : null}
         </span>
       </span>

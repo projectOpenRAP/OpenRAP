@@ -54,6 +54,7 @@ let createUser = (req, res) => {
   let password = req.body['password'].trim();
   let responseStructure = {
     createSuccessful : true,
+    error : undefined,
     msg : ""
   };
   if (typeof userName === "undefined" || typeof password === "undefined" || userName.length < 1 || password.length < 1) {
@@ -69,6 +70,7 @@ let createUser = (req, res) => {
     console.log(reject);
     return {
       createSuccessful : false,
+      error : reject,
       msg : "Cannot add user to database!"
     }
   }).then(response => {
@@ -76,6 +78,7 @@ let createUser = (req, res) => {
       responseStructure.msg = response.msg;
     } else {
       responseStructure.createSuccessful =  response.createSuccessful;
+      responseStructure.error = response.error;
       responseStructure.msg = response.msg;
     }
     return res.status(200).json(responseStructure);

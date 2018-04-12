@@ -24,9 +24,9 @@ const setSSID = (req, res) => {
     // executing the bash script for updating SSID
     exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
 
-        console.log('Error: ' + err);
-        console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
+        // console.log('Error: ' + err);
+        // console.log('stdout: ' + stdout);
+        // console.log('stderr: ' + stderr);
 
     	if(stderr || err) {
             responseData.ssidSetSuccessful = false;
@@ -48,9 +48,9 @@ const getSSID = (req, res) => {
     // executing the bash script for updating SSID
     exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
 
-        console.log('Error: ' + err);
-        console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
+        // console.log('Error: ' + err);
+        // console.log('stdout: ' + stdout);
+        // console.log('stderr: ' + stderr);
 
     	if(stderr || err) {
     		responseData.msg = stderr || err;

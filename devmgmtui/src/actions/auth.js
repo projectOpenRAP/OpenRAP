@@ -33,9 +33,11 @@ export const createUser = (user, password, cb) => (dispatch) => {
     }
     axios.post(`${BASE_URL}/user/create`, data)
         .then((response) => {
-            if(response.data.createSuccessful){
-                cb(null,"success");
-            }else{
+            if(response.data.createSuccessful) {
+                cb(null, "success");
+            } else if(JSON.stringify(response).includes('ER_DUP_ENTRY')) {
+                 cb("error", "User already exists.");
+            } else {
                 cb("error","Error in creating user");
             }
         })

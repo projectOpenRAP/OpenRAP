@@ -1,9 +1,21 @@
 "use strict"
+
+const dns = require('dns');
 const os = require('os-utils');
 const diskspace = require('diskspace');
 const fs = require("fs");
 const path = require('path');
 const exec = require('child_process').exec;
+
+let getInternetStatus = (req, res) => {
+    dns.lookup('google.com', (err) => {
+        if (err && err.code == "ENOTFOUND") {
+            res.send({data : false});
+        } else {
+            res.send({data : true});
+        }
+    })
+}
 
 let getLastRefresh = (req, res) => {
     let meta = path.join('/home/admin/meta');
@@ -22,9 +34,9 @@ let getNumberOfUsersConnected = (req, res) => {
     const cmd = path.join(__dirname, '../../CDN/getall_stations.sh');
 
     exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
-        console.log('Error: ' + err);
-        console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
+        // console.log('Error: ' + err);
+        // console.log('stdout: ' + stdout);
+        // console.log('stderr: ' + stderr);
 
     	if(err) {
             responseData.retrieveSuccessful = false;
@@ -73,6 +85,7 @@ let getSystemVersion = (req,res) => {
 }
 
 module.exports = {
+    getInternetStatus,
     getLastRefresh,
     getNumberOfUsersConnected,
     getSystemMemory,

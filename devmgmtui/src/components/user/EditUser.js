@@ -106,7 +106,7 @@ class EditUser extends Component {
           if (err) {
             alert(res);
           } else {
-            alert("Update of permissions successful!");
+            alert("Permissions updated successfully.");
           }
           this.props.history.push("/users");
         });

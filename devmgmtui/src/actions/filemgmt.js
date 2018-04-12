@@ -32,6 +32,13 @@ export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
   axios.post(`${BASE_URL}/file/new`, data, {
     headers : {
       'Content-type' : 'multipart/form-data'
+    },
+    onUploadProgress : (progressEvent) => {
+        console.log('Uploading');
+        if (progressEvent.lengthComputable) {
+            let progress = (progressEvent.loaded * 100) / progressEvent.total;
+            cb(null, progress, true);
+        }
     }
   }).then((response) => {
     if(response.data.success) {
@@ -51,7 +58,7 @@ export const createFolder = (prefix, folderName, cb) => (dispatch) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
-      cb("Error", "Could Not Create New Folder!");
+      cb("Error", JSON.stringify(response.data.msg));
     }
   }, reject => {
     cb("Error", "Server Error")

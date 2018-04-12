@@ -86,18 +86,18 @@ class FileUploadComponent extends Component {
 
   renderFileUploadComponent() {
     let fileNameDOMs = this.props.filemgmt.uploadableFiles.map((thing, index) =>
-        <div>
-          <SelectedFileShowComponent file = {thing} uploadStatus={this.state.autoUpload ? 'UPLOADING' : 'INACTIVE'} key={index}/>
-        </div>)
+        <Segment.Group>
+          <SelectedFileShowComponent file={thing} autoUpload={this.state.autoUpload} key={index}/>
+        </Segment.Group>)
     return (
       <div>
         <Segment>
         <span>
-        <Button animated color='teal' onClick={this.transferToUSB.bind(this)} disabled = {!this.state.usbConnected || this.state.isUploadingToUsb} loading={this.state.isUploadingToUsb}>
+        <Button animated color='blue' onClick={this.transferToUSB.bind(this)} disabled = {!this.state.usbConnected || this.state.isUploadingToUsb} loading={this.state.isUploadingToUsb}>
           <Button.Content visible>Transfer Folder to USB</Button.Content>
           <Button.Content hidden><Icon name='usb' /><Icon name='up arrow'/></Button.Content>
         </Button>
-        <Button animated color='teal' onClick={this.transferFromUSB.bind(this)} disabled = {!this.state.usbConnected || this.state.isDownloadingFromUsb} loading={this.state.isDownloadingFromUsb}>
+        <Button animated color='blue' onClick={this.transferFromUSB.bind(this)} disabled = {!this.state.usbConnected || this.state.isDownloadingFromUsb} loading={this.state.isDownloadingFromUsb}>
           <Button.Content visible>Transfer Here From USB</Button.Content>
           <Button.Content hidden><Icon name='usb' /><Icon name='down arrow'/></Button.Content>
         </Button>
@@ -105,40 +105,40 @@ class FileUploadComponent extends Component {
         </Segment>
         <Segment>
         <span>
-          <Button animated color='blue' onClick = {() => {
+          <Button animated='vertical' color='blue' onClick = {() => {
             document.getElementById("fileinput").click();
           }}>
             <Button.Content visible>
               Choose file(s) to upload
             </Button.Content>
             <Button.Content hidden>
-              <Icon name='upload' />
+              <Icon name='file' />
             </Button.Content>
           </Button>
           <input type='file' id='fileinput' style = {{display : 'None'}}
           onChange={(e) => this.handleFileInputChange(e.target.files)} multiple/>
         </span>
         <span>
-          <Button animated color='blue' onClick = {() => {
+          <Button animated='vertical' color='blue' onClick = {() => {
             document.getElementById("folderinput").click();
           }}>
             <Button.Content visible>
               Choose folder(s) to upload
             </Button.Content>
             <Button.Content hidden>
-              <Icon name='upload' />
+              <Icon name='folder' />
             </Button.Content>
           </Button>
           <input type='file' id='folderinput' style = {{display : 'None'}}
           onChange={(e) => this.handleFileInputChange(e.target.files)} multiple='' webkitdirectory='' mozdirectory='' directory=''/>
         </span>
-        <span>
-        { this.props.filemgmt.uploadableFiles.length > 0 ? <Button animated color='green' onClick = {this.enableAutomaticUpload.bind(this)}>
+        <span style={{ float : 'right' }}>
+        { this.props.filemgmt.uploadableFiles.length > 0 ? <Button animated='vertical' color='blue' onClick = {this.enableAutomaticUpload.bind(this)}>
           <Button.Content visible>
-            Upload all files
+            Start uploading
           </Button.Content>
           <Button.Content hidden>
-            <Icon name='checkmark' />
+            <Icon name='upload' />
           </Button.Content>
         </Button> : null}
         </span>

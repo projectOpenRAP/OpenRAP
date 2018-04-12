@@ -50,7 +50,7 @@ class Dashboard extends Component {
                         </Grid.Column>
                     </Grid.Row>
 
-                    <Grid.Row relaxed columns={3}>
+                    <Grid.Row columns={3}>
                         <Grid.Column >
                             {cpuUsage()}
                         </Grid.Column>
@@ -73,8 +73,6 @@ class Dashboard extends Component {
     }
 
     render() {
-        console.log('rendering now');
-
         if(typeof this.props.auth.user !== 'undefined') {
             return (
                 <SideNav>
