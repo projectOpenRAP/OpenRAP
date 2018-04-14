@@ -1,5 +1,5 @@
 module.exports = {
     config : {
-        FS_ROOT : '/home/genghiskh/'
+        FS_ROOT : '/home/admin/'
     }
 }
