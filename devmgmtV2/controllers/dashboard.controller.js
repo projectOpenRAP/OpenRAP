@@ -7,6 +7,8 @@ const fs = require("fs");
 const path = require('path');
 const exec = require('child_process').exec;
 
+const { config } = require('../../config');
+
 let getInternetStatus = (req, res) => {
     dns.lookup('google.com', (err) => {
         if (err && err.code == "ENOTFOUND") {
@@ -18,7 +20,7 @@ let getInternetStatus = (req, res) => {
 }
 
 let getLastRefresh = (req, res) => {
-    let meta = path.join('/home/admin/meta');
+    let meta = path.join(config.FS_ROOT, '.meta');
     fs.readFile(meta, 'utf-8', (err,data)=>{
         res.send({data});
     })

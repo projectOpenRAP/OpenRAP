@@ -123,7 +123,7 @@ class FileDisplayComponent extends Component {
   }
 
   render() {
-    let isDisabled = this.props.filemgmt.currentDir === '/home/admin/';
+    let isDisabled = this.props.filemgmt.currentDir === this.props.config.config.FS_ROOT;
     return (
       <div>
       <span style={fileDisplayStyles.topBar}>
@@ -164,8 +164,8 @@ class FileDisplayComponent extends Component {
   }
 }
 
-function mapStateToProps({ filemgmt, auth }) {
-  return { filemgmt, auth }
+function mapStateToProps({ filemgmt, auth, config }) {
+  return { filemgmt, auth, config }
 }
 
 export default connect(mapStateToProps, actions)(FileDisplayComponent);
