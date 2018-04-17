@@ -66,7 +66,7 @@ class Captive extends Component {
         } else {
           alert("Successfully wrote to file!");
           let iframe = document.getElementById("captiveframe");
-          iframe.contentWindow.location.reload(true);
+          iframe.src = iframe.src;
           this.setState(this.state);
         }
       });
