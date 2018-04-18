@@ -4,7 +4,7 @@ let unzip = require('unzip')
 let { exec } = require('child_process');
 const path = require('path');
 
-const { config } = require('../../config');
+const { config } = require('../config');
 
 let checkIfDeviceIsUSB = (string) => {
   let defer = q.defer();
@@ -270,7 +270,7 @@ let writeFileToDisk = (req, res) => {
     console.log(actualPathPrefix);
     actualFileName = "/" + filePathArr.splice(-1,1)[0];
   }
-  
+
   console.log(`mkdir -p ${mkdirPathPrefix}`)
   exec(`mkdir -p ${mkdirPathPrefix}`, (err, stdout, stderr) => {
     if (err) {
