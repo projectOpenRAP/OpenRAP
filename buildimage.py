@@ -288,33 +288,59 @@ class Device(object):
         cmd = "cp -r " + cdn_dir + " " + self.imgdir
         run_cmd(cmd)
 
+        #npm install in db sdk
+        cmd = "cd dbsdk && npm install"
+        run_cmd(cmd)
+
         # copy dbsdk
         cmd = "cp -r " + dbsdk_dir + " " + self.imgdir
+        run_cmd(cmd)
+
+        #npm install in db sdk
+        cmd = "cd dbsdk2 && npm install"
         run_cmd(cmd)
 
         # copy dbsdk
         cmd = "cp -r " + dbsdk2_dir + " " + self.imgdir
         run_cmd(cmd)
 
-        # copy dbsdk
+        #npm install in file sdk
+        cmd = "cd filesdk && npm install"
+        run_cmd(cmd)
+
+        # copy filesdk
         cmd = "cp -r " + filesdk_dir + " " + self.imgdir
         run_cmd(cmd)
 
-        # copy dbsdk
+        #npm install in search sdk
+        cmd = "cd searchsdk && npm install"
+        run_cmd(cmd)
+
+        # copy search sdk
         cmd = "cp -r " + searchsdk_dir + " " + self.imgdir
         run_cmd(cmd)
 
-        # copy dbsdk
+        #npm install in app server
+        cmd = "cd appServer && npm install"
+        run_cmd(cmd)
+
+        # copy app server
         cmd = "cp -r " + appServer_dir + " " + self.imgdir
         run_cmd(cmd)
 
-        # copy devmgmt/file-upload dir
+        #npm installl in devicemgmt server
+        cmd = "cd devmgmtV2 && npm install"
+        run_cmd(cmd)
+
+        # copy devmgmt server
         cmd = "cp -r " + dmserver_dir + " " + self.imgdir
         run_cmd(cmd)
 
         #build frontend for device management
-        cmd = "cd devmgmtui && npm run build"
+        cmd = "cd devmgmtui && npm install && npm run build"
         run_cmd(cmd)
+
+        
 
         # copy devmgmtui build to rootfs overlay
         cmd = "cp -r devmgmtui/build/* rootfs_overlay/var/www/html/admin/"

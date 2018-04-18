@@ -80,7 +80,7 @@ class SelectedFileShowComponent extends Component {
     return (
       <Segment>
           {
-            isUploading || hasUploaded
+            isUploading
             ? <Progress percent={this.state.uploadProgress} attached='top' color='blue'/>
             : null
           }
