@@ -31,7 +31,7 @@ class FileUploadComponent extends Component {
   }
 
   componentDidMount() {
-    this.props.readFolder(this.props.filemgmt.currentDir);
+    this.props.readFolder(this.props.filemgmt.currentDir || this.props.config.config.FS_ROOT);
     this.props.verifyConnectedUSB('', (ans) => {
       this.setState({usbConnected : ans});
     });
@@ -159,8 +159,8 @@ class FileUploadComponent extends Component {
   }
 }
 
-function mapStateToProps({ filemgmt }) {
-  return { filemgmt }
+function mapStateToProps({ filemgmt, config }) {
+  return { filemgmt, config }
 }
 
 export default connect(mapStateToProps, actions)(FileUploadComponent);

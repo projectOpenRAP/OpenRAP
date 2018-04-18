@@ -5,7 +5,7 @@ let multiparty = require('connect-multiparty')
 let multipartMiddle = multiparty()
 
 module.exports = app => {
-  app.post('/file/new', storeTimestamp, multipartMiddle, writeFileToDisk);
+  app.post('/file/new', multipartMiddle, storeTimestamp, writeFileToDisk);
   app.delete('/file/delete', storeTimestamp, deleteFileFromDisk);
   app.post('/file/newFolder', storeTimestamp, createNewFolder)
   app.get('/file/open', openDirectory);

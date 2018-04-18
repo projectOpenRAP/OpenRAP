@@ -2,6 +2,9 @@ let q = require('q')
 let fs = require('fs')
 let unzip = require('unzip')
 let { exec } = require('child_process');
+const path = require('path');
+
+const { config } = require('../../config');
 
 let checkIfDeviceIsUSB = (string) => {
   let defer = q.defer();
@@ -256,7 +259,7 @@ let writeFileToDisk = (req, res) => {
   let actualFileName = req.files.file.originalFilename;
 
   let filePathArr = actualFileName.split('/');
-  let mkdirPathPrefix = "/home/admin/tmp";
+  let mkdirPathPrefix = path.join(config.FS_ROOT, 'tmp');
   if (filePathArr.length > 1) {
     console.log(filePathArr);
     // console.log(filePathArr.splice(0, filePathArr.length - 1).join('/'));
@@ -300,7 +303,7 @@ let writeFileToDisk = (req, res) => {
 let storeTimestamp = (req, res, next) => {
   let timestamp = req.body.timestamp || req.query.timestamp;
 
-  fs.writeFile("/home/admin/meta", timestamp, function (err) {
+  fs.writeFile(path.join(config.FS_ROOT, '.meta'), timestamp, function (err) {
     if (err) {
       return console.log(err);
     }
