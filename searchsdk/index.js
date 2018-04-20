@@ -225,7 +225,7 @@ let search = (params) => {
     let options = {
         url : `${SEARCH_SERVER}/${INDEX_BASE_URL}/${indexName}/_search`,
         method : 'POST',
-        body : JSON.stringify({"query" : {"query" : searchString}}),
+        body : JSON.stringify({ "query" : searchString })
     }
     request(options, (err, res, body) => {
         if (err) {
