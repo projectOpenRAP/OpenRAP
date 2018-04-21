@@ -250,7 +250,7 @@ let advancedSearch = (params) => {
     let options = {
         url : `${SEARCH_SERVER}/${INDEX_BASE_URL}/${indexName}/_search`,
         method : 'POST',
-        body : JSON.stringify({"query" : query}})
+        body : JSON.stringify({"query" : query})
     }
     request(options, (err, res, body) => {
         if (err) {
