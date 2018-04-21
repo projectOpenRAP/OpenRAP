@@ -344,5 +344,6 @@ module.exports = {
     getDocument,
     count,
     search,
+    advancedSearch,
     getAllIndices
 }
