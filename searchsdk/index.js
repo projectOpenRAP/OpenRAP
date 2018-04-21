@@ -225,7 +225,32 @@ let search = (params) => {
     let options = {
         url : `${SEARCH_SERVER}/${INDEX_BASE_URL}/${indexName}/_search`,
         method : 'POST',
-        body : JSON.stringify({"query" : {"query" : searchString}}),
+        body : JSON.stringify({"query" : {"query" : searchString}})
+    }
+    request(options, (err, res, body) => {
+        if (err) {
+            return defer.reject({err, at : "Search for Document"});
+        } else {
+            let statusCode = res.statusCode.toString();
+            if (statusCode.search(/^[2]\d\d$/) === -1) {
+                return defer.reject({err : body, success : false});
+            } else {
+                return defer.resolve({body, success : true});
+            }
+        }
+    });
+    return defer.promise;
+}
+
+// Extended search
+let advancedSearch = (params) => {
+    let defer = q.defer();
+    let indexName = params.indexName;
+    let query = params.query;
+    let options = {
+        url : `${SEARCH_SERVER}/${INDEX_BASE_URL}/${indexName}/_search`,
+        method : 'POST',
+        body : JSON.stringify({"query" : query})
     }
     request(options, (err, res, body) => {
         if (err) {
@@ -319,5 +344,6 @@ module.exports = {
     getDocument,
     count,
     search,
+    advancedSearch,
     getAllIndices
 }
