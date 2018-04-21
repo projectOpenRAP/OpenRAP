@@ -11,7 +11,7 @@ const { config } = require('../config');
 
 let getInternetStatus = (req, res) => {
     dns.lookup('google.com', (err) => {
-        if (err && err.code == "ENOTFOUND") {
+        if (err) {
             res.send({data : false});
         } else {
             res.send({data : true});
