@@ -17,6 +17,7 @@ build_logfile = "buildimage.log"
 log = logging.getLogger('ORAP')
 
 # GO path setting
+GOARCH='arm'
 gopath = base_dir + 'build/go/'
 apiserver_parent_dir = gopath + "src/github.com/projectOpenRAP/OpenRAP/"
 
@@ -352,7 +353,7 @@ class Device(object):
 
         # Compile golang apiserver; create the executable in CDN directory
         log.info("go env path " + os.environ['GOPATH'])
-        cmd = "cd " + self.imgdir + "CDN/"  + " && env CGO_ENABLED=0 GOOS=linux " + ("GOARCH=arm go build github.com/projectOpenRAP/OpenRAP/searchServer" if self.boardtype == 'rpi' else "go build github.com/projectOpenRAP/OpenRAP/searchServer")
+        cmd = "cd " + self.imgdir + "CDN/" + " && env CGO_ENABLED=0 GOOS=linux " + "GOARCH=" + GOARCH + "  go build github.com/projectOpenRAP/OpenRAP/searchServer"
         run_cmd(cmd)
 
         #TODO: Copy the devicemgmt code
@@ -440,10 +441,10 @@ def run_cmd(cmd):
 
 ##########################################################
 
-boardlist = ["rpi", "opi", "minipc"]
-platformlist = ["raspbian", "armbian", "ubuntu"]
+boardlist = ["rpi", "opi", "minipc", "tinkerboard"]
+platformlist = ["raspbian", "armbian", "ubuntu", "tinkeros"]
 devicelist = ["openrap"]
-profilelist = ["meghshala", "ekstep"]
+profilelist = ["ekstep"]
 
 
 if __name__ == '__main__':
@@ -457,6 +458,8 @@ if __name__ == '__main__':
     (board, platform, profile, clean) = (args.board, args.platform, args.profile, args.clean)
     device="openrap"
 
+    if board == "minipc":
+        GOARCH='386'
 
     d = Profile(profile, device, platform, board)
     if args.clean:

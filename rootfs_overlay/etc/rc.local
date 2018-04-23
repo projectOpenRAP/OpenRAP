@@ -1,4 +1,3 @@
 #!/bin/sh -e
-/opt/opencdn/CDN/devicemgmtserver &
 service udev restart &
 exit 0
