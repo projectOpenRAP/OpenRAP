@@ -723,5 +723,6 @@ module.exports = {
     getEcarById,
     telemetryData,
     extractFile,
-    performRecommendation
+    performRecommendation,
+    createFolderIfNotExists
 }

@@ -2,7 +2,7 @@ let multiparty = require('connect-multiparty');
 let multipartMiddle = multiparty();
 let fs = require('fs');
 let q = require('q');
-let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices } = require('../../../searchsdk/index.js');
+let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices, createFolderIfNotExists } = require('../../../searchsdk/index.js');
 
 
 let { getHomePage, getEcarById,  performSearch, telemetryData, extractFile, performRecommendation } = require('./ekstep.controller.js');
@@ -149,9 +149,11 @@ module.exports = app => {
         */
         initializeEkstepData('/opt/opencdn/appServer/plugins/ekStep/profile.json').then(value => {
             let dir = value.jsonDir;
-            return processEcarFiles(ekStepData.media_root);
+            return createFolderIfNotExists('/home/admin/ekstep');
         }, reason => {
             console.log("Corrupt/Missing JSON File!");
+        }).then(value => {
+            return processEcarFiles(ekStepData.media_root);
         }).then(value => {
             return jsonDocsToDb(ekStepData.json_dir);
         }, reason => {
