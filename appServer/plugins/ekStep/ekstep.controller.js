@@ -3,7 +3,7 @@ let FormData = require('form-data');
 let { extractZip, deleteDir } = require('../../../filesdk');
 let fs = require('fs');
 let { BASE_URL, HOME_EXT, SEARCH_EXT, ID_MIDDLE, TELEMETRY_EXT, ECAR_MIDDLE } = require('./config.js');
-let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices } = require('../../../searchsdk/index.js');
+let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices, advancedSearch } = require('../../../searchsdk/index.js');
 let baseInt = 0;
 
 /*
@@ -159,11 +159,25 @@ let parseResults = (values) => {
 */
 let doThoroughSearch = (queryString) => {
     let defer = q.defer();
-    search({indexName : 'es.db', searchString : queryString})
-    .then(value => {
+
+    let searchPromise;
+
+    //console.log(queryString)
+    //console.log(typeof queryString);
+
+    if(typeof queryString !== 'object') {
+      searchPromise = search({indexName : 'es.db', searchString : queryString});
+    } else {
+      searchPromise = advancedSearch({indexName : 'es.db', query : queryString});
+    }
+
+    searchPromise
+      .then(value => {
         let defer2 = q.defer();
         let hitPromises = [];
         let hits = JSON.parse(value.body).hits;
+	    // console.log('\nhits\n')
+	    // console.log(hits);
         //console.log(hits); not here
         for (let i in hits) {
             let id = hits[i].id;
@@ -178,6 +192,7 @@ let doThoroughSearch = (queryString) => {
     }).then(value => {
         return defer.resolve(value);
     }).catch(err => {
+	    console.log("Error at search: " + JSON.stringify(err));
         return defer.reject({err});
     });
     return defer.promise;
@@ -280,13 +295,13 @@ let doPrebuiltSearch = (requestSkeletons, query) => {
             reqSkel = requestSkeletons[key];
             reqSkel.query = query;
             sectionNames.push(key);
-            bulkedResponsePromises.push(doThoroughSearch(JSON.stringify(reqSkel)));
+            bulkedResponsePromises.push(doThoroughSearch(reqSkel));
         }
     });
-    q.allSettled(bulkedResponsePromises).then(values => {
+    q.all(bulkedResponsePromises).then(values => {
         let responses = {};
         for (let i = 0 ; i < sectionNames.length ; i++) {
-            responses[sectionNames[i]] = values[i].value.responses.map(response => response.fields);
+            responses[sectionNames[i]] = values[i].responses.map(response => response.fields);
         }
         return defer.resolve({responses});
     }).catch(e => {
@@ -368,7 +383,7 @@ let getHomePage = (req, res) => {
         return loadSkeletonJson('homePageResponseSkeleton');
     }).then(value => {
         responseStructure = value.data;
-        return doThoroughSearch(JSON.stringify(query));
+        return doThoroughSearch(query);
     }).then(value => {
         let responses = value.responses;
         //console.log(responses);
@@ -439,7 +454,7 @@ let performSearch = (req, res) => {
     }
     loadSkeletonJson('searchResponseSkeleton').then(value => {
         responseStructure = value.data;
-        return doThoroughSearch(JSON.stringify({query}));
+        return doThoroughSearch(query);
     }).then(value => {
         //console.log(value);
 	    let mappedValues = value.responses.map(val => val.fields);
@@ -723,5 +738,6 @@ module.exports = {
     getEcarById,
     telemetryData,
     extractFile,
-    performRecommendation
+    performRecommendation,
+    createFolderIfNotExists
 }
