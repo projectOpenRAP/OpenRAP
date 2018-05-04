@@ -23,13 +23,14 @@ export const login = (user, password, cb) => (dispatch) => {
 
 }
 
-export const createUser = (user, password, cb) => (dispatch) => {
+export const createUser = (user, password, actor, cb) => (dispatch) => {
     console.log("Calling Auth");
     console.log(user);
     console.log(password);
     let data = {
         "username": user,
-        "password": password
+        "password": password,
+        actor
     }
     axios.post(`${BASE_URL}/user/create`, data)
         .then((response) => {
@@ -48,11 +49,13 @@ export const createUser = (user, password, cb) => (dispatch) => {
 
 }
 
-export const editUserPermissions = (user, permissions, cb) => (dispatch) => {
+export const editUserPermissions = (user, oldPermissions, permissions, actor, cb) => (dispatch) => {
   let data = {
     "username" : user,
     "field" : "permission",
-    "value" : permissions
+    "oldValue" : oldPermissions,
+    "value" : permissions,
+    actor
   }
   axios.put(`${BASE_URL}/user/update`, data)
     .then((response) => {

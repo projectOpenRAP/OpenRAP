@@ -7,5 +7,5 @@ let multipartMiddle = multipart()
 const { saveTelemetryData } = require('../middlewares/telemetry.middleware.js');
 
 module.exports = app => {
-  app.post('/upgrade', multipartMiddle, saveTelemetryData, saveTelemetryData, writeUpdateFile);
+  app.post('/upgrade', multipartMiddle, writeUpdateFile);
 }

@@ -8,5 +8,5 @@ module.exports = app => {
   app.post('/user/create', saveTelemetryData, createUser);
   app.put('/user/update', saveTelemetryData, updateUser);
   app.delete('/user/delete/:username', saveTelemetryData, deleteUser);
-  app.get('/user/list', saveTelemetryData, getAllUsers);
+  app.get('/user/list', getAllUsers);
 }

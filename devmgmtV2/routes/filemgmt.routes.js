@@ -15,8 +15,8 @@ module.exports = app => {
   app.post('/file/new', multipartMiddle, storeTimestamp, saveTelemetryData, writeFileToDisk);
   app.delete('/file/delete', storeTimestamp, saveTelemetryData, deleteFileFromDisk);
   app.post('/file/newFolder', storeTimestamp, saveTelemetryData, createNewFolder)
-  app.get('/file/open', saveTelemetryData, openDirectory);
-  app.put('/file/copy', storeTimestamp, saveTelemetryData, setTimeout, copyFile);
-  app.put('/file/move', storeTimestamp, saveTelemetryData, moveFile);
-  app.get('/file/getUSB', saveTelemetryData, getUSB);
+  app.get('/file/open', openDirectory);
+  app.put('/file/copy', storeTimestamp, setTimeout, copyFile);
+  app.put('/file/move', storeTimestamp, moveFile);
+  app.get('/file/getUSB', getUSB);
 }

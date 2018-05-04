@@ -25,7 +25,7 @@ class SelectedFileShowComponent extends Component {
 
   initiateUpload() {
     let that = this;
-    this.props.uploadFile(this.props.filemgmt.currentDir, this.props.file, function(err, res, uploading) {
+    this.props.uploadFile(this.props.filemgmt.currentDir, this.props.file, this.props.auth.user.username, function(err, res, uploading) {
         if (err) {
             alert(res);
             this.setState({
@@ -120,8 +120,8 @@ class SelectedFileShowComponent extends Component {
   }
 }
 
-function mapStateToProps({ filemgmt }) {
-  return { filemgmt }
+function mapStateToProps({ auth, filemgmt }) {
+  return { auth, filemgmt }
 }
 
 export default connect(mapStateToProps, actions)(SelectedFileShowComponent);

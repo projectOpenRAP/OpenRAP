@@ -44,7 +44,7 @@ class CreateUser extends Component {
     }
 
     handleSubmit() {
-        this.props.createUser(this.state.user, this.state.password, (err,msg)=>{
+        this.props.createUser(this.state.user, this.state.password, this.props.auth.user.username, (err,msg)=>{
             if(err){
                 alert(msg);
             }else{

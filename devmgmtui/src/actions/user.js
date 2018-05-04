@@ -13,9 +13,9 @@ export const getAllUser = () => (dispatch) => {
 
 }
 
-export const deleteUser = (user,cb) => (dispatch) => {
+export const deleteUser = (user, actor, cb) => (dispatch) => {
     console.log("calling all")
-    axios.delete(`${BASE_URL}/user/delete/${user}`)
+    axios.delete(`${BASE_URL}/user/delete/${user}`, { params : { actor } })
         .then((response) => {
             console.log(response.data)
             if(response.data.deleteSuccessful){

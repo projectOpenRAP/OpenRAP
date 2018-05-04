@@ -55,9 +55,19 @@ let telemetryData = {
 		'event' : '',
 		'value': '',
 		'actor' : '',
-		'actorDetails': '',
+		'actorDetails': ''
 	},
 	'tags': ['']
+}
+
+const formatBytes = (bytes, decimals) => {
+	if(bytes === 0) return '0 Bytes';
+	const k = 1024,
+		dm = decimals || 2,
+		sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+		i = Math.floor(Math.log(bytes) / Math.log(k));
+
+	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
 const _getSystemVersion = () => {
@@ -78,74 +88,168 @@ const _getSystemVersion = () => {
 
 const saveTelemetryData = (req, res, next) => {
 
-	const eventMap = {
-		'/auth/login' : 'Client requested authentication',
-		'/auth/password' : 'Client requested a password update',
+	const actor = req.body.actor || req.query.actor || req.params['actor'];
 
-		'/captive/uploadImage' : 'Client initiated image upload on captive portal',
-		'/captive/uploadApk' : 'Client initiated apk upload on captive portal',
-		'/captive/writeHtml' : 'Client wrote changes to captive portal',
-		'/captive/getCurrent' : 'Client requested the current captive portal',
+	switch(req.route.path) {
+		case '/file/new' :
+			telemetryData = {
+				...telemetryData,
+				'eid' : 'LOG',
+				'edata' : {
+					'type' : 'api_call',
+					'level' : 'INFO',
+					'message' : 'Created new file',
+					'params' : [
+						{
+							'timestamp': new Date().toLocaleString('en-IN'),
+							actor,
+							'details' : {
+								'name' : req.files.file.name,
+								'size' : formatBytes(req.files.file.size),
+								'type' : req.files.file.type
+							}
+						}
+					]
+				}
+			}
 
-		'/config' : 'Client requested the configuration file',
+			break;
 
-		'/dashboard/system/internetStatus' : 'Client requested the internet status',
-		'/dashboard/system/lastRefresh' : 'Client requested the last refresh time',
-		'/dashboard/system/usersConnected' : 'Client requested the number of users currently connected to the device',
-		'/dashboard/system/memory' : 'Client requested the current system memory',
-		'/dashboard/system/space' : 'Client requested the current system space',
-		'/dashboard/system/cpu' : 'Client requested the current cpu usage',
-		'/dashboard/system/version' : 'Client requested the the system version',
+		case '/file/delete' :
+			telemetryData = {
+				...telemetryData,
+				'eid' : 'LOG',
+				'edata' : {
+					'type' : 'api_call',
+					'level' : 'INFO',
+					'message' : 'Deleted file/folder',
+					'params' : [
+						{
+							'timestamp': new Date().toLocaleString('en-IN'),
+							actor,
+							'path' : decodeURIComponent(req.query.path)
+						}
+					]
+				}
+			}
 
-		'/file/new' : 'Client requested the creation of a new file',
-		'/file/delete' : 'Client requested the deletion of a file',
-		'/file/newFolder' : 'Client requested creation of new folder',
-		'/file/open' : 'Client requested the contents of a folder',
-		'/file/copy' : 'Client requested a copy operation',
-		'/file/move' : 'Client requested a move operation',
-		'/file/getUSB' : 'Client fetched the USB connected',
+			break;
 
-		'/ssid/set' : 'Client requested the updation of ssid',
-		'/ssid' : 'Client requested the current ssid',
+		case '/file/newFolder' :
+			telemetryData = {
+				...telemetryData,
+				'eid' : 'LOG',
+				'edata' : {
+					'type' : 'api_call',
+					'level' : 'INFO',
+					'message' : 'Created new folder',
+					'params' : [
+						{
+							'timestamp': new Date().toLocaleString('en-IN'),
+							actor,
+							'path' : decodeURIComponent(req.body.path)
+						}
+					]
+				}
+			}
 
-		'/upgrade' : 'Client requested a device upgrade',
+			break;
 
-		'/user/create' : 'Client requested the creation of new user',
-		'/user/update' : 'Client requested the updation of user details',
-		'/user/delete/:username' : 'Client requested the deletion of a user',
-		'/user/list' : 'Client requested the list of users'
+		case '/ssid/set' :
+			telemetryData = {
+				...telemetryData,
+				'eid' : 'AUDIT',
+				'edata' : {
+					'props': ['ssid'],
+					'state': req.body['ssid'].trim(),
+					'prevstate': ''
+				}
+			}
+
+			break;
+
+		case '/user/create' :
+			telemetryData = {
+				...telemetryData,
+				'eid' : 'LOG',
+				'edata' : {
+					'type' : 'api_call',
+					'level' : 'INFO',
+					'message' : 'User added',
+					'params' : [
+						{
+							'timestamp': new Date().toLocaleString('en-IN'),
+							actor,
+							'user' : req.body.username
+						}
+					]
+				}
+			}
+
+			break;
+
+		case '/user/delete/:username' :
+			telemetryData = {
+				...telemetryData,
+				'eid' : 'LOG',
+				'edata' : {
+					'type' : 'api_call',
+					'level' : 'INFO',
+					'message' : 'User removed',
+					'params' : [
+						{
+							'timestamp': new Date().toLocaleString('en-IN'),
+							actor,
+							'user' : req.params['username']
+						}
+					]
+				}
+			}
+
+			break;
+
+		case '/user/update' :
+			telemetryData = {
+				...telemetryData,
+				'eid' : 'AUDIT',
+				'edata' : {
+					'props': ['permisions'],
+					'state': {
+						'username' : req.body.username,
+						'permissions' : JSON.parse(req.body.value)
+					},
+					'prevstate': {
+						'username' : req.body.username,
+						'permissions' : req.body.oldValue
+					}
+				}
+			}
+
+			break;
 	}
 
 	_getSystemVersion()
 		.then(systemVersion => {
-
 			telemetryData = {
 				...telemetryData,
-				'eid': 'LOG',
-				'ets': new Date().toLocaleString('en-IN'),
-				'ver': '3.0',
-				'mid': uniqid('devmgmt-'),
-				'actor': {
-					'id': systemVersion.replace(/\n$/, '')
+				'ets' : new Date().getTime(),
+				'ver' : '3.0',
+				'mid' : uniqid('<device-id>-'), // concatenate did to retain individuality across multiple devices
+				'actor' : {
+					'id' : actor
 				},
 				'context': {
-					'channel': 'OpenRAP',
-					'pdata': {
-						'id': 'devmgmt',
-						'pid': require('process').pid,
-						'ver': '' // to be added
+					'channel' : 'OpenRAP',
+					'pdata' : {
+						'id' : '<device-id>', // did
+ 						'pid' : require('process').pid,
+						'ver' : systemVersion.replace(/\n$/, '')
 					},
-					'env': req.headers['user-agent']
-				},
-				'edata': {
-					'event': eventMap[req.route.path],
-					'value': '' // to be added
+					'env' : 'Device Management'
 				}
 			}
-
-			console.log('TelData :\n');
-			console.log(telemetryData);
-			console.log('\n----------------------------------------------------');
+			
+			console.log(JSON.stringify(telemetryData, null, 4));
 
 			// saveTelemetry(telemetryData, 'devmgmt');
 

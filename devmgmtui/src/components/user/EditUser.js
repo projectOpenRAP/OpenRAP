@@ -102,7 +102,7 @@ class EditUser extends Component {
         } else {
           checkedPermissions = JSON.stringify(["ALL"]);
         }
-        this.props.editUserPermissions(this.state.user, checkedPermissions, (err, res) => {
+        this.props.editUserPermissions(this.state.user, this.state.permissionList, checkedPermissions, this.props.auth.user.username, (err, res) => {
           if (err) {
             alert(res);
           } else {
