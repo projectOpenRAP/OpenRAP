@@ -17,7 +17,8 @@ class SelectedFileShowComponent extends Component {
     super(props);
     this.state = {
       uploadProgress : 0,
-      uploadStatus : 'INACTIVE'
+      uploadStatus : 'INACTIVE',
+      cancelUpload : undefined
     }
     this.initiateUpload = this.initiateUpload.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
@@ -25,15 +26,17 @@ class SelectedFileShowComponent extends Component {
 
   initiateUpload() {
     let that = this;
-    this.props.uploadFile(this.props.filemgmt.currentDir, this.props.file, function(err, res, uploading) {
+    
+    this.props.uploadFile(this.props.filemgmt.currentDir, this.props.file, function(err, res, uploading, cancelUpload) {
         if (err) {
             alert(res);
-            this.setState({
+            that.setState({
                 uploadProgress : 0,
                 uploadStatus : 'ERROR'
             });
         } else if(uploading) {
             that.setState({
+                cancelUpload,
                 uploadProgress : res,
                 uploadStatus : 'UPLOADING'
             });
@@ -43,6 +46,7 @@ class SelectedFileShowComponent extends Component {
                 uploadStatus : 'UPLOADED'
             }, that.handleDeleteClick);
         }
+
         that.props.readFolder(that.props.filemgmt.currentDir);
     });
   }
@@ -52,6 +56,10 @@ class SelectedFileShowComponent extends Component {
   }
 
   handleDeleteClick() {
+    if(this.state.uploadStatus !== 'INACTIVE') {
+      this.state.cancelUpload();
+    }
+
     let uploadableFiles = this.props.filemgmt.uploadableFiles;
     let fileIndex = uploadableFiles.indexOf(this.props.file);
     if(fileIndex !== -1) {

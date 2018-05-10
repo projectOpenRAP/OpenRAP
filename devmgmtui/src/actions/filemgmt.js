@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { BASE_URL } from '../config/config'
 
+const CancelToken = axios.CancelToken;
+
 const getTimestamp = () => {
     let currentTime = new Date();
     let options = { hour: 'numeric', minute: 'numeric', hour12: true, weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
@@ -25,6 +27,7 @@ export const readFolder = (folderPath, update=true) => (dispatch) => {
 }
 
 export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
+  let source = CancelToken.source();
   let data = new FormData();
   data.append('file', fileData);
   data.append('prefix', prefix);
@@ -33,11 +36,11 @@ export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
     headers : {
       'Content-type' : 'multipart/form-data'
     },
+    cancelToken : source.token,
     onUploadProgress : (progressEvent) => {
-        console.log('Uploading');
         if (progressEvent.lengthComputable) {
             let progress = (progressEvent.loaded * 100) / progressEvent.total;
-            cb(null, progress, true);
+            cb(null, progress, true, source.cancel);
         }
     }
   }).then((response) => {
@@ -47,8 +50,12 @@ export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
       cb("Error", "Could not save file!");
     }
   }, reject => {
-    console.log(reject);
-    cb('Error', 'Server Error');
+    if (axios.isCancel(reject)) {
+      console.log('Upload canceled.');
+    } else {
+      console.log('Error occurred.\n', reject);
+      cb('Error', 'Server Error');
+    }
   })
 }
 
