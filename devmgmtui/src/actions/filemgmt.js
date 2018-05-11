@@ -10,6 +10,21 @@ const getTimestamp = () => {
     return currentTime.toLocaleString('en-IN', options);
 }
 
+export const applyChanges = () => (dispatch) => {
+    axios.put(`${BASE_URL}/file/apply`)
+        .then(response => {
+            if(response.success) {
+                alert('Changes applied successfully!');
+            } else {
+                throw new Error(response.message);
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            alert('Failed to apply changes.');
+        });
+}
+
 export const readFolder = (folderPath, update=true) => (dispatch) => {
   let encodedPath = encodeURIComponent(folderPath)
   axios.get(`${BASE_URL}/file/open`, {params : {path : encodedPath}})
