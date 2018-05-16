@@ -5,7 +5,7 @@ let multiparty = require('connect-multiparty')
 let multipartMiddle = multiparty()
 
 const setTimeout = (req, res, next) => {
-  req.setTimeout(15*60*1000);
+  req.setTimeout(0);
   next();
 }
 
