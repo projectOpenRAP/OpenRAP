@@ -85,10 +85,14 @@ class FileUploadComponent extends Component {
   }
 
   renderFileUploadComponent() {
-    let fileNameDOMs = this.props.filemgmt.uploadableFiles.map((thing, index) =>
+    let fileNameDOMs = (
         <Segment.Group>
-          <SelectedFileShowComponent file={thing} autoUpload={this.state.autoUpload} key={index}/>
-        </Segment.Group>)
+            {
+                this.props.filemgmt.uploadableFiles.map((thing, index) => <SelectedFileShowComponent file={thing} autoUpload={this.state.autoUpload} key={index}/>)
+            }
+        </Segment.Group>
+    );
+
     return (
       <div>
         <Segment>
