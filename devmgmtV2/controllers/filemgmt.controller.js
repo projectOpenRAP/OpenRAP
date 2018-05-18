@@ -299,6 +299,46 @@ let writeFileToDisk = (req, res) => {
   // });
 }
 
+const applyChangesToPlugins = (req, res) => {
+    console.log('Applying changes to files.');
+
+    let response = {
+        success : false,
+        message : null
+    }
+
+    exec('systemctl restart appserver', (err, stdout, stderr) => {
+        if (err) {
+            console.log(err);
+
+            response = {
+                ...response,
+                message : 'Could not apply changes to the plugins.'
+            }
+
+            res.status(500).json(response);
+        } else if (stderr) {
+            console.log(err);
+
+            response = {
+                ...response,
+                message : 'Could not apply changes to the plugins.'
+            }
+
+            res.status(500).json(response);
+        } else {
+            response = {
+                ...response,
+                success : true,
+                message : 'Changes applied successfully.'
+            }
+
+            res.status(200).json(response);
+        }
+    })
+
+}
+
 // Middleware to write content refresh time to a file
 let storeTimestamp = (req, res, next) => {
   let timestamp = req.body.timestamp || req.query.timestamp;
@@ -314,5 +354,13 @@ let storeTimestamp = (req, res, next) => {
 }
 
 module.exports = {
-  openDirectory, deleteFileFromDisk, createNewFolder, copyFile, moveFile, writeFileToDisk, getUSB, storeTimestamp
+  openDirectory,
+  deleteFileFromDisk,
+  createNewFolder,
+  copyFile,
+  moveFile,
+  writeFileToDisk,
+  getUSB,
+  storeTimestamp,
+  applyChangesToPlugins
 }

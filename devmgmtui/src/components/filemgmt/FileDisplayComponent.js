@@ -63,7 +63,9 @@ class FileDisplayComponent extends Component {
   }
 
   componentDidMount() {
-    this.setState({folderLoaded : true})
+    if(typeof this.props.filemgmt.files !== 'undefined') {
+      this.setState({folderLoaded : true})
+    }
   }
 
   selectAll() {
@@ -95,7 +97,13 @@ class FileDisplayComponent extends Component {
     this.setState({newFolderName : e.target.value})
   }
 
-
+  renderLoader() {
+    return (
+      <Segment loading padded>
+        Loading...
+      </Segment>
+    );
+  }
 
   renderFileDisplayComponent() {
     //let that = this;
@@ -110,15 +118,22 @@ class FileDisplayComponent extends Component {
         )
     });
     return (
-      <Segment>
-        {!this.state.folderLoaded ? <Dimmer active inverted> <Loader></Loader></Dimmer> : null}
-        <List>
-          {folders}
-        </List>
-        <List>
-          {files}
-        </List>
-    </Segment>
+      <div>
+        {
+          !this.state.folderLoaded
+          ? this.renderLoader()
+          : (
+            <Segment>
+              <List>
+                {folders}
+              </List>
+              <List>
+                {files}
+              </List>
+            </Segment>
+          )
+        }
+    </div>
     )
   }
 

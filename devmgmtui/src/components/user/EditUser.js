@@ -71,8 +71,19 @@ class EditUser extends Component {
     }
 
     handlePermissionsChange = permLabel => e => {
-        var permissions = this.state.permissions
+        var permissions = this.state.permissions;
+        const permissionsAsStrings = this.state.permissionsAsStrings;
+
         permissions[permLabel] = !permissions[permLabel]
+
+        if(permissions[permLabel] && ["DELETE_USERS", "EDIT_USERS", "ADD_USERS"].indexOf(permissionsAsStrings[permLabel]) !== -1) {
+            permissions['perm1'] = true;
+        }
+
+        if(permissions[permLabel] && ["UPLOAD_FILES", "DELETE_FILES"].indexOf(permissionsAsStrings[permLabel]) !== -1) {
+            permissions['perm5'] = true;
+        }
+
         this.setState({permissions})
     }
 

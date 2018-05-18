@@ -8,7 +8,6 @@ import { Segment, Grid } from 'semantic-ui-react';
 import SideNav from '../common/Sidebar';
 import ChartSegment from './ChartSegment';
 
-
 let timer;
 
 class Dashboard extends Component {
@@ -22,7 +21,7 @@ class Dashboard extends Component {
 
         this.props.fetchSystemData();
 
-        timer = setInterval(() => { this.props.fetchSystemData() }, 5000);
+        timer = setInterval(() => { this.props.fetchSystemData() }, 10 * 1000);
     }
 
     componentWillUnmount() {

@@ -7,11 +7,10 @@ import { Segment, Container, Grid, Icon, Header, Message } from 'semantic-ui-rea
 
 import PieChart from 'react-svg-piechart';
 
-
-const maxNumberOfUsers = 12;
+const maxNumberOfUsers = 20;
 
 const UserChart = ({ numberOfUsers }) => {
-    let numberOfUsersPercent = Math.floor((numberOfUsers * 100) / 12);
+    let numberOfUsersPercent = Math.floor(((numberOfUsers) * 100) / maxNumberOfUsers);
 
     let data = [
         { title: 'Current capacity', value: 100-numberOfUsersPercent, color: '#B2DFDB' },
@@ -35,8 +34,8 @@ const UserChart = ({ numberOfUsers }) => {
 
             </div>
 
-            <div style={{position: 'absolute', top: '70%', left: '42%', margin: '-10%', width: '100%', height: '100%', color: 'black'}}>
-                {numberOfUsers} / {maxNumberOfUsers}
+            <div style={{position: 'absolute', top: '70%', left: '37%', margin: '-10%', width: '100%', height: '100%', color: 'black'}}>
+                {numberOfUsers <= maxNumberOfUsers ? `${numberOfUsers} / ${maxNumberOfUsers}` : `>${maxNumberOfUsers}`}
             </div>
         </Container>
     );
