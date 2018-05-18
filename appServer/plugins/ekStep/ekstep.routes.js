@@ -7,6 +7,8 @@ let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, 
 
 let { getHomePage, getEcarById,  performSearch, telemetryData, extractFile, performRecommendation } = require('./ekstep.controller.js');
 
+let { uploadTelemetryToCloud } = require('./ekstep.telemetry_upload.js');
+
 module.exports = app => {
 
     let ekStepData = {};
@@ -149,9 +151,11 @@ module.exports = app => {
         */
         initializeEkstepData('/opt/opencdn/appServer/plugins/ekStep/profile.json').then(value => {
             let dir = value.jsonDir;
-            return createFolderIfNotExists('/home/admin/ekstep');
+            return createFolderIfNotExists(ekStepData.media_root);
         }, reason => {
             console.log("Corrupt/Missing JSON File!");
+        }).then(value => {
+            return createFolderIfNotExists(ekStepData.telemetry);
         }).then(value => {
             return processEcarFiles(ekStepData.media_root);
         }).then(value => {
