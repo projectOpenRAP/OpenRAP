@@ -2,10 +2,10 @@ let multiparty = require('connect-multiparty');
 let multipartMiddle = multiparty();
 let fs = require('fs');
 let q = require('q');
-let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices, createFolderIfNotExists } = require('../../../searchsdk/index.js');
+let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices } = require('../../../searchsdk/index.js');
 
 
-let { getHomePage, getEcarById,  performSearch, telemetryData, extractFile, performRecommendation } = require('./ekstep.controller.js');
+let { getHomePage, getEcarById,  performSearch, telemetryData, extractFile, performRecommendation, createFolderIfNotExists } = require('./ekstep.controller.js');
 
 let { uploadTelemetryToCloud } = require('./ekstep.telemetry_upload.js');
 
