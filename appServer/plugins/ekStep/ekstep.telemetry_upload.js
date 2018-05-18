@@ -71,7 +71,6 @@ let runCommand = (command) => {
     let defer = q.defer();
     exec(command, (err, stdout, stderr) => {
         if (err) {
-	    console.log("73 " + err);
             return defer.reject({err});
         } else {
             return defer.resolve({stdout, stderr});
@@ -81,15 +80,13 @@ let runCommand = (command) => {
 }
 
 let generateJwt = (key, secret) => {
-    console.log("Generating JWT with key: " + key  + " and secret " + secret);
     let defer = q.defer();
     let payload = {"iss" : key};
     let options = {
         algorithm : 'RS256'
     }
-    jwt.sign(payload, secret, (err, token) => {
+    jwt.sign(payload, secret, options, (err, token) => {
         if (err) {
-	    console.log("90 " + err);
             return defer.reject({err});
         } else {
             return defer.resolve({token});
@@ -170,7 +167,6 @@ let generateToken = () => {
             key : deviceKey
         }
     };
-    console.log("Requesting with jwt " + appJwt);
     let authText = "bearer " + appJwt;
     let headers = {
         'Content-Type': 'application/json',
@@ -184,7 +180,7 @@ let generateToken = () => {
     }
     let statusCode = 0;
     requestTokenGeneration(options).then(value => {
-        return defer.resolve();
+        return defer.reslove();
     }).catch(e => {
         return defer.reject(e);
     });
@@ -212,19 +208,19 @@ let uploadTelemetryFile = (fileName, jwt, endpoint = telemetryURL) => {
                 body : data
             }
             request(options, (err, res, body2) => {
-		let body = null;
-		if (err) {
-		    console.log(err);
-		}
-		if (typeof body2 === 'undefined') {
-		    console.log(res);
-		}
-		if (typeof body2.params === 'undefined') {
-		    body = JSON.parse(body2);
-		} else {
+		        let body = null;
+		        if (err) {
+		            return defer.reject({err});
+		        }
+		        if (typeof body2 === 'undefined') {
+		            return defer.reject({err : res})
+		        }
+		        if (typeof body2.params === 'undefined') {
+		            body = JSON.parse(body2);
+		        } else {
                     body = JSON.parse(body2);
-		    body.params = {}
-		}
+		            body.params = {};
+		        }
                 let statusCode = res.statusCode;
                 let status = body.params.status;
                 let err2 = body.params.err;

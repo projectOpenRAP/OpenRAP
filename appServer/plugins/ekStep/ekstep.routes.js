@@ -153,14 +153,24 @@ module.exports = app => {
             let dir = value.jsonDir;
             return createFolderIfNotExists(ekStepData.media_root);
         }, reason => {
+	    console.log(reason);
             console.log("Corrupt/Missing JSON File!");
         }).then(value => {
+	    console.log("Created " + ekStepData.media_root);
             return createFolderIfNotExists(ekStepData.telemetry);
         }).then(value => {
+	        console.log("Created " + ekStepData.telemetry);
+	        return createFolderIfNotExists(ekStepData.json_dir);
+	    }).then(value => {
+	        return createFolderIfNotExists(ekStepData.content_root);
+	    }).then(value => {
+	        return createFolderIfNotExists(ekStepData.unzip_content);
+	    }).then(value => {
             return processEcarFiles(ekStepData.media_root);
-        }).then(value => {
+	    }).then(value => {
             return jsonDocsToDb(ekStepData.json_dir);
         }, reason => {
+	        console.log(reason);
             console.log("There seem to be corrupt ecar files in the directory.");
             return jsonDocsToDb(ekStepData.json_dir);
         }).then(value => {
