@@ -5,6 +5,10 @@ const fs = require('fs');
 const path = require('path');
 const q = require('q');
 
+const { config } = require('../config');
+const deviceID = config.did;
+
+
 // const {
 // 	saveTelemetry
 // } = require('../../telemetrySdk');
@@ -89,6 +93,7 @@ const _getSystemVersion = () => {
 const saveTelemetryData = (req, res, next) => {
 
 	const actor = req.body.actor || req.query.actor || req.params['actor'];
+	const timestamp = new Date().toLocaleString('en-IN').replace(',', '');
 
 	switch(req.route.path) {
 		case '/file/new' :
@@ -101,7 +106,7 @@ const saveTelemetryData = (req, res, next) => {
 					'message' : 'Created new file',
 					'params' : [
 						{
-							'timestamp': new Date().toLocaleString('en-IN'),
+							timestamp,
 							actor,
 							'details' : {
 								'name' : req.files.file.name,
@@ -125,7 +130,7 @@ const saveTelemetryData = (req, res, next) => {
 					'message' : 'Deleted file/folder',
 					'params' : [
 						{
-							'timestamp': new Date().toLocaleString('en-IN'),
+							timestamp,
 							actor,
 							'path' : decodeURIComponent(req.query.path)
 						}
@@ -145,7 +150,7 @@ const saveTelemetryData = (req, res, next) => {
 					'message' : 'Created new folder',
 					'params' : [
 						{
-							'timestamp': new Date().toLocaleString('en-IN'),
+							timestamp,
 							actor,
 							'path' : decodeURIComponent(req.body.path)
 						}
@@ -178,7 +183,7 @@ const saveTelemetryData = (req, res, next) => {
 					'message' : 'User added',
 					'params' : [
 						{
-							'timestamp': new Date().toLocaleString('en-IN'),
+							timestamp,
 							actor,
 							'user' : req.body.username
 						}
@@ -198,7 +203,7 @@ const saveTelemetryData = (req, res, next) => {
 					'message' : 'User removed',
 					'params' : [
 						{
-							'timestamp': new Date().toLocaleString('en-IN'),
+							timestamp,
 							actor,
 							'user' : req.params['username']
 						}
@@ -234,14 +239,14 @@ const saveTelemetryData = (req, res, next) => {
 				...telemetryData,
 				'ets' : new Date().getTime(),
 				'ver' : '3.0',
-				'mid' : uniqid('<device-id>-'), // concatenate did to retain individuality across multiple devices
+				'mid' : uniqid(`${deviceID}-`), // TODO : Use appropriate device ID
 				'actor' : {
 					'id' : actor
 				},
 				'context': {
 					'channel' : 'OpenRAP',
 					'pdata' : {
-						'id' : '<device-id>', // did
+						'id' : deviceID,
  						'pid' : require('process').pid,
 						'ver' : systemVersion.replace(/\n$/, '')
 					},
