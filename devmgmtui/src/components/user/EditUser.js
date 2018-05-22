@@ -70,9 +70,22 @@ class EditUser extends Component {
         document.title = "Edit User";
     }
 
+    setAllEnabled = () => {
+        let { permissions, isAllEnabled } = this.state;
+
+        isAllEnabled = true;
+
+        Object.values(permissions).forEach(permission => {
+            if(!permission) {
+                isAllEnabled = false;
+            }
+        });
+
+        this.setState({ isAllEnabled });
+    }
+
     handlePermissionsChange = permLabel => e => {
-        var permissions = this.state.permissions;
-        const permissionsAsStrings = this.state.permissionsAsStrings;
+        let { permissions, permissionsAsStrings } = this.state;
 
         permissions[permLabel] = !permissions[permLabel]
 
@@ -84,7 +97,7 @@ class EditUser extends Component {
             permissions['perm5'] = true;
         }
 
-        this.setState({permissions})
+        this.setState({ permissions }, this.setAllEnabled);
     }
 
     handleUserChange(e) {
@@ -98,7 +111,7 @@ class EditUser extends Component {
       for (let i in permissions) {
         permissions[i] = true;
       }
-      this.setState({permissions, isAllEnabled : true});
+      this.setState({ permissions }, this.setAllEnabled);
     }
 
     handleSubmit() {
