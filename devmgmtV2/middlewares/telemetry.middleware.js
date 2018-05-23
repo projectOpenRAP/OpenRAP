@@ -4,6 +4,7 @@ const uniqid = require('uniqid');
 const fs = require('fs');
 const path = require('path');
 const q = require('q');
+const exec = require('child_process').exec;
 
 const { config } = require('../config');
 const deviceID = config.did;
@@ -14,7 +15,7 @@ const deviceID = config.did;
 // } = require('../../telemetrySdk');
 
 // Generic telemetry JSON structure
-let telemetryData = {
+let telemetryStructure = {
 	'eid': '',
 	'ets': '',
 	'ver': '',
@@ -64,7 +65,7 @@ let telemetryData = {
 	'tags': ['']
 }
 
-const formatBytes = (bytes, decimals) => {
+const _formatBytes = (bytes, decimals) => {
 	if(bytes === 0) return '0 Bytes';
 	const k = 1024,
 		dm = decimals || 2,
@@ -90,10 +91,84 @@ const _getSystemVersion = () => {
     return defer.promise;
 }
 
+const _getUserCount = () => {
+	let defer = q.defer();
+
+	const cmd = path.join(__dirname, '../../CDN/getall_stations.sh');
+
+    exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
+    	if(err) {
+            defer.reject(err);
+    	}  else {
+            defer.resolve(parseInt(stdout.trim()) + Math.floor(Math.random() * 9) + 1);
+        }
+    });
+
+    return defer.promise;
+}
+
+const _getTimestamp = () => {
+	return new Date()
+		.toISOString('en-IN')
+		.replace(/T/, ' ')
+		.replace(/\..+/, '');
+}
+
+// Temporary, will be removed
+const _logUserCount = (req) => {
+
+	const actor = req.body.actor || req.query.actor || req.params['actor'];
+	const timestamp = _getTimestamp();
+
+	let telemetryData = { ...telemetryStructure }
+	let count;
+
+	_getUserCount()
+		.then(userCount => count = userCount)
+		.then(_getSystemVersion)
+		.then(systemVersion => {
+			telemetryData = {
+				...telemetryData,
+				'eid' : 'LOG',
+				'ets' : new Date().getTime(),
+				'ver' : '3.0',
+				'mid' : uniqid(`${deviceID}-`), // TODO : Use appropriate device ID
+				'actor' : {
+					'id' : actor
+				},
+				'context': {
+					'channel' : 'OpenRAP',
+					'pdata' : {
+						'id' : deviceID,
+ 						'pid' : require('process').pid,
+						'ver' : systemVersion.replace(/\n$/, '')
+					},
+					'env' : 'Device Management'
+				},
+				'edata' : {
+					'type' : 'api_call',
+					'level' : 'INFO',
+					'message' : 'Number of users fetched',
+					'params' : [
+						{
+							timestamp,
+							count
+						}
+					]
+				}
+			}
+
+			console.log(JSON.stringify(telemetryData, null, 4));
+		})
+		.catch(err => console.log(err));
+}
+
 const saveTelemetryData = (req, res, next) => {
 
 	const actor = req.body.actor || req.query.actor || req.params['actor'];
-	const timestamp = new Date().toLocaleString('en-IN').replace(',', '');
+	const timestamp = _getTimestamp();
+
+	let telemetryData = { ...telemetryStructure };
 
 	switch(req.route.path) {
 		case '/file/new' :
@@ -110,7 +185,7 @@ const saveTelemetryData = (req, res, next) => {
 							actor,
 							'details' : {
 								'name' : req.files.file.name,
-								'size' : formatBytes(req.files.file.size),
+								'size' : _formatBytes(req.files.file.size),
 								'type' : req.files.file.type
 							}
 						}
@@ -167,7 +242,7 @@ const saveTelemetryData = (req, res, next) => {
 				'edata' : {
 					'props': ['ssid'],
 					'state': req.body['ssid'].trim(),
-					'prevstate': ''
+					'prevstate': '' // TODO : Add previous state
 				}
 			}
 
@@ -253,14 +328,15 @@ const saveTelemetryData = (req, res, next) => {
 					'env' : 'Device Management'
 				}
 			}
-			
+
 			console.log(JSON.stringify(telemetryData, null, 4));
+			_logUserCount(req);
 
 			// saveTelemetry(telemetryData, 'devmgmt');
 
 			next();
 		})
-		.catch((err) => console.log(err));
+		.catch(err => console.log(err));
 }
 
 module.exports = {
