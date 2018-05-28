@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import SideNav from '../common/Sidebar'
 import * as actions from '../../actions/user'
-import { Segment, Container, List, Button, Icon } from 'semantic-ui-react'
+import { Segment, Container, List, Button, Icon, Header } from 'semantic-ui-react'
 const styles = {
     container: {
         marginTop: '4%'
@@ -28,6 +28,7 @@ class UserList extends Component {
     handleDelete(key) {
         this.props.deleteUser(key, (err,msg) => {
             if(!err){
+                alert("Deletion Success");
                 this.props.getAllUser();
             }else{
                 alert(msg);
@@ -73,11 +74,11 @@ class UserList extends Component {
         return (
             <SideNav>
                 <Container style={styles.container}>
+                    <Header as='h1'>User Management</Header>
                     <Segment raised >
                         <div>
                             <List animated divided verticalAlign='middle' size={'big'}>
                                 {this.props.user.list && this.renderUserList()}
-
                             </List>
                         </div>
                         { this.props.auth.user.permissions.search(/ADD_USERS|ALL/) >= 0 ? <Container textAlign='center' style={{ marginTop: '10px' }}>
