@@ -72,6 +72,8 @@ class FileDisplayComponent extends Component {
     let currentDirFiles = this.props.filemgmt.files;
     if (!this.state.allSelected) {
       this.props.updateSelectedFiles(currentDirFiles.map((item, index) => item.name));
+    } else if(!this.props.filemgmt.selectedFiles.length) {
+      this.props.updateSelectedFiles(currentDirFiles.map((item, index) => item.name));
     } else {
       this.props.updateSelectedFiles([]);
     }
@@ -160,7 +162,7 @@ class FileDisplayComponent extends Component {
       </div>
       <Divider></Divider>
       <Button animated color='linkedin' onClick={this.selectAll.bind(this)}>
-        <Button.Content visible>{this.state.allSelected ? 'Uns' : 'S'}elect All</Button.Content>
+        <Button.Content visible>{this.state.allSelected && this.props.filemgmt.selectedFiles.length ? 'Uns' : 'S'}elect All</Button.Content>
         <Button.Content hidden><Icon name='check circle' /></Button.Content>
       </Button>
       <span style={{float:'right'}}>
