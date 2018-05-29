@@ -19,23 +19,26 @@ server {
     location @ekstep {
         # First attempt to serve request as file, then
         # as directory, then fall back to displaying a 404.
-        root /var/www/ekstep;
+        root /home/admin/ekstep/;
     }
 
 	#
 	#openRAP apiserver configuration
 	#
 	location /api {
-                proxy_pass http://127.0.0.1:9000;
+                proxy_pass http://127.0.0.1:9090;
 	}
 	location /content {
-                proxy_pass http://127.0.0.1:9000;
+                proxy_pass http://127.0.0.1:9090;
 	}
 	location /composite {
-                proxy_pass http://127.0.0.1:9000;
+                proxy_pass http://127.0.0.1:9090;
 	}
 	location /data {
-                proxy_pass http://127.0.0.1:9000;
+                proxy_pass http://127.0.0.1:9090;
+	}
+	location /gok {
+                proxy_pass http://127.0.0.1:9090;
 	}
 	location /devmgmt/api {
                 proxy_pass http://127.0.0.1:8080;
@@ -57,7 +60,18 @@ server {
 
 	location / {
                 #proxy_pass http://127.0.0.1:8008;
-				try_files $uri $uri/ @ekstep;
+				try_files $uri $uri/ /index.html;
+	}
+}
+server {
+	listen 80;
+	server_name gok.openrap.com;
+	root /var/www/gok;
+	index index.php index.html;
+
+	location / {
+                #proxy_pass http://127.0.0.1:8008;
+				try_files $uri $uri/ /index.html;
 	}
 }
 server {
@@ -67,11 +81,12 @@ server {
 	index index.php index.html;
 
 	location / {
+			proxy_connect_timeout       999999;
+			proxy_send_timeout          999999;
+			proxy_read_timeout          999999;
+			send_timeout                999999;
+			client_max_body_size 0;
             proxy_pass http://127.0.0.1:8080;
-			proxy_connect_timeout       900;
-            proxy_send_timeout          900;
-            proxy_read_timeout          900;
-            send_timeout                900;
 			#try_files $uri $uri/ @ekstep;
 	}
 }

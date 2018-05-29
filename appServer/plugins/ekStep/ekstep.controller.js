@@ -35,6 +35,7 @@ let cleanKeys = (fieldList) => {
 	Worksheet : "Worksheets",
 	Plugin : "Plugins",
 	Template : "Templates",
+	Resource : "Resources",
     }
 
     let remainingAllowedKeys = [
@@ -84,7 +85,9 @@ let cleanKeys = (fieldList) => {
         'gradeLevel',
         'language',
         'organization',
+	'audience',
         'os',
+	'tags',
     ]
 
     let newFieldList = {};
@@ -478,7 +481,7 @@ let getEcarById = (req, res) => {
         responseStructure = value.data;
         return doThoroughSearch(contentID);
     }).then(value => {
-        responseStructure.result.content = value.responses[0];
+        responseStructure.result.content = value.responses[0].fields;
         return res.status(200).json(responseStructure);
     }).catch(e => {
         return res.status(500).json({e});
