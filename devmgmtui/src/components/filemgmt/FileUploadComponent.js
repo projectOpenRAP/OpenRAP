@@ -84,11 +84,23 @@ class FileUploadComponent extends Component {
     })
   }
 
+  handleApplyChanges() {
+    if(window.confirm('Some services might be interrupted for a moment. Do you still wish to proceed?')) {
+      this.props.applyChanges();
+    } else {
+      alert('No changes were applied.');
+    }
+  }
+
   renderFileUploadComponent() {
-    let fileNameDOMs = this.props.filemgmt.uploadableFiles.map((thing, index) =>
+    let fileNameDOMs = (
         <Segment.Group>
-          <SelectedFileShowComponent file={thing} autoUpload={this.state.autoUpload} key={index}/>
-        </Segment.Group>)
+            {
+                this.props.filemgmt.uploadableFiles.map((thing, index) => <SelectedFileShowComponent file={thing} autoUpload={this.state.autoUpload} key={index}/>)
+            }
+        </Segment.Group>
+    );
+
     return (
       <div>
         <Segment>
@@ -133,17 +145,36 @@ class FileUploadComponent extends Component {
           onChange={(e) => this.handleFileInputChange(e.target.files)} multiple='' webkitdirectory='' mozdirectory='' directory=''/>
         </span>
         <span style={{ float : 'right' }}>
-        { this.props.filemgmt.uploadableFiles.length > 0 ? <Button animated='vertical' color='blue' onClick = {this.enableAutomaticUpload.bind(this)}>
-          <Button.Content visible>
-            Start uploading
-          </Button.Content>
-          <Button.Content hidden>
-            <Icon name='upload' />
-          </Button.Content>
-        </Button> : null}
+            <Button animated='vertical' color='green' onClick = {this.handleApplyChanges.bind(this)}>
+              <Button.Content visible>
+                Apply Changes
+              </Button.Content>
+              <Button.Content hidden>
+                <Icon name='checkmark' />
+              </Button.Content>
+            </Button>
         </span>
         <div className='ui divider'></div>
-        {this.props.filemgmt.uploadableFiles.length > 0 ? <h2>Selected files for upload</h2> : null}
+        {
+            this.props.filemgmt.uploadableFiles.length > 0
+            ? (
+                <div>
+                    <h2 style={{ clear : 'both', display : 'inline' }}>
+                        Selected files for upload
+                    </h2>
+
+                    <Button style={{ float : 'right', display : 'inline' }} animated='vertical' color='blue' onClick = {this.enableAutomaticUpload.bind(this)}>
+                      <Button.Content visible>
+                        Start uploading
+                      </Button.Content>
+                      <Button.Content hidden>
+                        <Icon name='upload' />
+                      </Button.Content>
+                    </Button>
+                </div>
+            )
+            : null
+        }
         {fileNameDOMs}
         </Segment>
       </div>

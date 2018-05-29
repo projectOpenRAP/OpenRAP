@@ -7,16 +7,33 @@ import { Segment, Container, Grid, Icon, Header, Message } from 'semantic-ui-rea
 
 import PieChart from 'react-svg-piechart';
 
-
-const maxNumberOfUsers = 12;
+const maxNumberOfUsers = 25;
+const colorCodes = {
+    zeroToFifteen : ['#B2DFDB', 'teal'],
+    fifteenToTwentyFive : ['#FFE0B2', 'orange'],
+    twentyFiveAndAbove : ['#FFCDD2', 'red']
+}
 
 const UserChart = ({ numberOfUsers }) => {
-    let numberOfUsersPercent = Math.floor((numberOfUsers * 100) / 12);
+    let numberOfUsersPercent = Math.floor(((numberOfUsers) * 100) / maxNumberOfUsers);
 
-    let data = [
-        { title: 'Current capacity', value: 100-numberOfUsersPercent, color: '#B2DFDB' },
-        { title: 'Users connected', value: numberOfUsersPercent, color: 'teal' }
-    ]
+    const userChartColor = () => {
+        let colors;
+
+        if(numberOfUsers <= 15) {
+            colors = colorCodes.zeroToFifteen;
+        } else if (numberOfUsers > 15 && numberOfUsers <= 25) {
+            colors = colorCodes.fifteenToTwentyFive;
+        } else {
+            colors = colorCodes.twentyFiveAndAbove;
+        }
+
+        let data = [
+            { title: 'Current capacity', value: 100-numberOfUsersPercent, color: colors[0] },
+            { title: 'Users connected', value: numberOfUsersPercent, color: colors[1] }
+        ];
+        return data;
+    }
 
     return (
         <Container style={{position: 'relative', width: '100px', height: '100px'}}>
@@ -25,7 +42,7 @@ const UserChart = ({ numberOfUsers }) => {
                     strokeLinejoin="round"
                     strokeWidth={0.2}
                     viewBoxSize={100}
-                    data={data}
+                    data={userChartColor()}
                 />
             </div>
 
@@ -35,8 +52,8 @@ const UserChart = ({ numberOfUsers }) => {
 
             </div>
 
-            <div style={{position: 'absolute', top: '70%', left: '42%', margin: '-10%', width: '100%', height: '100%', color: 'black'}}>
-                {numberOfUsers} / {maxNumberOfUsers}
+            <div style={{position: 'absolute', top: '70%', left: '37%', margin: '-10%', width: '100%', height: '100%', color: 'black'}}>
+                {numberOfUsers <= maxNumberOfUsers ? `${numberOfUsers} / ${maxNumberOfUsers}` : <span>&nbsp;&nbsp;>&nbsp;{maxNumberOfUsers}</span>}
             </div>
         </Container>
     );
