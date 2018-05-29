@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import * as actions from '../../actions/filemgmt'
 import { Button, Icon, Segment } from 'semantic-ui-react'
 import SelectedFileShowComponent from './SelectedFileShowComponent'
-import path from 'path'
 
 
 class FileUploadComponent extends Component {
@@ -66,18 +65,14 @@ class FileUploadComponent extends Component {
     });
   }
 
-  transferFromUSB(fileList) {
+  transferFromUSB() {
     this.props.verifyConnectedUSB('', (ans) => {
       if (!ans) {
         alert('USB unplugged!');
         this.setState({usbConnected : false});
       } else {
-        this.setState({isDownloadingFromUsb : true});
-
-        let fullPath = path.dirname(fileList[0].webkitRelativePath);
-        let folderToTransfer = fullPath.substring(0, fullPath.indexOf(path.sep));
-
-        this.props.copyBunchOfFiles(this.props.filemgmt.usbDir, [folderToTransfer || fullPath], this.props.filemgmt.currentDir, (msg) => {
+        this.setState({isDownloadingFromUsb : true})
+        this.props.copyBunchOfFiles(this.props.filemgmt.usbDir, this.props.filemgmt.usbDownFiles, this.props.filemgmt.currentDir, (msg) => {
           alert(msg);
           this.props.verifyConnectedUSB('', (ans) => {
             return;
@@ -110,17 +105,14 @@ class FileUploadComponent extends Component {
       <div>
         <Segment>
         <span>
-            <Button animated color='blue' onClick={() => document.getElementById('usbinput').click()} disabled={!this.state.usbConnected || this.state.isDownloadingFromUsb} loading={this.state.isDownloadingFromUsb}>
-              <Button.Content visible>Transfer Here From USB</Button.Content>
-              <Button.Content hidden><Icon name='usb' /><Icon name='up arrow'/></Button.Content>
-            </Button>
-            <input type='file' id='usbinput' style = {{display : 'None'}}
-            onChange={(e) => this.transferFromUSB(e.target.files)} multiple='' webkitdirectory='' mozdirectory='' directory=''/>
-
-            <Button animated color='blue' onClick={this.transferToUSB.bind(this)} disabled = {!this.state.usbConnected || this.state.isUploadingToUsb} loading={this.state.isUploadingToUsb}>
-              <Button.Content visible>Transfer Folder to USB</Button.Content>
-              <Button.Content hidden><Icon name='usb' /><Icon name='down arrow'/></Button.Content>
-            </Button>
+        <Button animated color='blue' onClick={this.transferToUSB.bind(this)} disabled = {!this.state.usbConnected || this.state.isUploadingToUsb} loading={this.state.isUploadingToUsb}>
+          <Button.Content visible>Transfer Folder to USB</Button.Content>
+          <Button.Content hidden><Icon name='usb' /><Icon name='up arrow'/></Button.Content>
+        </Button>
+        <Button animated color='blue' onClick={this.transferFromUSB.bind(this)} disabled = {!this.state.usbConnected || this.state.isDownloadingFromUsb} loading={this.state.isDownloadingFromUsb}>
+          <Button.Content visible>Transfer Here From USB</Button.Content>
+          <Button.Content hidden><Icon name='usb' /><Icon name='down arrow'/></Button.Content>
+        </Button>
         </span>
         </Segment>
         <Segment>
