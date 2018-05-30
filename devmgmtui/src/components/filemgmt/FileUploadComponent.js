@@ -86,7 +86,13 @@ class FileUploadComponent extends Component {
 
   handleApplyChanges() {
     if(window.confirm('Some services might be interrupted for a moment. Do you still wish to proceed?')) {
-      this.props.applyChanges();
+      this.props.applyChanges(err => {
+        if (err) {
+          alert('Failed to apply changes.');
+        } else {
+          alert('Changes applied successfully.');
+        }
+      });
     } else {
       alert('No changes were applied.');
     }

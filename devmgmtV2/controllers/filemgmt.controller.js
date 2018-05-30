@@ -300,24 +300,15 @@ let writeFileToDisk = (req, res) => {
 }
 
 const applyChangesToPlugins = (req, res) => {
-    console.log('Applying changes to files.');
-
     let response = {
         success : false,
         message : null
     }
 
-    exec('systemctl restart appserver', (err, stdout, stderr) => {
-        if (err) {
-            console.log(err);
+    const cmd = 'service appserver restart';
 
-            response = {
-                ...response,
-                message : 'Could not apply changes to the plugins.'
-            }
-
-            res.status(500).json(response);
-        } else if (stderr) {
+    exec(cmd, (err, stdout, stderr) => {
+        if (err || stderr) {
             console.log(err);
 
             response = {
