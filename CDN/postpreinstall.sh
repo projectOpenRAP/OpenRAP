@@ -29,6 +29,8 @@ reboot()
 {
 	echo "Rebooting device"
 	reboot now
+
+	exit 0
 }
 
 post_install()
