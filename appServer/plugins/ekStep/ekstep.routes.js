@@ -3,11 +3,10 @@ let multipartMiddle = multiparty();
 let fs = require('fs');
 let q = require('q');
 let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices } = require('../../../searchsdk/index.js');
-
-
+let { deleteDir } = require('../../../filesdk');
 let { getHomePage, getEcarById,  performSearch, telemetryData, extractFile, performRecommendation, createFolderIfNotExists } = require('./ekstep.controller.js');
 
-let { uploadTelemetryToCloud } = require('./ekstep.telemetry_upload.js');
+// let { uploadTelemetryToCloud } = require('./ekstep.telemetry_upload.js');
 
 module.exports = app => {
 
@@ -82,11 +81,12 @@ module.exports = app => {
                 return defer.reject(err);
             } else {
                 let extractPromises = [];
-                files.forEach(file => {
+                for (let i = 0; i < files.length; i++) {
+                    let file = files[i];
                     if (file.slice(file.lastIndexOf(".") + 1) === 'ecar') {
                         extractPromises.push(extractFile(filePath, file));
                     }
-                });
+                }
                 q.allSettled(extractPromises).then(values => {
                     let statuses = values.map((value, index) => value.state);
                     let failIndex = statuses.indexOf("rejected");
@@ -107,7 +107,17 @@ module.exports = app => {
 
     let jsonDocsToDb = (dir) => {
         let defer = q.defer();
-        init().then(value => {
+        /*
+            Updated behavior: Carpet bomb the index and rebuild from scratch
+        */
+        console.log("Initiating carpet bomb... P51s at the ready");
+        deleteIndex({indexName : "es.db"}).then(value => {
+            return createIndex({indexName : "es.db"});
+        }, reason => {
+            console.log("Did not delete index due to " + reason.err);
+            return createIndex({indexName : "es.db"});
+        }).then(value => {
+        /*init().then(value => {
             return getAllIndices();
         }).then(value => {
             let availableIndexes = JSON.parse(value.body).indexes;
@@ -117,7 +127,9 @@ module.exports = app => {
             } else {
                 return count({indexName : "es.db"});
             }
-        }).then(value => {
+        })
+        .then(value => {*/
+            console.log("Carpet bomb successful!");
             let promises = [];
             fs.readdir(dir, (err, files) => {
                 if (err) {
@@ -139,8 +151,25 @@ module.exports = app => {
                 }
             });
         }).catch(e => {
-            console.log(e);
-            return defer.reject(e);
+            if (e.err && e.err === 'error creating index: cannot create new index, path already exists\n') {
+                console.log("Flushing insurgents out...");
+                deleteDir('/opt/searchEngine/bleveDbDir/es.db/').then(value => {
+                    console.log("Folder removed");
+                    return init();
+                }).then(value => {
+                    console.log("Initialized Search Server");
+                    return createIndex({indexName : "es.db"});
+                }).then(value => {
+                    console.log("Index Created");
+                    return defer.resolve();
+                }).catch(e2 => {
+                    console.log("Not Ok");
+                    console.log(e2);
+                    return defer.reject(e2);
+                });
+            } else {
+                return defer.reject(e);
+            }
         });
         return defer.promise;
     }
@@ -152,20 +181,20 @@ module.exports = app => {
         initializeEkstepData('/opt/opencdn/appServer/plugins/ekStep/profile.json').then(value => {
             let dir = value.jsonDir;
             return createFolderIfNotExists(ekStepData.media_root);
-        }, reason => {
-	    console.log(reason);
-            console.log("Corrupt/Missing JSON File!");
         }).then(value => {
-	    console.log("Created " + ekStepData.media_root);
+	        console.log("Created " + ekStepData.media_root);
             return createFolderIfNotExists(ekStepData.telemetry);
         }).then(value => {
 	        console.log("Created " + ekStepData.telemetry);
 	        return createFolderIfNotExists(ekStepData.json_dir);
 	    }).then(value => {
+            console.log("Created " + ekStepData.json_dir);
 	        return createFolderIfNotExists(ekStepData.content_root);
 	    }).then(value => {
+            console.log("Created " + ekStepData.content_root);
 	        return createFolderIfNotExists(ekStepData.unzip_content);
 	    }).then(value => {
+            console.log("Created " + ekStepData.unzip_content);
             return processEcarFiles(ekStepData.media_root);
 	    }).then(value => {
             return jsonDocsToDb(ekStepData.json_dir);
@@ -176,6 +205,7 @@ module.exports = app => {
         }).then(value => {
             console.log("Initialized API Server");
         }).catch(e => {
+            console.log(e);
             if (typeof e.state === 'undefined') {
                 console.log(e);
                 console.log("Could not initialize API Server");
