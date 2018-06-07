@@ -615,7 +615,7 @@ let modifyJsonData = (jsonFile, file) => {
 	                }
                     return defer.resolve({jsonData});
                 } catch (err) {
-                    return defer.reject({err}); 
+                    return defer.reject({err});
                 }
            }
        });
@@ -724,22 +724,22 @@ let deleteEcarData = (dir, file) => {
     let defer = q.defer();
     let fileNameAsFolder = file.slice(0, file.lastIndexOf('.')) + '/';
     deleteOriginalEcarFileIfExists(dir, file).then(value => {
-        console.log("Deleted original ecar file");
+        console.log("Deleted original ecar file: " + file);
         return deleteDir(dir + fileNameAsFolder);
     }).then(value => {
-        console.log("Deleted temporary folder");
+        console.log("Deleted temporary folder: "  + file);
         return deleteXContentFolderIfExists(dir, file);
     }).then(value => {
-        console.log("Deleted XContent");
+        console.log("Deleted XContent: " + file);
         return deleteMovedEcarFileIfExists(dir, file);
     }).then(value => {
-        console.log("Deleted ECAR File");
+        console.log("Deleted ECAR File: " + file);
         return deleteMovedJsonFileIfExists(dir, file);
     }).then(value => {
-        console.log("Deleted JSON File");
+        console.log("Deleted JSON File: " + file);
         return defer.resolve();
     }).catch(err => {
-        console.log("Delete ecar error!");
+        console.log("Delete ecar error!: " + file);
         console.log(err);
         return defer.reject({err});
     });
@@ -761,29 +761,29 @@ let doPostExtraction = (dir, file) => {
     createFolderIfNotExists(dir + 'ecar_files/').then(resolve => {
         return moveFileWithPromise(dir + file, dir + 'ecar_files/' + file);
     }).then(resolve => {
-        console.log("Moved file to ecar_files");
+        console.log("Moved file to ecar_files: " + file);
         return createFolderIfNotExists(dir + 'json_dir/');
     }).then(resolve => {
         let jsonFile = dir + fileNameAsFolder + 'manifest.json';
         return changeDownloadUrl(jsonFile, file);
     }).then(resolve => {
-        console.log("Modded JSON file");
+        console.log("Modded JSON file: " + file);
         let jsonFile = resolve.jsonFile;
         return moveFileWithPromise(jsonFile, dir + 'json_dir/' + file + '.json');
     }).then(resolve => {
-        console.log("Moved JSON file");
+        console.log("Moved JSON file: " + file);
         return createFolderIfNotExists(dir + 'xcontent/');
     }).then(resolve => {
         let folderName = file.match(/do_\d+/);
         return moveFileWithPromise(dir + fileNameAsFolder + folderName[0], dir + 'xcontent/' + folderName[0]);
     }).then(value => {
-        console.log("Moved XContnet");
+        console.log("Moved XContnet: " + file);
         return deleteDir(dir + fileNameAsFolder);
     }).then(value => {
-        console.log("Deleted directory");
+        console.log("Deleted directory: " + file);
         return defer.resolve(value);
     }).catch(e => {
-        console.log(e);
+        console.log("Wrong ecar format for " + file);
         deleteEcarData(dir, file).then(value => {
             return defer.reject({err : e});
         }).catch(err => {
@@ -813,18 +813,17 @@ let extractFile = (dir, file) => {
     let folderName = '';
     console.log("Extracting " + file);
     createFolderToExtractFiles(dir, file).then(value => {
-        console.log("Created folder pour extraction");
+        console.log("Created folder for extraction: " + file);
         folderName = value;
         return performExtraction(dir, file, folderName);
     }).then(value => {
-        console.log("Extracted!");
+        console.log("Extracted!: " + file);
         return doPostExtraction(dir, file);
     }).then(value => {
-        console.log("Post extraction done!");
+        console.log("Post extraction done!: " + file);
         return defer.resolve(value);
     }).catch(e => {
-        console.log("PHAEL");
-        console.log(e);
+        console.log("Error processing " + file);
         if (e.err && e.err === 'Cannot extract this file') {
             deleteEcarData(dir, file).then(value => {
                 return defer.reject(e);

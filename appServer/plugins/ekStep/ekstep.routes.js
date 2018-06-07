@@ -5,6 +5,7 @@ let q = require('q');
 let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices } = require('../../../searchsdk/index.js');
 let { deleteDir } = require('../../../filesdk');
 let { getHomePage, getEcarById,  performSearch, telemetryData, extractFile, performRecommendation, createFolderIfNotExists } = require('./ekstep.controller.js');
+let { exec } = require('child_process');
 
 // let { uploadTelemetryToCloud } = require('./ekstep.telemetry_upload.js');
 
@@ -101,6 +102,36 @@ module.exports = app => {
         return defer.promise;
     }
 
+    let restartSearchServer = () => {
+        let defer = q.defer();
+        exec('service searchserver restart', (err, stdout, stderr) => {
+            if (err) {
+                return defer.reject({err});
+            } else {
+                return defer.resolve();
+            }
+        });
+        return defer.promise;
+    }
+
+    let waitUntilSearchServerIsLive = () => {
+        let defer = q.defer();
+        let cleared = false;
+        let searchServerTimed = null;
+        searchServerTimed = setInterval(() => {
+            console.log("Attempting to connect...");
+            init().then(value => {
+                console.log("Connected!");
+                cleared = true;
+                clearInterval(searchServerTimed);
+                return defer.resolve();
+            }).catch(err => {
+                console.log("Still waiting...");
+            });
+        }, 1000);
+        return defer.promise;
+    }
+
     /*
         Adds the JSON files to BleveSearch Database
     */
@@ -110,11 +141,13 @@ module.exports = app => {
         /*
             Updated behavior: Carpet bomb the index and rebuild from scratch
         */
-        console.log("Initiating carpet bomb... P51s at the ready");
+        console.log("Attempting to rebuild index...");
         deleteIndex({indexName : "es.db"}).then(value => {
+            console.log("Deleted index, creating new one...");
             return createIndex({indexName : "es.db"});
         }, reason => {
-            console.log("Did not delete index due to " + reason.err);
+            console.log("Deletion failed because: " + reason.err);
+            console.log("Attempting to create index");
             return createIndex({indexName : "es.db"});
         }).then(value => {
         /*init().then(value => {
@@ -129,7 +162,6 @@ module.exports = app => {
             }
         })
         .then(value => {*/
-            console.log("Carpet bomb successful!");
             let promises = [];
             fs.readdir(dir, (err, files) => {
                 if (err) {
@@ -152,18 +184,22 @@ module.exports = app => {
             });
         }).catch(e => {
             if (e.err && e.err === 'error creating index: cannot create new index, path already exists\n') {
-                console.log("Flushing insurgents out...");
+                console.log("Deleting index location and creating again...");
                 deleteDir('/opt/searchEngine/bleveDbDir/es.db/').then(value => {
                     console.log("Folder removed");
+                    console.log("Restarting searchServer...");
                     return init();
+                /*}).then(value => {
+                    console.log("Waiting for searchServer to come up...");
+                    return waitUntilSearchServerIsLive();*/
                 }).then(value => {
-                    console.log("Initialized Search Server");
+                    console.log("Search Server Restarted!");
                     return createIndex({indexName : "es.db"});
                 }).then(value => {
                     console.log("Index Created");
                     return defer.resolve();
                 }).catch(e2 => {
-                    console.log("Not Ok");
+                    console.log("Error in fixing searchServer");
                     console.log(e2);
                     return defer.reject(e2);
                 });
