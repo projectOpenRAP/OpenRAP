@@ -1,0 +1,12 @@
+[Unit]
+Description=System telemetry collector
+After=devmgmt.service
+
+[Service]
+Type=simple
+ExecStart=/opt/opencdn/CDN/sys_telemetry.sh
+PIDFile=/tmp/opencdn/sys_telemetry.pid
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
