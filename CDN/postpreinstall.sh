@@ -47,6 +47,8 @@ systemctl restart appserver
 systemctl enable devmgmt
 systemctl restart devmgmt
 
+systemctl enable system.telemetry
+
 reboot
 
 exit 0
