@@ -32,10 +32,8 @@ app.listen(8080, err => {
     if (err)
         console.log(err);
     else {
-        cron.schedule("0,15,30,45 * * * * *", () => {
+        cron.schedule("*/15 * * * * *", () => {
             repeatedlyCheckForInternet();
-        });
-        cron.schedule("7,22,37,52 * * * * *", () => {
             repeatedlyCheckUsers();
         });
         console.log("server running on port 8080");
