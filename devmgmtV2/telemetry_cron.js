@@ -67,28 +67,25 @@ let generateTelemetry = (telemetryType, telemetryValue) => {
 }
 
 let repeatedlyCheckForInternet = () => {
-    let internetChecker = () => {
-        console.log("Checking internet status...");
-        isInternetActive().then(value => {
-            let currentConnection = true;
-            if (currentConnection !== internetConnected) {
-                internetConnected = currentConnection;
-                generateTelemetry('internetConnected', currentConnection);
-            }
-        }).catch(e => {
-            let currentConnection = false;
-            if (currentConnection !== internetConnected) {
-                internetConnected = currentConnection;
-                generateTelemetry('internetConnected', currentConnection);
-            }
-        });
-    }
-    setInterval(internetChecker, timeInterval);
+    console.log("Checking internet status...");
+    isInternetActive().then(value => {
+        let currentConnection = true;
+        if (currentConnection !== internetConnected) {
+            internetConnected = currentConnection;
+            generateTelemetry('internetConnected', currentConnection);
+        }
+    }).catch(e => {
+        let currentConnection = false;
+        if (currentConnection !== internetConnected) {
+        internetConnected = currentConnection;
+            generateTelemetry('internetConnected', currentConnection);
+        }
+    });
 }
 
 let repeatedlyCheckUsers = () => {
     const cmd = path.join(__dirname, '../../CDN/getall_stations.sh');
-    let userChecker = () => exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
+    exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
         // console.log('Error: ' + err);
         // console.log('stdout: ' + stdout);
         // console.log('stderr: ' + stderr);
@@ -101,7 +98,6 @@ let repeatedlyCheckUsers = () => {
             }
         }
     });
-    setInterval(userChecker, timeInterval);
 }
 
 module.exports = {
