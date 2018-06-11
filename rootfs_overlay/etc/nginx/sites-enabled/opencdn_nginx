@@ -26,20 +26,18 @@ server {
 	#openRAP apiserver configuration
 	#
 	location /api {
-                proxy_pass http://127.0.0.1:9090;
+                proxy_pass http://127.0.0.1:9000;
 	}
 	location /content {
-                proxy_pass http://127.0.0.1:9090;
+                proxy_pass http://127.0.0.1:9000;
 	}
 	location /composite {
-                proxy_pass http://127.0.0.1:9090;
+                proxy_pass http://127.0.0.1:9000;
 	}
 	location /data {
-                proxy_pass http://127.0.0.1:9090;
+                proxy_pass http://127.0.0.1:9000;
 	}
-	location /gok {
-                proxy_pass http://127.0.0.1:9090;
-	}
+
 	location /devmgmt/api {
                 proxy_pass http://127.0.0.1:8080;
 	}
@@ -60,7 +58,7 @@ server {
 
 	location / {
                 #proxy_pass http://127.0.0.1:8008;
-				try_files $uri $uri/ /index.html;
+				try_files $uri $uri/ @ekstep;
 	}
 }
 server {
