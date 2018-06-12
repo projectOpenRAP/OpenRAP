@@ -35,7 +35,6 @@ class Upgrade extends Component {
         </SideNav>
     )
   } else {
-    this.props.history.push("/");
     return (
       null
     )

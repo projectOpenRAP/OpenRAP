@@ -150,7 +150,6 @@ class Captive extends Component {
           </div>
         )
       } else {
-        this.props.history.push('/');
         return null;
       }
     }

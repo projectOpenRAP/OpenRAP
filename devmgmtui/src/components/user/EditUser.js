@@ -57,9 +57,6 @@ class EditUser extends Component {
     }
 
     componentWillMount() {
-        if (this.props.auth && !this.props.auth.authenticated) {
-            this.props.history.push("/");
-        }
         if (this.state.permissionList.indexOf('ALL') >= 0) {
           let permissions = this.state.permissions;
           for (let i in permissions) {
@@ -201,7 +198,6 @@ class EditUser extends Component {
                 {this.renderUserUpdateForm()}
             </SideNav>
         )} else {
-          this.props.history.push("/");
           return null;
         }
     }
