@@ -10,18 +10,18 @@ const getTimestamp = () => {
     return currentTime.toLocaleString('en-IN', options);
 }
 
-export const applyChanges = () => (dispatch) => {
+export const applyChanges = (cb) => (dispatch) => {
     axios.put(`${BASE_URL}/file/apply`)
         .then(response => {
-            if(response.success) {
-                alert('Changes applied successfully!');
+            if(response.data.success) {
+                cb(null);
             } else {
-                throw new Error(response.message);
+                throw new Error(response.data.message);
             }
         })
         .catch(error => {
             console.log(error);
-            alert('Failed to apply changes.');
+            cb(error);
         });
 }
 
