@@ -63,17 +63,6 @@ server {
 }
 server {
 	listen 80;
-	server_name gok.openrap.com;
-	root /var/www/gok;
-	index index.php index.html;
-
-	location / {
-                #proxy_pass http://127.0.0.1:8008;
-				try_files $uri $uri/ /index.html;
-	}
-}
-server {
-	listen 80;
 	server_name devmgmt.openrap.com;
 	#root /var/www/html/admin;
 	index index.php index.html;
