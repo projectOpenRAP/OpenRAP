@@ -5,14 +5,11 @@ const fs = require('fs');
 const path = require('path');
 const q = require('q');
 const exec = require('child_process').exec;
+const mac = require('getmac');
 
-const { config } = require('../config');
-const deviceID = config.did;
-
-
-// const {
-// 	saveTelemetry
-// } = require('../../telemetrySdk');
+const {
+	saveTelemetry
+} = require('../../telemetrysdk');
 
 // Generic telemetry JSON structure
 let telemetryStructure = {
@@ -91,18 +88,17 @@ const _getSystemVersion = () => {
     return defer.promise;
 }
 
-const _getUserCount = () => {
+const _getMacAddr = () => {
 	let defer = q.defer();
 
-	const cmd = path.join(__dirname, '../../CDN/getall_stations.sh');
-
-    exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
-    	if(err) {
-            defer.reject(err);
-    	}  else {
-            defer.resolve(parseInt(stdout.trim()) + Math.floor(Math.random() * 9) + 1);
-        }
-    });
+	mac.getMac((err, addr) => {
+		if(err) {
+			console.log('Error encountered while fetching mac address.', err);
+			defer.reject(err);
+		} else {
+			defer.resolve(addr);
+		}
+	});
 
     return defer.promise;
 }
@@ -114,61 +110,18 @@ const _getTimestamp = () => {
 		.replace(/\..+/, '');
 }
 
-// Temporary, will be removed
-const _logUserCount = (req) => {
 
-	const actor = req.body.actor || req.query.actor || req.params['actor'];
-	const timestamp = _getTimestamp();
-
-	let telemetryData = { ...telemetryStructure }
-	let count;
-
-	_getUserCount()
-		.then(userCount => count = userCount)
-		.then(_getSystemVersion)
-		.then(systemVersion => {
-			telemetryData = {
-				...telemetryData,
-				'eid' : 'LOG',
-				'ets' : new Date().getTime(),
-				'ver' : '3.0',
-				'mid' : uniqid(`${deviceID}-`), // TODO : Use appropriate device ID
-				'actor' : {
-					'id' : actor
-				},
-				'context': {
-					'channel' : 'OpenRAP',
-					'pdata' : {
-						'id' : deviceID,
- 						'pid' : require('process').pid,
-						'ver' : systemVersion.replace(/\n$/, '')
-					},
-					'env' : 'Device Management'
-				},
-				'edata' : {
-					'type' : 'api_call',
-					'level' : 'INFO',
-					'message' : 'Number of users fetched',
-					'params' : [
-						{
-							timestamp,
-							count
-						}
-					]
-				}
-			}
-
-			console.log(JSON.stringify(telemetryData, null, 4));
-		})
-		.catch(err => console.log(err));
-}
-
+// TODO Refactor this
 const saveTelemetryData = (req, res, next) => {
 
 	const actor = req.body.actor || req.query.actor || req.params['actor'];
 	const timestamp = _getTimestamp();
 
 	let telemetryData = { ...telemetryStructure };
+
+	/*
+	* Populating event-specific telemetry data
+	*/
 
 	switch(req.route.path) {
 		case '/file/new' :
@@ -308,31 +261,60 @@ const saveTelemetryData = (req, res, next) => {
 			break;
 	}
 
+
+	/*
+	* Populating event-agnostic telemetry data
+	*/
+
+	telemetryData = {
+		...telemetryData,
+		'ets' : new Date().getTime(),
+		'ver' : '3.0',
+		'actor' : {
+			'id' : actor
+		},
+		'context': {
+			'channel' : 'OpenRAP',
+			'pdata' : {
+				'pid' : require('process').pid,
+			},
+			'env' : 'Device Management'
+		}
+	}
+
 	_getSystemVersion()
 		.then(systemVersion => {
 			telemetryData = {
 				...telemetryData,
-				'ets' : new Date().getTime(),
-				'ver' : '3.0',
-				'mid' : uniqid(`${deviceID}-`), // TODO : Use appropriate device ID
-				'actor' : {
-					'id' : actor
-				},
 				'context': {
-					'channel' : 'OpenRAP',
+					...telemetryData.context,
 					'pdata' : {
-						'id' : deviceID,
- 						'pid' : require('process').pid,
+						...telemetryData.context.pdata,
 						'ver' : systemVersion.replace(/\n$/, '')
-					},
-					'env' : 'Device Management'
+					}
 				}
 			}
 
-			console.log(JSON.stringify(telemetryData, null, 4));
-			_logUserCount(req);
+			return _getMacAddr();
+		})
+		.then(macAddr => {
+			const deviceID = macAddr;
 
-			// saveTelemetry(telemetryData, 'devmgmt');
+			telemetryData = {
+				...telemetryData,
+				'mid' : uniqid(`${deviceID}-`),
+				'context': {
+					...telemetryData.context,
+					'pdata' : {
+						...telemetryData.context.pdata,
+						'id' : deviceID
+					},
+				}
+			}
+
+			console.log('Saving telemetry'); // JSON.stringify(telemetryData, null, 4))
+
+			saveTelemetry(telemetryData, 'devmgmt');
 
 			next();
 		})
