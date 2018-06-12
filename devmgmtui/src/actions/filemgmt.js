@@ -34,6 +34,7 @@ export const readFolder = (folderPath, update=true) => (dispatch) => {
       }
       dispatch({type : 'READ_DIR', payload : response.data.children});
       dispatch({type : 'OPEN_DIR', payload : folderPath});
+      localStorage.setItem('directoryData',folderPath);
   })
     .catch(e => {
       console.log(e);
