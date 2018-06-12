@@ -63,12 +63,16 @@ class FileDisplayComponent extends Component {
   }
 
   componentDidMount() {
-    this.setState({folderLoaded : true})
+    if(typeof this.props.filemgmt.files !== 'undefined') {
+      this.setState({folderLoaded : true})
+    }
   }
 
   selectAll() {
     let currentDirFiles = this.props.filemgmt.files;
     if (!this.state.allSelected) {
+      this.props.updateSelectedFiles(currentDirFiles.map((item, index) => item.name));
+    } else if(!this.props.filemgmt.selectedFiles.length) {
       this.props.updateSelectedFiles(currentDirFiles.map((item, index) => item.name));
     } else {
       this.props.updateSelectedFiles([]);
@@ -95,7 +99,13 @@ class FileDisplayComponent extends Component {
     this.setState({newFolderName : e.target.value})
   }
 
-
+  renderLoader() {
+    return (
+      <Segment loading padded>
+        Loading...
+      </Segment>
+    );
+  }
 
   renderFileDisplayComponent() {
     //let that = this;
@@ -110,15 +120,22 @@ class FileDisplayComponent extends Component {
         )
     });
     return (
-      <Segment>
-        {!this.state.folderLoaded ? <Dimmer active inverted> <Loader></Loader></Dimmer> : null}
-        <List>
-          {folders}
-        </List>
-        <List>
-          {files}
-        </List>
-    </Segment>
+      <div>
+        {
+          !this.state.folderLoaded
+          ? this.renderLoader()
+          : (
+            <Segment>
+              <List>
+                {folders}
+              </List>
+              <List>
+                {files}
+              </List>
+            </Segment>
+          )
+        }
+    </div>
     )
   }
 
@@ -145,7 +162,7 @@ class FileDisplayComponent extends Component {
       </div>
       <Divider></Divider>
       <Button animated color='linkedin' onClick={this.selectAll.bind(this)}>
-        <Button.Content visible>{this.state.allSelected ? 'Uns' : 'S'}elect All</Button.Content>
+        <Button.Content visible>{this.state.allSelected && this.props.filemgmt.selectedFiles.length ? 'Uns' : 'S'}elect All</Button.Content>
         <Button.Content hidden><Icon name='check circle' /></Button.Content>
       </Button>
       <span style={{float:'right'}}>

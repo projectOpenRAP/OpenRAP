@@ -17,7 +17,8 @@ class SelectedFileShowComponent extends Component {
     super(props);
     this.state = {
       uploadProgress : 0,
-      uploadStatus : 'INACTIVE'
+      uploadStatus : 'INACTIVE',
+      cancelUpload : undefined
     }
     this.initiateUpload = this.initiateUpload.bind(this);
     this.handleDeleteClick = this.handleDeleteClick.bind(this);
@@ -25,15 +26,17 @@ class SelectedFileShowComponent extends Component {
 
   initiateUpload() {
     let that = this;
-    this.props.uploadFile(this.props.filemgmt.currentDir, this.props.file, this.props.auth.user.username, function(err, res, uploading) {
+
+    this.props.uploadFile(this.props.filemgmt.currentDir, this.props.file, this.props.auth.user.username, function(err, res, uploading, cancelUpload) {
         if (err) {
             alert(res);
-            this.setState({
+            that.setState({
                 uploadProgress : 0,
                 uploadStatus : 'ERROR'
             });
         } else if(uploading) {
             that.setState({
+                cancelUpload,
                 uploadProgress : res,
                 uploadStatus : 'UPLOADING'
             });
@@ -41,9 +44,11 @@ class SelectedFileShowComponent extends Component {
             that.setState({
                 uploadProgress : res,
                 uploadStatus : 'UPLOADED'
-            }, that.handleDeleteClick);
+            }, () => {
+                that.props.readFolder(that.props.filemgmt.currentDir);
+                that.handleDeleteClick();
+            });
         }
-        that.props.readFolder(that.props.filemgmt.currentDir);
     });
   }
 
@@ -52,16 +57,21 @@ class SelectedFileShowComponent extends Component {
   }
 
   handleDeleteClick() {
+    if(this.state.uploadStatus !== 'INACTIVE') {
+      this.state.cancelUpload();
+    }
+
     let uploadableFiles = this.props.filemgmt.uploadableFiles;
     let fileIndex = uploadableFiles.indexOf(this.props.file);
+
     if(fileIndex !== -1) {
-        uploadableFiles.splice(fileIndex, 1);
+        delete uploadableFiles[fileIndex];
         this.props.updateUploadableFiles(uploadableFiles);
     }
   }
 
   componentDidUpdate() {
-    if(this.props.autoUpload === true) {
+    if(this.props.autoUpload === true && this.state.uploadStatus === 'INACTIVE') {
         this.initiateUpload();
     }
   }
@@ -112,11 +122,7 @@ class SelectedFileShowComponent extends Component {
   }
 
   render() {
-    return (
-      <div>
-        {this.renderSelectedFileShowComponent()}
-      </div>
-    )
+    return this.renderSelectedFileShowComponent();
   }
 }
 

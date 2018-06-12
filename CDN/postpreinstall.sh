@@ -25,6 +25,12 @@ restore_files()
 	done
 }
 
+reboot()
+{
+	echo "Rebooting device"
+	reboot now
+}
+
 post_install()
 {
 echo "Running post install scripts"
@@ -40,6 +46,8 @@ systemctl restart appserver
 
 systemctl enable devmgmt
 systemctl restart devmgmt
+
+reboot
 
 exit 0
 

@@ -16,14 +16,14 @@ let writeUpdateFile = (req, res) => {
       exec('/opt/opencdn/CDN/upgrade.sh ' + updateFileArgument, (err, stdout, stderr) => {
         if (err){
           console.log(err);
-          return res.status(500).json({success : false, msg : 'Server Error!'})
         } else if (stdout){
-          return res.status(200).json({success : true, msg : 'Success!'})
+          console.log(stdout)
         } else {
-          console.log(stderr);
-          return res.status(200).json({success : false, msg : 'Script Error!'})
+          console.log('Script error : ' + stderr);
         }
       })
+
+      res.status(200).json({success : true});
     }
   })
 }

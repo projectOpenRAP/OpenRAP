@@ -1,13 +1,13 @@
 "use strict";
 
-let {writeFileToDisk, deleteFileFromDisk, createNewFolder, openDirectory, copyFile, moveFile, getUSB, storeTimestamp} = require("../controllers/filemgmt.controller.js")
+let {writeFileToDisk, deleteFileFromDisk, createNewFolder, openDirectory, copyFile, moveFile, getUSB, storeTimestamp, applyChangesToPlugins} = require("../controllers/filemgmt.controller.js")
 let multiparty = require('connect-multiparty')
 let multipartMiddle = multiparty()
 
 const { saveTelemetryData } = require('../middlewares/telemetry.middleware.js');
 
 const setTimeout = (req, res, next) => {
-  req.setTimeout(15*60*1000);
+  req.setTimeout(0);
   next();
 }
 
@@ -19,4 +19,5 @@ module.exports = app => {
   app.put('/file/copy', storeTimestamp, setTimeout, copyFile);
   app.put('/file/move', storeTimestamp, moveFile);
   app.get('/file/getUSB', getUSB);
+  app.put('/file/apply', applyChangesToPlugins);
 }

@@ -1,10 +1,16 @@
 "use strict"
 
+
+
+
+let cron = require('node-cron');
 let express = require("express");
 let bodyParser = require('body-parser');
 let cors = require('cors');
 let app = express();
-let { exec } = require('child_process')
+let { exec } = require('child_process');
+let { repeatedlyCheckForInternet, repeatedlyCheckUsers } = require('./telemetry_cron.js');
+
 
 app.use(cors())
 // parse application/x-www-form-urlencoded
@@ -26,6 +32,10 @@ app.listen(8080, err => {
     if (err)
         console.log(err);
     else {
+        cron.schedule("*/15 * * * * *", () => {
+            repeatedlyCheckForInternet();
+            repeatedlyCheckUsers();
+        });
         console.log("server running on port 8080");
         exec('mysql -u root -proot < /opt/opencdn/devmgmtV2/init.sql', (err, stdout, stderr) => {
           if (err) {

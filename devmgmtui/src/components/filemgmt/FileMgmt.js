@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import SideNav from '../common/Sidebar'
 import * as actions from '../../actions/filemgmt'
-import { Segment, Grid } from 'semantic-ui-react'
+import { Segment, Grid, Header } from 'semantic-ui-react'
 import FileUploadComponent from './FileUploadComponent'
 import FileDisplayComponent from './FileDisplayComponent'
 
 const fileMgmtStyles = {
   gridGap : {
-    marginTop : '4%',
+    marginTop : '3%',
     paddingLeft : '2%',
     paddingRight : '2%'
   },
@@ -37,6 +37,7 @@ class FileMgmt extends Component {
     return (
       <SideNav>
          <Grid columns={2} divided style={fileMgmtStyles.gridGap}>
+            <Header as='h1'>File Management</Header>
             <Grid.Row>
             <Grid.Column>
              <Segment>
