@@ -18,6 +18,8 @@ import Upgrade from './components/upgrade/Upgrade'
 import FileMgmt from './components/filemgmt/FileMgmt'
 import Captive from './components/captive/Captive'
 
+import verifyAuth from './components/VerifyAuthentication';
+
 class App extends Component {
 
   componentDidMount() {
@@ -37,16 +39,16 @@ class App extends Component {
             <BrowserRouter >
                 <div>
                     <Route exact path={"/"} component={Login} />
-                    <Route exact path={"/users/edit/:username/:permissions"} component={EditUser} />
-                    <Route exact path={"/create/user"} component={CreateUser} />
-                    <Route exact path={"/users"} component={UserList} />
-                    <Route exact path={"/ssid/set"} component={SetSSID} />
-                    <Route exact path={"/update/password"} component={UpdatePassword} />
-                    <Route exact path={"/upgrade"} component={Upgrade} />
-                    <Route exact path={"/filemgmt"} component={FileMgmt} />
-                    <Route exact path={"/dashboard"} component={Dashboard} />
-                    <Route exact path={"/upgrade"} component={Upgrade} />
-                    <Route exact path={"/captive"} component={Captive} />
+                    <Route exact path={"/users/edit/:username/:permissions"} component={verifyAuth(EditUser)} />
+                    <Route exact path={"/create/user"} component={verifyAuth(CreateUser)} />
+                    <Route exact path={"/users"} component={verifyAuth(UserList)} />
+                    <Route exact path={"/ssid/set"} component={verifyAuth(SetSSID)} />
+                    <Route exact path={"/update/password"} component={verifyAuth(UpdatePassword)} />
+                    <Route exact path={"/upgrade"} component={verifyAuth(Upgrade)} />
+                    <Route exact path={"/filemgmt"} component={verifyAuth(FileMgmt)} />
+                    <Route exact path={"/dashboard"} component={verifyAuth(Dashboard)} />
+                    <Route exact path={"/upgrade"} component={verifyAuth(Upgrade)} />
+                    <Route exact path={"/captive"} component={verifyAuth(Captive)} />
                 </div>
             </BrowserRouter>
       </div>
