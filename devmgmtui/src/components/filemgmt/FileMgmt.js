@@ -27,9 +27,6 @@ class FileMgmt extends Component {
   }
 
   componentWillMount() {
-      if (this.props.auth && !this.props.auth.authenticated) {
-        this.props.history.push(`/`);
-      }
       document.title = "File Management";
   }
 
@@ -37,7 +34,14 @@ class FileMgmt extends Component {
     return (
       <SideNav>
          <Grid columns={2} divided style={fileMgmtStyles.gridGap}>
-            <Header as='h1'>File Management</Header>
+            <Grid.Row>
+              <Grid.Column>
+                <Header as='h1'>File Management</Header>
+              </Grid.Column>
+              <Grid.Column>
+                <Header as='h1'>File Upload</Header>
+              </Grid.Column>
+            </Grid.Row>
             <Grid.Row>
             <Grid.Column>
              <Segment>
@@ -65,7 +69,6 @@ class FileMgmt extends Component {
         </div>
     )
   } else {
-      this.props.history.push("/");
       return (
         null
       )
