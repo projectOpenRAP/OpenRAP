@@ -35,6 +35,7 @@ let cleanKeys = (fieldList) => {
 	Worksheet : "Worksheets",
 	Plugin : "Plugins",
 	Template : "Templates",
+	Resource : "Resources",
     }
 
     let remainingAllowedKeys = [
@@ -84,46 +85,54 @@ let cleanKeys = (fieldList) => {
         'gradeLevel',
         'language',
         'organization',
+	    'audience',
         'os',
+	    'tags',
     ]
 
     let newFieldList = {};
     loadSkeletonJson('profile')
     .then(value => {
-        let currentProfile = value.data.active_profile;
-        let cdnUrl = value.data.available_profiles[currentProfile].cdn_url;
+        try {
+            let currentProfile = value.data.active_profile;
+            let cdnUrl = value.data.available_profiles[currentProfile].cdn_url;
 	   // console.log("CDN url is " + cdnUrl);
-        for (let key in fieldList) {
-	       if (fieldList[key] === null) {
-		             continue;
-	       }
-	       if (typeof fieldList[key] === 'object') {
-	        fieldList[key] = fieldList[key][0];
-	       }
-           let newKey = key.slice(key.lastIndexOf(".") + 1);
-           if (keysWIthListValues.indexOf(newKey) !== -1 && typeof fieldList[key] !== 'object') {
-               newFieldList[newKey] = [fieldList[key]];
-           } else if (keysPointingToUrls.indexOf(newKey) !== -1) {
-               let value = fieldList[key];
-	       let newValue = value;
-	       if (value === null || value.search('https://www.youtube.com') !== -1)  {
-                   newValue = value;
-	       }
-	        else if (value.search(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/) !== -1){
-                   newValue = value.replace(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/, cdnUrl);
-               } else if (newKey === 'posterImage' || newKey === 'appIcon' || newKey === 'artifactUrl' || newKey === 'downloadUrl') {
-	           newValue = cdnUrl + '/xcontent/' + value;
-	       } else {
-		  newValue = cdnUrl + '/' + value;
-	       }
-	       newFieldList[newKey] = newValue;
-           } else  {
-               newFieldList[newKey] = fieldList[key];
-           }
+            for (let key in fieldList) {
+                if (fieldList[key] === null) {
+                    continue;
+	            }
+	            if (typeof fieldList[key] === 'object') {
+                    fieldList[key] = fieldList[key][0];
+	            }
+                let newKey = key.slice(key.lastIndexOf(".") + 1);
+                if (keysWIthListValues.indexOf(newKey) !== -1 && typeof fieldList[key] !== 'object') {
+                    newFieldList[newKey] = [fieldList[key]];
+                } else if (keysPointingToUrls.indexOf(newKey) !== -1) {
+                    let value = fieldList[key];
+	                let newValue = value;
+	                if (value === null || value.search('https://www.youtube.com') !== -1)  {
+                        newValue = value;
+	                }
+	                else if (value.search(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/) !== -1){
+                        newValue = value.replace(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/, cdnUrl);
+                    } else if (newKey === 'posterImage' || newKey === 'appIcon' || newKey === 'artifactUrl' || newKey === 'downloadUrl') {
+	                       newValue = cdnUrl + '/xcontent/' + value;
+	                } else {
+		                   newValue = cdnUrl + '/' + value;
+	                }
+	                newFieldList[newKey] = newValue;
+                } else  {
+                    newFieldList[newKey] = fieldList[key];
+                }
+            }
+            contentType = plurals[newFieldList.contentType];
+            return defer.resolve({fields : newFieldList, contentType});
+        } catch (e) {
+            console.log("Corrupt JSON file!");
+            throw e;
         }
-        contentType = plurals[newFieldList.contentType];
-        return defer.resolve({fields : newFieldList, contentType});
     }).catch(err => {
+        console.log("JSON errors caught?");
         return defer.reject({err});
     })
     return defer.promise;
@@ -478,7 +487,7 @@ let getEcarById = (req, res) => {
         responseStructure = value.data;
         return doThoroughSearch(contentID);
     }).then(value => {
-        responseStructure.result.content = value.responses[0];
+        responseStructure.result.content = value.responses[0].fields;
         return res.status(200).json(responseStructure);
     }).catch(e => {
         return res.status(500).json({e});
@@ -585,27 +594,31 @@ let performRecommendation = (req, res) => {
 let modifyJsonData = (jsonFile, file) => {
     let defer = q.defer();
     fs.readFile(jsonFile, (err, data) => {
-        if (err) {
-            return defer.reject({err});
-        } else {
-            jsonData = JSON.parse(data);
-            let downloadUrl = jsonData.archive.items[0].downloadUrl;
-            console.log(downloadUrl);
-	    if (downloadUrl !== null) {
-            	let website = downloadUrl.match(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/);
-            	if (website !== null && downloadUrl.indexOf("youtube") !== -1) {
-                    downloadUrl = downloadUrl.slice(0, downloadUrl.indexOf(website) + website.length) + '/ecar_files/' + file;
-                } else {
-                    downloadUrl = 'http://www.openrap.com/ecar_files/' + file;
+            if (err) {
+                return defer.reject({err});
+            } else {
+                try {
+                    jsonData = JSON.parse(data);
+                    let downloadUrl = jsonData.archive.items[0].downloadUrl;
+                    console.log(downloadUrl);
+	                if (downloadUrl !== null) {
+            	        let website = downloadUrl.match(/^http(s?):\/\/(((\w|\d)+)\.)+(\w|\d)+/);
+            	        if (website !== null && downloadUrl.indexOf("youtube") !== -1) {
+                            downloadUrl = downloadUrl.slice(0, downloadUrl.indexOf(website) + website.length) + '/ecar_files/' + file;
+                        } else {
+                            downloadUrl = 'http://www.openrap.com/ecar_files/' + file;
+                        }
+                        jsonData.archive.items[0].downloadUrl = downloadUrl;
+	                } else {
+		                downloadUrl = 'http://www.openrap.com/ecar_files/' + file;
+		                jsonData.archive.items[0].downloadUrl = downloadUrl;
+	                }
+                    return defer.resolve({jsonData});
+                } catch (err) {
+                    return defer.reject({err});
                 }
-                jsonData.archive.items[0].downloadUrl = downloadUrl;
-	    } else {
-		downloadUrl = 'http://www.openrap.com/ecar_files/' + file;
-		      jsonData.archive.items[0].downloadUrl = downloadUrl;
-	    }
-            return defer.resolve({jsonData});
-        }
-    });
+           }
+       });
     return defer.promise;
 }
 
@@ -634,6 +647,105 @@ let changeDownloadUrl = (jsonFile, file) => {
     return defer.promise;
 }
 
+let deleteXContentFolderIfExists = (dir, file) => {
+    let defer = q.defer();
+    let folderNameStart = file.lastIndexOf("do_");
+    let folderNameEnd = file.lastIndexOf("_");
+    let folderName = file.slice(folderNameStart, folderNameEnd) + '/';
+    fs.stat(dir + 'xcontent/' + folderName, (err, stats) => {
+        if (err) {
+            return defer.resolve();
+        } else {
+            deleteDir(dir + folderName).then(value => {
+                return defer.resolve();
+            }).catch(err => {
+                return defer.reject({err});
+            });
+        }
+    });
+    return defer.promise;
+}
+
+let deleteMovedJsonFileIfExists = (dir, file) => {
+    let defer = q.defer();
+    fs.stat(dir + 'json_dir/' + file + '.json', (err, stats) => {
+        if (err) {
+            return defer.resolve();
+        } else {
+            fs.unlink(dir + 'json_dir/' + file + '.json', (err) => {
+                if (err) {
+                    return defer.reject({err});
+                } else {
+                    return defer.resolve();
+                }
+            })
+        }
+    });
+    return defer.promise;
+}
+
+let deleteMovedEcarFileIfExists = (dir, file) => {
+    let defer = q.defer();
+    fs.stat(dir + 'ecar_files/' + file, (err, stats) => {
+        if (err) {
+            return defer.resolve();
+        } else {
+            fs.unlink(dir + 'ecar_files/' + file, (err) => {
+                if (err) {
+                    return defer.reject({err});
+                } else {
+                    return defer.resolve();
+                }
+            })
+        }
+    });
+    return defer.promise;
+}
+
+let deleteOriginalEcarFileIfExists = (dir, file) => {
+    let defer = q.defer();
+    fs.stat(dir + file, (err, stats) => {
+        if (err) {
+            return defer.resolve();
+        } else {
+            fs.unlink(dir + file, (err) => {
+                if (err) {
+                    return defer.reject({err});
+                } else {
+                    return defer.resolve();
+                }
+            })
+        }
+    });
+    return defer.promise;
+}
+
+let deleteEcarData = (dir, file) => {
+    let defer = q.defer();
+    let fileNameAsFolder = file.slice(0, file.lastIndexOf('.')) + '/';
+    deleteOriginalEcarFileIfExists(dir, file).then(value => {
+        console.log("Deleted original ecar file: " + file);
+        return deleteDir(dir + fileNameAsFolder);
+    }).then(value => {
+        console.log("Deleted temporary folder: "  + file);
+        return deleteXContentFolderIfExists(dir, file);
+    }).then(value => {
+        console.log("Deleted XContent: " + file);
+        return deleteMovedEcarFileIfExists(dir, file);
+    }).then(value => {
+        console.log("Deleted ECAR File: " + file);
+        return deleteMovedJsonFileIfExists(dir, file);
+    }).then(value => {
+        console.log("Deleted JSON File: " + file);
+        return defer.resolve();
+    }).catch(err => {
+        console.log("Delete ecar error!: " + file);
+        console.log(err);
+        return defer.reject({err});
+    });
+    return defer.promise;
+}
+
 
 /*
     Post extraction methods, called if extraction is successful and data needs to be post-processed.
@@ -649,25 +761,34 @@ let doPostExtraction = (dir, file) => {
     createFolderIfNotExists(dir + 'ecar_files/').then(resolve => {
         return moveFileWithPromise(dir + file, dir + 'ecar_files/' + file);
     }).then(resolve => {
+        console.log("Moved file to ecar_files: " + file);
         return createFolderIfNotExists(dir + 'json_dir/');
     }).then(resolve => {
-        let jsonFile = dir + file.slice(0,file.lastIndexOf('.')) + '/manifest.json';
+        let jsonFile = dir + fileNameAsFolder + 'manifest.json';
         return changeDownloadUrl(jsonFile, file);
     }).then(resolve => {
+        console.log("Modded JSON file: " + file);
         let jsonFile = resolve.jsonFile;
         return moveFileWithPromise(jsonFile, dir + 'json_dir/' + file + '.json');
     }).then(resolve => {
+        console.log("Moved JSON file: " + file);
         return createFolderIfNotExists(dir + 'xcontent/');
     }).then(resolve => {
         let folderName = file.match(/do_\d+/);
         return moveFileWithPromise(dir + fileNameAsFolder + folderName[0], dir + 'xcontent/' + folderName[0]);
     }).then(value => {
+        console.log("Moved XContnet: " + file);
         return deleteDir(dir + fileNameAsFolder);
     }).then(value => {
+        console.log("Deleted directory: " + file);
         return defer.resolve(value);
     }).catch(e => {
-        console.log(e);
-        return defer.reject({err : e});
+        console.log("Wrong ecar format for " + file);
+        deleteEcarData(dir, file).then(value => {
+            return defer.reject({err : e});
+        }).catch(err => {
+            return defer.reject({err})
+        });
     });
     return defer.promise;
 }
@@ -690,21 +811,25 @@ let performExtraction = (parentDir, fileName, folderName) => {
 let extractFile = (dir, file) => {
     let defer = q.defer();
     let folderName = '';
+    console.log("Extracting " + file);
     createFolderToExtractFiles(dir, file).then(value => {
+        console.log("Created folder for extraction: " + file);
         folderName = value;
         return performExtraction(dir, file, folderName);
     }).then(value => {
+        console.log("Extracted!: " + file);
         return doPostExtraction(dir, file);
     }).then(value => {
+        console.log("Post extraction done!: " + file);
         return defer.resolve(value);
     }).catch(e => {
+        console.log("Error processing " + file);
         if (e.err && e.err === 'Cannot extract this file') {
-            deleteDir(dir + folderName)
-            .then(value => {
+            deleteEcarData(dir, file).then(value => {
                 return defer.reject(e);
             }).catch(e2 => {
                 return defer.reject(e2);
-            })
+            });
         } else {
             return defer.reject(e);
         }
