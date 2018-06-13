@@ -1,9 +1,9 @@
 let q  = require('q');
 let FormData = require('form-data');
-let { extractZip, deleteDir } = require('../../../filesdk');
+let { extractZip, deleteDir } = require('filesdk');
 let fs = require('fs');
 let { BASE_URL, HOME_EXT, SEARCH_EXT, ID_MIDDLE, TELEMETRY_EXT, ECAR_MIDDLE } = require('./config.js');
-let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices, advancedSearch } = require('../../../searchsdk/index.js');
+let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices, advancedSearch } = require('searchsdk');
 let baseInt = 0;
 
 /*

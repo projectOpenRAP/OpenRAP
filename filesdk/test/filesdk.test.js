@@ -12,7 +12,7 @@ const {
     extractZip,
     extractTar,
     createTar
-} = require('../index');
+} = require('filesdk');
 const should = chai.should();
 let playground = './test/playground/';
 
@@ -48,7 +48,7 @@ describe('Testing Write files', function () {
             res.should.equal("Hello World");
         })
     });
-    
+
 });
 
 describe('Testing Delete files', function () {

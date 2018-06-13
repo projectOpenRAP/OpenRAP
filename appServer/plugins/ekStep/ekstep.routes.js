@@ -2,8 +2,8 @@ let multiparty = require('connect-multiparty');
 let multipartMiddle = multiparty();
 let fs = require('fs');
 let q = require('q');
-let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices } = require('../../../searchsdk/index.js');
-let { deleteDir } = require('../../../filesdk');
+let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices } = require('searchsdk');
+let { deleteDir } = require('filesdk');
 let { getHomePage, getEcarById,  performSearch, telemetryData, extractFile, performRecommendation, createFolderIfNotExists } = require('./ekstep.controller.js');
 let { exec } = require('child_process');
 
