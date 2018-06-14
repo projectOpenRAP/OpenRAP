@@ -268,10 +268,12 @@ then
 	#run_cmd cp -r $MOUNT_PATH$TARGET/$CDNROOT-$NVER $TARGET
 	run_cmd  mv $TARGET/$CDNROOT $TARGET/$CDNROOT.backup
 	run_cmd ln -s $MOUNT_PATH$TARGET/$CDNROOT-$NVER $TARGET/$CDNROOT
-	run_cmd "cp -frs $TARGET/$ROOTFS_OVERLAY/* /$MOUNT_PATH/"
+	#run_cmd "cp -frs $TARGET/$ROOTFS_OVERLAY/* /$MOUNT_PATH/"
+    run_cmd "find $TARGET/$ROOTFS_OVERLAY/ -mindepth 1 -maxdepth 1 -name var -prune -o -exec cp -frst /$MOUNT_PATH/ {} \;"
 	run_cmd rm $TARGET/$CDNROOT
 else
-	run_cmd "cp -frs $TARGET/$ROOTFS_OVERLAY/* /$MOUNT_PATH/"
+    #run_cmd "cp -frs $TARGET/$ROOTFS_OVERLAY/* /$MOUNT_PATH/"
+    run_cmd "find $TARGET/$ROOTFS_OVERLAY/ -mindepth 1 -maxdepth 1 -name var -prune -o -exec cp -frst /$MOUNT_PATH/ {} \;"
 
 fi
 

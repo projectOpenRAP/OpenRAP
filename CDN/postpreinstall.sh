@@ -25,7 +25,7 @@ restore_files()
 	done
 }
 
-reboot()
+reboot_device()
 {
 	echo "Rebooting device"
 	reboot now
@@ -47,7 +47,7 @@ systemctl restart appserver
 systemctl enable devmgmt
 systemctl restart devmgmt
 
-reboot
+reboot_device
 
 exit 0
 
