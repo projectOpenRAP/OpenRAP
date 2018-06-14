@@ -1,5 +1,5 @@
 "use strict"
-let {selectFields, updateFields, deleteFields, insertFields} = require('dbsdk');
+let {readRecords, updateRecords} = require('dbsdk2');
 let q = require('q');
 
 let defaultDbName = 'device_mgmt';
@@ -13,27 +13,54 @@ function getColumnFromDB(name, column) {
     fields : [column],
     where : "where username = '" + name + "'"
   };
-  return selectFields(queryObject);
+  return readRecords(queryObject);
 }
 
 function writeColumnToDB(name, column, newValue) {
-  let queryObject = {
-    dbName : defaultDbName,
-    tableName : defaultTableName,
-    fields : [{key:column, value:newValue}],
-    where : "where username = '" + name + "'"
-  };
-  return updateFields(queryObject);
+  return updateRecords(
+      {
+          "db" : {
+              "name" : "device_mgmt",
+          },
+
+          "table" : {
+              "name" : "users",
+              "fields" : [
+                  {
+                      "name" : `${column}`,
+                      "value" : `${newValue}`,
+                  }
+              ],
+              "filters" : [
+                  {
+                      "by" : "username",
+                      "if" : `= \'${name}\'`
+                  }
+              ]
+          }
+      }
+  );
 }
 
 function verifyIfUserExists(name) {
+  return readRecords(
+      {
+          "db" : {
+              "name" : "device_mgmt",
+          },
 
-  let queryObject = {
-    dbName : defaultDbName,
-    tableName : defaultTableName,
-    where : "where username = '" + name + "'"
-  };
-  return selectFields(queryObject);
+          "table" : {
+              "name" : "users",
+              "fields" : ["username", "password", "permission"],
+              "filters" : [
+                  {
+                      "by" : "username",
+                      "if" : `= \'${name}\'`
+                  }
+              ]
+          }
+      }
+  );
 }
 
 
@@ -50,14 +77,14 @@ let authLogin = (req,res) => {
 
   verifyIfUserExists(userName)
   .then( response => {
-    if(typeof response[0] === "undefined" || response[0].password != password) {
+    if(!response.success || !response.results.length || response.results[0].password !== password) {
       return {
         msg : "Invalid username or password",
       }
     }else{
       return {
         successful :true,
-        data : response[0]['permission']
+        data : response.results[0].permission
       }
     }
   }).then(data => {
@@ -89,7 +116,7 @@ let updatePassword = (req, res) => {
     msg : ""
   }
   verifyIfUserExists(userName).then(response => {
-      if (typeof response[0] === "undefined") {
+      if (!response.success || !response.results.length) {
         return {
           msg : "User does not exist"
         }
@@ -105,7 +132,13 @@ let updatePassword = (req, res) => {
       }
   }).then(response => {
     if (response.successful) {
-      return writeColumnToDB(userName, 'password', newPassword);
+      if (newPassword !== '') {
+        return writeColumnToDB(userName, 'password', newPassword);
+      }
+      else {
+        responseStructure.msg = "Please fill in the password";
+        return res.status(200).json(responseStructure);
+      }
     }
     else {
       responseStructure.msg = response.msg;
