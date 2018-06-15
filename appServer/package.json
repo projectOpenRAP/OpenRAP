@@ -15,13 +15,15 @@
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "form-data": "^2.3.2",
+    "getmac": "^1.4.3",
     "glob": "^7.1.2",
     "jsonwebtoken": "^8.2.1",
-    "winston": "^2.4.2"
     "node-cron": "^1.2.1",
+    "node-zip": "^1.1.1",
     "q": "^1.5.1",
     "random-mac": "0.0.4",
     "request": "^2.87.0",
-    "uniqid": "^4.1.1"
+    "uniqid": "^5.0.3",
+    "winston": "^2.4.2"
   }
 }
