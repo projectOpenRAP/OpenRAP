@@ -42,15 +42,6 @@ def file_version_update(vf, version):
     with open(vf, "w") as f:
         f.write(version)
 
-def version_suffix(profile, version):
-    if profile == "meghshala":
-        suffix = "MS"
-    elif profile == "ekstep":
-        suffix = "ES"
-    else:
-        suffix = "DF"
-    return suffix
-
 
 def hostname_get(profile):
     hostname = "openRAP"
@@ -341,7 +332,7 @@ class Device(object):
         cmd = "cd devmgmtui && npm install && npm run build"
         run_cmd(cmd)
 
-        
+
 
         # copy devmgmtui build to rootfs overlay
         cmd = "cp -r devmgmtui/build/* rootfs_overlay/var/www/html/admin/"
@@ -410,8 +401,6 @@ class Profile(Device):
 
         ver_file = self.imgdir + "CDN/version.txt"
         version = version_get(ver_file)
-        # Modify version to profile specific
-        version = version[:-2] + version_suffix(self.profiletype, version)
         file_version_update(ver_file, version)
         tgz_file = "openrap-" + version + ".tgz"
         cmd = "cd " + self.distdir + " && tar -zcf " + tgz_file + "   ../opencdn"
