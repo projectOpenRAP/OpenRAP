@@ -132,7 +132,7 @@ let updatePassword = (req, res) => {
       }
   }).then(response => {
     if (response.successful) {
-      if (newPassword !== '') {
+      if (newPassword.length >= 1) {
         return writeColumnToDB(userName, 'password', newPassword);
       }
       else {
