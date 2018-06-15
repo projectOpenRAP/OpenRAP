@@ -67,7 +67,6 @@ let generateTelemetry = (telemetryType, telemetryValue) => {
 }
 
 let repeatedlyCheckForInternet = () => {
-    console.log("Checking internet status...");
     isInternetActive().then(value => {
         let currentConnection = true;
         if (currentConnection !== internetConnected) {
@@ -89,7 +88,6 @@ let repeatedlyCheckUsers = () => {
         // console.log('Error: ' + err);
         // console.log('stdout: ' + stdout);
         // console.log('stderr: ' + stderr);
-        console.log("Checking user status...");
         if (err !== null) {
             let usersConnected = stdout.trim();
             if (usersConnected !== numberOfUsers) {
