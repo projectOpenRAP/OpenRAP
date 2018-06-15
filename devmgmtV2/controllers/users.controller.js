@@ -1,59 +1,111 @@
-let {selectFields, updateFields, deleteFields, insertFields} = require('dbsdk');
+let {readRecords, updateRecords, deleteRecords, addRecord} = require('dbsdk2');
 
 let defaultDbName = "device_mgmt";
 let defaultTableName = 'users';
 
 let addUserToDB = (userName, password) => {
-  let queryObject = {
-    dbName : defaultDbName,
-    tableName : defaultTableName,
-    columns : ['username', 'password', 'permission'],
-    values : [userName, password, JSON.stringify(["VIEW_DASHBOARD"])]
-  }
-  return insertFields(queryObject);
+  return addRecord(
+    {
+      "db" : {
+          "name" : "device_mgmt",
+      },
+
+      "table" : {
+          "name" : "users",
+          "fields" : ["username", "password", "permission"],
+          "values" : [`${userName}`, `${password}`, JSON.stringify(["VIEW_DASHBOARD"])]
+      }
+    }
+  );
 }
 
 let verifyIfUserExists = (name) => {
-  let queryObject = {
-    dbName : defaultDbName,
-    tableName : defaultTableName,
-    where : "where username = '" + name + "'"
-  };
-  return selectFields(queryObject);
+  return readRecords(
+    {
+      "db" : {
+          "name" : "device_mgmt",
+      },
+
+      "table" : {
+          "name" : "users",
+          "fields" : ["username", "password", "permission"],
+          "filters" : [
+              {
+                  "by" : "username",
+                  "if" : `= \'${name}\'`
+              }
+          ]
+      }
+    }
+  );
 }
 
 let updateUserInDB = (userName, key, value) => {
-  let queryObject = {
-    dbName : defaultDbName,
-    tableName : defaultTableName,
-    fields : [{key, value}],
-    where : "where username = '" + userName + "'"
-  };
-  return updateFields(queryObject);
+  return updateRecords(
+      {
+          "db" : {
+              "name" : "device_mgmt",
+          },
+
+          "table" : {
+              "name" : "users",
+              "fields" : [
+                  {
+                      "name" : `${key}`,
+                      "value" : `${value}`,
+                  }
+              ],
+              "filters" : [
+                  {
+                      "by" : "username",
+                      "if" : `= \'${userName}\'`
+                  }
+              ]
+          }
+      }
+  );
 }
 
 let deleteUserFromDB = (userName) => {
-  let queryObject = {
-    dbName : defaultDbName,
-    tableName : defaultTableName,
-    where : "where username = '" + userName + "'"
-  };
-  return deleteFields(queryObject);
+  return deleteRecords(
+      {
+          "db" : {
+              "name" : "device_mgmt",
+          },
+
+          "table" : {
+              "name" : "users",
+              "filters" : [
+                  {
+                      "by" : "username",
+                      "if" : `= \'${userName}\'`
+                  }
+              ]
+          }
+      }
+  );
 }
 
 let selectAllUsers = () => {
-  let queryObject = {
-    dbName : defaultDbName,
-    tableName : defaultTableName,
-  };
-  return selectFields(queryObject);
+  return readRecords(
+      {
+        "db" : {
+            "name" : "device_mgmt",
+        },
+
+        "table" : {
+            "name" : "users",
+            "fields" : ["id","username","permission"]
+        }
+      }
+  );
 }
 
 let createUser = (req, res) => {
   let userName = req.body['username'].trim();
   let password = req.body['password'].trim();
   let responseStructure = {
-    createSuccessful : true,
+    createSuccessful : false,
     error : undefined,
     msg : ""
   };
@@ -75,6 +127,7 @@ let createUser = (req, res) => {
     }
   }).then(response => {
     if (response.createSuccessful) {
+      responseStructure.createSuccessful = response.createSuccessful;
       responseStructure.msg = response.msg;
     } else {
       responseStructure.createSuccessful =  response.createSuccessful;
@@ -99,11 +152,11 @@ let updateUser = (req, res) => {
     return res.status(200).json(responseStructure);
   }
   verifyIfUserExists(userName).then(response => {
-    if (typeof response[0] != 'undefined') {
-      return updateUserInDB(userName, field, value);
-    } else {
+    if (!response.success || !response.results.length) {
       responseStructure.msg = "User does not exist!";
       return res.status(200).json(responseStructure);
+    } else {
+      return updateUserInDB(userName, field, value);
     }
   }).then(response => {
     responseStructure.updateSuccessful = true;
@@ -123,11 +176,11 @@ let deleteUser = (req, res) => {
     msg : ""
   };
   verifyIfUserExists(userName).then(response => {
-    if (typeof response[0] != "undefined") {
-      return deleteUserFromDB(userName);
-    } else {
+    if (!response.success || !response.results.length) {
       responseStructure.msg = "User does not exist!";
       return res.status(200).json(responseStructure);
+    } else {
+      return deleteUserFromDB(userName);
     }
   }).then(response => {
     responseStructure.deleteSuccessful = true;
@@ -149,10 +202,10 @@ let getAllUsers = (req, res) => {
   selectAllUsers().then(response => {
     responseStructure.retrieveSuccessful = true;
     let cleanedResponse = []
-    for (var i in response) {
-      cleanedResponse.push({"id" : response[i]["id"],
-                            "username" : response[i]["username"],
-                            "permission" : response[i]["permission"]
+    for (var i in response.results) {
+      cleanedResponse.push({"id" : response.results[i].id,
+                            "username" : response.results[i].username,
+                            "permission" : response.results[i].permission
                           });
     }
     responseStructure.userList = cleanedResponse;
