@@ -28,6 +28,7 @@ dbsdk2_dir = base_dir + 'dbsdk2'
 filesdk_dir = base_dir + 'filesdk'
 searchsdk_dir = base_dir + 'searchsdk'
 appServer_dir = base_dir + 'appServer'
+telemetrysdk_dir = base_dir + 'telemetrysdk'
 #############
 
 def version_get(vf):
@@ -310,6 +311,14 @@ class Device(object):
 
         # copy search sdk
         cmd = "cp -r " + searchsdk_dir + " " + self.imgdir
+        run_cmd(cmd)
+
+        #npm install in telemetry sdk
+        cmd = "cd telemetrysdk && npm install"
+        run_cmd(cmd)
+
+        # copy telemetry sdk
+        cmd = "cp -r " + telemetrysdk_dir + " " + self.imgdir
         run_cmd(cmd)
 
         #npm install in app server
