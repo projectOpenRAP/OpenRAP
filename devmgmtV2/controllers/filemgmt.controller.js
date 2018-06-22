@@ -185,6 +185,7 @@ let deleteFileFromDisk = (req, res) => {
     success: false,
     msg: ''
   }
+  fileToDelete = fileToDelete.replace(/'/g, "\'\\''");
   exec("rm -rf '" + fileToDelete + "'", (err, stdout, stderr) => {
     if (err) {
       console.log(err);
