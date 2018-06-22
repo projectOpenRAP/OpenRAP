@@ -47,7 +47,7 @@ let cp = require('child_process');
 const dns = require('dns')
 const q = require("q");
 
-let telemetryPath = "/home/stuart/Downloads/telemetry"
+let telemetryPath = "/home/admin/telemetry"
 cp.exec(`mkdir -p ${telemetryPath}/raw ${telemetryPath}/log ${telemetryPath}/zip`, (err, stdout, stderr) => {
 
 });
@@ -115,14 +115,17 @@ let sendTelemetryToCloud = (url, path) => {
 // });
 
 let zipContents = (plugin, content) => {
-    zip.file(`${plugin}-zip-log-${new Date().getTime()}`, JSON.stringify(content));
-    var data = zip.generate({ base64: false, compression: 'DEFLATE' });
-    let zipFileName = `${plugin}-zip-log-${new Date().getTime()}.zip`;
-    let zipName = `${telemetryPath}/zip/${zipFileName}`;
+	const zipFileName = `${plugin}-zip-log-${new Date().getTime()}`;
+	const zipName = `${telemetryPath}/zip/${zipFileName}`;
+
+    zip.file(`${zipFileName}`, JSON.stringify(content));
+    const data = zip.generate({ base64: false, compression: 'DEFLATE' });
     fs.writeFileSync(zipName, data, 'binary');
-    return { fullPath: zipName, fileName: zipFileName };
+
+    return { fullPath: zipName, fileName: zipFileName, buffer: new Buffer(data)};
 }
-console.log(zipContents("gok", "hello zip"));
+
+//console.log(zipContents("gok", "hello zip"));
 
 let isInternetActive = () => {
     let defer = q.defer();
@@ -169,7 +172,7 @@ let checkFileCreationTime = (plugin) => {
             data = JSON.parse(data);
             let timeNow = (new Date()).getTime()
             let timeDiff = timeNow - data.time;
-            if (timeDiff < 1 * 60 * 1000) {
+            if (timeDiff < 15 * 60 * 1000) {
                 defer.resolve(fileToBeMoved);
             } else {
                 fileToBeMoved.toBeMoved = true;
@@ -234,7 +237,7 @@ let moveRawTelemetryToLog = (plugin) => {
             }
         }, 0);
         console.log("File count is", filesCount);
-        if (filesCount < 2) {
+        if (filesCount < 100) {
             console.log("Just move file no need to delete");
             return moveRawContentsAndChangeCTime(plugin);
         } else {
@@ -341,14 +344,14 @@ let getTelemetryData = (plugin, filesToSend = 2, order = "ASC") => {
     return defer.promise;
 }
 
-getTelemetryData("gok", 2)
-    .then((data) => {
-        console.log(data);
-    })
-
-isInternetActive().then(() => {
-    console.log("Internet");
-}).catch(e => { console.log("Not Internet") })
+// getTelemetryData("gok", 2)
+//     .then((data) => {
+//         console.log(data);
+//     })
+//
+// isInternetActive().then(() => {
+//     console.log("Internet");
+// }).catch(e => { console.log("Not Internet") })
 
 // let getTelemetryData = (filesToSend) => {
 //     fs.readFile('/home/stuart/append.txt', 'utf-8', (err, data) => {
@@ -372,9 +375,12 @@ isInternetActive().then(() => {
 // }
 
 
-// module.exports = {
-//     append
-// }
+module.exports = {
+	saveTelemetry,
+	isInternetActive,
+    getTelemetryData,
+	zipContents
+}
 
 // getLastLines()
 
