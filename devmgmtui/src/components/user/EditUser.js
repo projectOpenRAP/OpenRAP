@@ -45,6 +45,18 @@ class EditUser extends Component {
                 perm8 : "MODIFY_SSID",
                 perm9 : "UPGRADE_DEVICE"
             },
+            disabledFlag : {
+                perm0 : false,
+                perm1 : false,
+                perm2 : false,
+                perm3 : false,
+                perm4 : false,
+                perm5 : false,
+                perm6 : false,
+                perm7 : false,
+                perm8 : false,
+                perm9 : false,
+            },
             isAllEnabled : true
         }
         for (var key in this.state.permissionsAsStrings) {
@@ -82,16 +94,26 @@ class EditUser extends Component {
     }
 
     handlePermissionsChange = permLabel => e => {
-        let { permissions, permissionsAsStrings } = this.state;
+        let { permissions, permissionsAsStrings, disabledFlag } = this.state;
 
         permissions[permLabel] = !permissions[permLabel]
 
         if(permissions[permLabel] && ["DELETE_USERS", "EDIT_USERS", "ADD_USERS"].indexOf(permissionsAsStrings[permLabel]) !== -1) {
             permissions['perm1'] = true;
+            disabledFlag['perm1'] = true;
+        }
+
+        if(!permissions['perm2'] && !permissions['perm3'] && !permissions['perm4']) {
+            disabledFlag['perm1'] = false;
         }
 
         if(permissions[permLabel] && ["UPLOAD_FILES", "DELETE_FILES"].indexOf(permissionsAsStrings[permLabel]) !== -1) {
             permissions['perm5'] = true;
+            disabledFlag['perm5'] = true;
+        }
+
+        if(!permissions['perm6'] && !permissions['perm7']) {
+            disabledFlag['perm5'] = false;
         }
 
         this.setState({ permissions }, this.setAllEnabled);
@@ -137,7 +159,7 @@ class EditUser extends Component {
         var permissionsList = Object.entries(this.state.permissions).map(([permLabel, set]) => {
             return (
                 <div key={permLabel}>
-                    <Checkbox label={this.state.permissionsAsStrings[permLabel]} checked={set} onChange={this.handlePermissionsChange(permLabel)} />
+                    <Checkbox label={this.state.permissionsAsStrings[permLabel]} checked={set} disabled={this.state.disabledFlag[permLabel]} onChange={this.handlePermissionsChange(permLabel)} />
 
                     <Divider horizontal/>
                 </div>
