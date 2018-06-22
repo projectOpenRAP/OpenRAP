@@ -14,7 +14,7 @@ class Upgrade extends Component {
     return (
       <div className="ui container" style={{'padding-top' : '60px'}}>
         <div>
-          <h1>Upgrade Device</h1>
+          <h1>Upgrade Firmware</h1>
         </div>
         <div>
           <UpgradeDisplayComponent />
