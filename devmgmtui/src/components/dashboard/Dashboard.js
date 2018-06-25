@@ -13,10 +13,6 @@ let timer;
 class Dashboard extends Component {
 
     componentWillMount() {
-        if (this.props.auth && !this.props.auth.authenticated) {
-            this.props.history.push("/");
-        }
-
         document.title = "Dashboard";
 
         this.props.fetchSystemData();
@@ -26,12 +22,6 @@ class Dashboard extends Component {
 
     componentWillUnmount() {
         clearInterval(timer);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.auth && !nextProps.auth.authenticated) {
-            this.props.history.push("/");
-        }
     }
 
     renderCharts() {
@@ -81,7 +71,6 @@ class Dashboard extends Component {
                 </SideNav>
             );
         }  else {
-        this.props.history.push("/");
         return (null);
 }
   }
