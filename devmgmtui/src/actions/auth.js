@@ -30,6 +30,7 @@ export const createUser = (user, password, actor, cb) => (dispatch) => {
     let data = {
         "username": user,
         "password": password,
+        "timestamp": new Date(),
         actor
     }
     axios.post(`${BASE_URL}/user/create`, data)
@@ -55,6 +56,7 @@ export const editUserPermissions = (user, oldPermissions, permissions, actor, cb
     "field" : "permission",
     "oldValue" : oldPermissions,
     "value" : permissions,
+    "timestamp" : new Date(),
     actor
   }
   axios.put(`${BASE_URL}/user/update`, data)

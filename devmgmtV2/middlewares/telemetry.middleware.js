@@ -12,37 +12,37 @@ const {
 } = require('../../telemetrysdk');
 
 // Generic telemetry JSON structure
-let telemetryStructure = {
-	'eid': '',
-	'ets': '',
-	'ver': '',
-	'mid': '',
+const telemetryStructure = {
+	'eid': '', // Event ID
+	'ets': '', // Event timestamp
+	'ver': '', // Structure version
+	'mid': '', // Message ID
 	'actor': {
-		'id': '',
-		'type': ''
+		'id': '', // ID of the entity causing the event
+		'type': '' // Type of entity
 	},
 	'context': {
-		'channel': '',
+		'channel': '', // Where event occurred
 		'pdata': {
-			'id': '',
-			'pid': '',
-			'ver': ''
+			'id': '', // Device ID
+			'pid': '', // Process ID
+			'ver': '' // Version of the firmware
 		},
-		'env': '',
-		'sid': '',
-		'did': '',
-		'cdata': [{
+		'env': '', // Event environment
+		'sid': '', // Optional
+		'did': '', // Optional
+		'cdata': [{ // Optional
 			'type':'',
 			'id': ''
 		}],
-		'rollup': {
+		'rollup': { // Optional
 			'l1': '',
 			'l2': '',
 			'l3': '',
 			'l4': ''
 		}
 	},
-	'object': {
+	'object': { // Optional
 		'id': '',
 		'type': '',
 		'ver': '',
@@ -53,10 +53,10 @@ let telemetryStructure = {
 			'l4': ''
 		}
 	},
-	'edata': {
-		'event' : '',
+	'edata': { // Event spcific data
+		'event': '',
 		'value': '',
-		'actor' : '',
+		'actor': '',
 		'actorDetails': ''
 	},
 	'tags': ['']
@@ -88,6 +88,24 @@ const _getSystemVersion = () => {
     return defer.promise;
 }
 
+const _formatTimestamp = timestamp => {
+	const pad = number => number < 10 ? '0' + number : number;
+
+	const date = [
+		timestamp.getFullYear(),
+		pad(timestamp.getMonth()+1),
+		pad(timestamp.getDate())
+	].join('-');
+
+	const time = [
+		pad(timestamp.getHours()),
+		pad(timestamp.getMinutes()),
+		pad(timestamp.getSeconds())
+	].join(':');
+
+    return `${date} ${time}`;
+}
+
 const _getMacAddr = () => {
 	let defer = q.defer();
 
@@ -103,19 +121,11 @@ const _getMacAddr = () => {
     return defer.promise;
 }
 
-const _getTimestamp = () => {
-	return new Date()
-		.toISOString('en-IN')
-		.replace(/T/, ' ')
-		.replace(/\..+/, '');
-}
-
 
 // TODO Refactor this
 const saveTelemetryData = (req, res, next) => {
-
 	const actor = req.body.actor || req.query.actor || req.params['actor'];
-	const timestamp = _getTimestamp();
+	const timestamp = new Date(req.body.timestamp || req.query.timestamp);
 
 	let telemetryData = { ...telemetryStructure };
 
@@ -134,7 +144,7 @@ const saveTelemetryData = (req, res, next) => {
 					'message' : 'Created new file',
 					'params' : [
 						{
-							timestamp,
+							'timestamp' : _formatTimestamp(timestamp),
 							actor,
 							'details' : {
 								'name' : req.files.file.name,
@@ -158,7 +168,7 @@ const saveTelemetryData = (req, res, next) => {
 					'message' : 'Deleted file/folder',
 					'params' : [
 						{
-							timestamp,
+							'timestamp' : _formatTimestamp(timestamp),
 							actor,
 							'path' : decodeURIComponent(req.query.path)
 						}
@@ -178,7 +188,7 @@ const saveTelemetryData = (req, res, next) => {
 					'message' : 'Created new folder',
 					'params' : [
 						{
-							timestamp,
+							'timestamp' : _formatTimestamp(timestamp),
 							actor,
 							'path' : decodeURIComponent(req.body.path)
 						}
@@ -211,7 +221,7 @@ const saveTelemetryData = (req, res, next) => {
 					'message' : 'User added',
 					'params' : [
 						{
-							timestamp,
+							'timestamp' : _formatTimestamp(timestamp),
 							actor,
 							'user' : req.body.username
 						}
@@ -231,7 +241,7 @@ const saveTelemetryData = (req, res, next) => {
 					'message' : 'User removed',
 					'params' : [
 						{
-							timestamp,
+							'timestamp' : _formatTimestamp(timestamp),
 							actor,
 							'user' : req.params['username']
 						}
@@ -268,7 +278,7 @@ const saveTelemetryData = (req, res, next) => {
 
 	telemetryData = {
 		...telemetryData,
-		'ets' : new Date().getTime(),
+		'ets' : timestamp.getTime(),
 		'ver' : '3.0',
 		'actor' : {
 			'id' : actor

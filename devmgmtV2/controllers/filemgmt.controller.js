@@ -330,18 +330,36 @@ const applyChangesToPlugins = (req, res) => {
 
 }
 
-// Middleware to write content refresh time to a file
+
+/*
+* Code to write content refresh time to a `.meta` file
+*/
+
+const formatTimestamp = timestamp => {
+    const options = {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    };
+
+    return timestamp.toLocaleString('en-IN', options);
+}
+
 let storeTimestamp = (req, res, next) => {
-  let timestamp = req.body.timestamp || req.query.timestamp;
+    const timestamp = new Date(req.body.timestamp || req.query.timestamp);
 
-  fs.writeFile(path.join(config.FS_ROOT, '.meta'), timestamp, function (err) {
-    if (err) {
-      return console.log(err);
-    }
+    fs.writeFile(path.join(config.FS_ROOT, '.meta'), formatTimestamp(timestamp), function (err) {
+        if (err) {
+            return console.log(err);
+        }
 
-    next();
-    console.log("Timestamp stored.");
-  });
+        next();
+        console.log("Timestamp stored.");
+    });
 }
 
 module.exports = {

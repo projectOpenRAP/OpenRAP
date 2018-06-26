@@ -3,12 +3,14 @@ import { BASE_URL } from '../config/config'
 
 const CancelToken = axios.CancelToken;
 
-const getTimestamp = () => {
-    let currentTime = new Date();
-    let options = { hour: 'numeric', minute: 'numeric', hour12: true, weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+const getTimestamp = () => new Date(); 
 
-    return currentTime.toLocaleString('en-IN', options);
-}
+// const getTimestamp = () => {
+//     let currentTime = new Date();
+//     let options = { hour: 'numeric', minute: 'numeric', hour12: true, weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+//
+//     return currentTime.toLocaleString('en-IN', options);
+// }
 
 export const applyChanges = (cb) => (dispatch) => {
     axios.put(`${BASE_URL}/file/apply`)
