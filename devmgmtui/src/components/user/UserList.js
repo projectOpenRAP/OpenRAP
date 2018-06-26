@@ -11,18 +11,9 @@ const styles = {
 }
 class UserList extends Component {
 
-
     componentWillMount() {
-        if (this.props.auth && !this.props.auth.authenticated) {
-            this.props.history.push("/");
-        }
         this.props.getAllUser();
         document.title = "User List";
-    }
-    componentWillReceiveProps(nextProps) {
-       if (nextProps.auth && !nextProps.auth.authenticated) {
-            this.props.history.push("/");
-        }
     }
 
     handleDelete(key) {
@@ -98,7 +89,6 @@ class UserList extends Component {
             </SideNav>
         )
     } else {
-      this.props.history.push("/");
       return (null);
     }
   }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import * as actions from '../../actions/filemgmt'
+import * as actions from '../../actions/auth'
 import { Sidebar, Menu, Icon } from 'semantic-ui-react'
 class SideNav extends Component {
     constructor(props){
@@ -19,14 +19,11 @@ class SideNav extends Component {
         })
     }
 
-    componentWillMount() {
-        if (this.props.auth && !this.props.auth.authenticated) {
-          this.props.history.push(`/`);
-        }
+    handleLogout() {
+        this.props.logout();
     }
 
     render() {
-
         if (typeof this.props.auth.user !== `undefined`) {
         return (
             <div style={{ height: '100vh' }}>
@@ -57,7 +54,7 @@ class SideNav extends Component {
                           Modify Captive Portal
                         </Menu.Item> : null }
 
-                        <Menu.Item name='logout' as={Link} to={'/'} onClick={(dispatch) => dispatch({ type: "DISABLE_AUTH"})}>
+                        <Menu.Item name='logout' as={Link} to={'/'} onClick={this.handleLogout.bind(this)}>
                             <Icon name='log out' />
                             Logout
                         </Menu.Item>
@@ -74,7 +71,6 @@ class SideNav extends Component {
             </div>
         );
       } else {
-        this.props.history.push("/");
         return null;
       }
     }

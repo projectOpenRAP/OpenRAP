@@ -11,8 +11,8 @@ export const login = (user, password, cb) => (dispatch) => {
             // console.log(response.data)
             if (response.data.successful) {
                 dispatch({ type: "ENABLE_AUTH", payload: response.data });
+                localStorage.setItem('authData',JSON.stringify(response.data));
                 cb(null);
-
             }else{
                 cb("error", response.data);
             }
@@ -71,4 +71,9 @@ export const editUserPermissions = (user, oldPermissions, permissions, actor, cb
         console.log(e);
         cb("error", "some server error");
       });
+}
+
+export const logout = () => (dispatch) => {
+    localStorage.removeItem('authData');
+    dispatch({ type: 'DISABLE_AUTH' });
 }

@@ -152,7 +152,7 @@ class FileDisplayComponent extends Component {
         </span>
         <span style={{float:'right'}}>
           {this.props.auth.user.permissions.search(/UPLOAD_FILES|ALL/) >= 0 ? <span>
-            <Input action={{ color: 'blue', labelPosition: 'right', icon: 'plus', content: 'Make New Folder', onClick : this.createNewFolder.bind(this)}} placeholder='Type name here...' value={this.state.newFolderName} onChange={this.handleFolderNameChange.bind(this)} />
+            <Input action={{ color: 'blue', labelPosition: 'right', icon: 'plus', content: 'Create New Folder', onClick : this.createNewFolder.bind(this)}} placeholder='Type name here...' value={this.state.newFolderName} onChange={this.handleFolderNameChange.bind(this)} />
         </span> : null}
         </span>
       </span>

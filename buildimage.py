@@ -28,6 +28,7 @@ dbsdk2_dir = base_dir + 'dbsdk2'
 filesdk_dir = base_dir + 'filesdk'
 searchsdk_dir = base_dir + 'searchsdk'
 appServer_dir = base_dir + 'appServer'
+telemetrysdk_dir = base_dir + 'telemetrysdk'
 #############
 
 def version_get(vf):
@@ -41,15 +42,6 @@ def version_get(vf):
 def file_version_update(vf, version):
     with open(vf, "w") as f:
         f.write(version)
-
-def version_suffix(profile, version):
-    if profile == "meghshala":
-        suffix = "MS"
-    elif profile == "ekstep":
-        suffix = "ES"
-    else:
-        suffix = "DF"
-    return suffix
 
 
 def hostname_get(profile):
@@ -321,6 +313,14 @@ class Device(object):
         cmd = "cp -r " + searchsdk_dir + " " + self.imgdir
         run_cmd(cmd)
 
+        #npm install in telemetry sdk
+        cmd = "cd telemetrysdk && npm install"
+        run_cmd(cmd)
+
+        # copy telemetry sdk
+        cmd = "cp -r " + telemetrysdk_dir + " " + self.imgdir
+        run_cmd(cmd)
+
         #npm install in app server
         cmd = "cd appServer && npm install"
         run_cmd(cmd)
@@ -341,7 +341,7 @@ class Device(object):
         cmd = "cd devmgmtui && npm install && npm run build"
         run_cmd(cmd)
 
-        
+
 
         # copy devmgmtui build to rootfs overlay
         cmd = "cp -r devmgmtui/build/* rootfs_overlay/var/www/html/admin/"
@@ -410,8 +410,6 @@ class Profile(Device):
 
         ver_file = self.imgdir + "CDN/version.txt"
         version = version_get(ver_file)
-        # Modify version to profile specific
-        version = version[:-2] + version_suffix(self.profiletype, version)
         file_version_update(ver_file, version)
         tgz_file = "openrap-" + version + ".tgz"
         cmd = "cd " + self.distdir + " && tar -zcf " + tgz_file + "   ../opencdn"
