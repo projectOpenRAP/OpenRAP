@@ -22,7 +22,6 @@ const {
 } = require('../telemetrysdk');
 
 const plugin = 'devmgmt';
-const telemetryPath = '/home/genghiskh/tmp/telemetry';
 
 app.use(cors())
 // parse application/x-www-form-urlencoded
