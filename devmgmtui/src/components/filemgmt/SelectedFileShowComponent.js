@@ -27,6 +27,10 @@ class SelectedFileShowComponent extends Component {
   initiateUpload() {
     let that = this;
 
+    if (this.props.filemgmt.files.find(file => file.name === this.props.file.name)) {
+        alert(`${this.props.file.name} will be overwritten.`);
+    }
+
     this.props.uploadFile(this.props.filemgmt.currentDir, this.props.file, this.props.auth.user.username, function(err, res, uploading, cancelUpload) {
         if (err) {
             alert(res);
