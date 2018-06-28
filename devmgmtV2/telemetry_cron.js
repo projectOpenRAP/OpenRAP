@@ -2,6 +2,11 @@ let path = require('path');
 let { exec } = require('child_process');
 let q = require('q');
 
+const {
+	isInternetActive,
+    saveTelemetry
+} = require('../telemetrysdk');
+
 let internetConnectivitySkeleton = {
         edata: {
             type: "system", // Required. Type of log (system, process, api_access, api_call, job, app_update etc)
@@ -33,17 +38,6 @@ let internetConnected = null;
 let numberOfUsers = null;
 let timeInterval = 15000;
 
-let isInternetActive = () => {
-    /*
-        DUMMY FUNCTION
-        TODO: Replace with import from telemetrySDK
-    */
-    let defer = q.defer();
-    defer.resolve();
-    return defer.promise;
-}
-
-
 let generateTelemetry = (telemetryType, telemetryValue) => {
     let telemetryNow = null;
     switch(telemetryType) {
@@ -64,10 +58,12 @@ let generateTelemetry = (telemetryType, telemetryValue) => {
             console.log("Generated " + telemetryType);
         }
     }
+
+    saveTelemetry(telemetryNow, 'devmgmt');
 }
 
 let repeatedlyCheckForInternet = () => {
-    console.log("Checking internet status...");
+    // console.log("Checking internet status...");
     isInternetActive().then(value => {
         let currentConnection = true;
         if (currentConnection !== internetConnected) {
@@ -89,7 +85,7 @@ let repeatedlyCheckUsers = () => {
         // console.log('Error: ' + err);
         // console.log('stdout: ' + stdout);
         // console.log('stderr: ' + stderr);
-        console.log("Checking user status...");
+        // console.log("Checking user status...");
         if (err !== null) {
             let usersConnected = stdout.trim();
             if (usersConnected !== numberOfUsers) {

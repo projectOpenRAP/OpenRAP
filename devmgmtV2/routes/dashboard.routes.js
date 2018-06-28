@@ -10,6 +10,8 @@ let {
     getSystemVersion
 } = require("../controllers/dashboard.controller")
 
+const { saveTelemetryData } = require('../middlewares/telemetry.middleware.js');
+
 module.exports = app => {
     app.get("/dashboard/system/internetStatus", getInternetStatus);
     app.get("/dashboard/system/lastRefresh", getLastRefresh);

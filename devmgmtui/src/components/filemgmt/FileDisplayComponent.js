@@ -47,7 +47,7 @@ class FileDisplayComponent extends Component {
       alert('A folder needs a name.');
       return;
     }
-    this.props.createFolder(this.props.filemgmt.currentDir, this.state.newFolderName, (err, res) => {
+    this.props.createFolder(this.props.filemgmt.currentDir, this.state.newFolderName, this.props.auth.user.username, (err, res) => {
       if (err) {
         if(res.includes('EEXIST')) {
           alert('Folder already exists.');
@@ -89,7 +89,7 @@ class FileDisplayComponent extends Component {
       return;
     }
     let deleteableFiles = this.props.filemgmt.selectedFiles;
-    this.props.deleteBunchOfFiles(this.props.filemgmt.currentDir, deleteableFiles, (res) => {
+    this.props.deleteBunchOfFiles(this.props.filemgmt.currentDir, deleteableFiles, this.props.auth.user.username, (res) => {
       alert(res);
       this.props.readFolder(this.props.filemgmt.currentDir);
     });
