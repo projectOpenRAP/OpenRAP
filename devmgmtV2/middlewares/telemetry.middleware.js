@@ -88,6 +88,64 @@ const _getSystemVersion = () => {
     return defer.promise;
 }
 
+const addAgnosticDataAndSave = (telemetryData, actor, timestamp) => {
+    let defer = q.defer();
+    telemetryData = {
+		...telemetryData,
+		'ets' : timestamp.getTime(),
+		'ver' : '3.0',
+		'actor' : {
+			'id' : actor
+		},
+		'context': {
+			'channel' : 'OpenRAP',
+			'pdata' : {
+				'pid' : require('process').pid,
+			},
+			'env' : 'Device Management'
+		}
+	}
+
+	_getSystemVersion()
+		.then(systemVersion => {
+			telemetryData = {
+				...telemetryData,
+				'context': {
+					...telemetryData.context,
+					'pdata' : {
+						...telemetryData.context.pdata,
+						'ver' : systemVersion.replace(/\n$/, '')
+					}
+				}
+			}
+
+			return _getMacAddr();
+		})
+        .then(macAddr => {
+			const deviceID = macAddr;
+
+			telemetryData = {
+				...telemetryData,
+				'mid' : uniqid(`${deviceID}-`),
+				'context': {
+					...telemetryData.context,
+					'pdata' : {
+						...telemetryData.context.pdata,
+						'id' : deviceID
+					},
+				}
+			}
+			console.log('Saving telemetry'); // JSON.stringify(telemetryData, null, 4))
+			saveTelemetry(telemetryData, 'devmgmt');
+            return defer.resolve();
+        })
+        .catch(err => {
+            console.log(err);
+            return defer.reject();
+        });
+        return defer.promise;
+    }
+
 const _formatTimestamp = timestamp => {
 	const pad = number => number < 10 ? '0' + number : number;
 
@@ -276,61 +334,23 @@ const saveTelemetryData = (req, res, next) => {
 	* Populating event-agnostic telemetry data
 	*/
 
-	telemetryData = {
-		...telemetryData,
-		'ets' : timestamp.getTime(),
-		'ver' : '3.0',
-		'actor' : {
-			'id' : actor
-		},
-		'context': {
-			'channel' : 'OpenRAP',
-			'pdata' : {
-				'pid' : require('process').pid,
-			},
-			'env' : 'Device Management'
-		}
-	}
+	addAgnosticDataAndSave(telemetryData, actor, timestamp).then(value => {
+        next();
+	}).catch(err => console.log(err));
+}
 
-	_getSystemVersion()
-		.then(systemVersion => {
-			telemetryData = {
-				...telemetryData,
-				'context': {
-					...telemetryData.context,
-					'pdata' : {
-						...telemetryData.context.pdata,
-						'ver' : systemVersion.replace(/\n$/, '')
-					}
-				}
-			}
-
-			return _getMacAddr();
-		})
-		.then(macAddr => {
-			const deviceID = macAddr;
-
-			telemetryData = {
-				...telemetryData,
-				'mid' : uniqid(`${deviceID}-`),
-				'context': {
-					...telemetryData.context,
-					'pdata' : {
-						...telemetryData.context.pdata,
-						'id' : deviceID
-					},
-				}
-			}
-
-			console.log('Saving telemetry'); // JSON.stringify(telemetryData, null, 4))
-
-			saveTelemetry(telemetryData, 'devmgmt');
-
-			next();
-		})
-		.catch(err => console.log(err));
+const saveCronTelemetryData = eData => {
+    let timestamp = new Date();
+    let actor = "127.0.0.1";
+    addAgnosticDataAndSave(eData, actor, timestamp).then(value => {
+        return;
+    }).catch(err => {
+        console.log(err);
+        return;
+    });
 }
 
 module.exports = {
-	saveTelemetryData
+	saveTelemetryData,
+    saveCronTelemetryData
 }
