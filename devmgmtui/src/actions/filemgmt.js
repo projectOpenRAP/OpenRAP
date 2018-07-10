@@ -3,7 +3,7 @@ import { BASE_URL } from '../config/config'
 
 const CancelToken = axios.CancelToken;
 
-const getTimestamp = () => new Date(); 
+const getTimestamp = () => `${new Date().getTime()}`;
 
 // const getTimestamp = () => {
 //     let currentTime = new Date();
