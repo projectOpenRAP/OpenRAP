@@ -5,7 +5,7 @@ export const setSSID = (ssid, cb) => (dispatch) => {
 
     let data = {
         "ssid": ssid,
-        "timestamp": new Date()
+        "timestamp": `${new Date().getTime()}`
     }
 
     axios.put(`${BASE_URL}/ssid/set`, data)

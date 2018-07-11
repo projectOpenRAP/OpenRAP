@@ -183,7 +183,7 @@ const _getMacAddr = () => {
 // TODO Refactor this
 const saveTelemetryData = (req, res, next) => {
 	const actor = req.body.actor || req.query.actor || req.params['actor'];
-	const timestamp = new Date(req.body.timestamp || req.query.timestamp);
+	const timestamp = new Date(parseInt(req.body.timestamp || req.query.timestamp));
 
 	let telemetryData = { ...telemetryStructure };
 
@@ -317,7 +317,7 @@ const saveTelemetryData = (req, res, next) => {
 					'props': ['permisions'],
 					'state': {
 						'username' : req.body.username,
-						'permissions' : JSON.parse(req.body.value)
+						'permissions' : req.body.value
 					},
 					'prevstate': {
 						'username' : req.body.username,
