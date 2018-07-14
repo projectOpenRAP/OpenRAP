@@ -110,7 +110,7 @@ let generateTelemetry = (telemetryType, telemetryValue) => {
     }
     if (telemetryNow !== null) {
         let now = new Date();
-        let nowAsString = now.getUTCFullYear() + '-' + now.getUTCMonth() + '-' + now.getUTCDate() + ' ' + now.getUTCHours() + ':' + now.getUTCMinutes() + ':' + now.getUTCSeconds();
+        let nowAsString = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate() + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
         telemetryNow.edata.params[0].timestamp = nowAsString;
         console.log("Generated " + telemetryType);
     }
@@ -135,15 +135,16 @@ let repeatedlyCheckForInternet = () => {
 }
 
 let repeatedlyCheckUsers = () => {
-    const cmd = path.join(__dirname, '../../CDN/getall_stations.sh');
+    const cmd = path.join(__dirname, '../CDN/getall_stations.sh');
     exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
         // console.log('Error: ' + err);
-        // console.log('stdout: ' + stdout);
+        console.log('stdout: ' + stdout);
         // console.log('stderr: ' + stderr);
         // console.log("Checking user status...");
-        if (err !== null) {
-            let usersConnected = stdout.trim();
+        if (err === null) {
+            let usersConnected = stdout;
             if (usersConnected !== numberOfUsers) {
+                console.log("Logging users telemetry");
                 numberOfUsers = usersConnected;
                 generateTelemetry('usersConnected', usersConnected);
             }
