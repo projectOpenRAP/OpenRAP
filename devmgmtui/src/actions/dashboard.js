@@ -66,4 +66,12 @@ export const fetchSystemData = () => (dispatch) => {
         .catch((e) => {
             console.log(e);
         })
+
+    axios.get(`${BASE_URL}/dashboard/system/deviceID`)
+        .then((response) => {
+            dispatch({type: 'DEVICEID_FETCH', payload: response.data.deviceID})
+        })
+        .catch((e) => {
+            console.log(e);
+        })
 }
