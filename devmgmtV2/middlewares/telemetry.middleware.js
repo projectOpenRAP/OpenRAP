@@ -5,11 +5,13 @@ const fs = require('fs');
 const path = require('path');
 const q = require('q');
 const exec = require('child_process').exec;
-const mac = require('getmac');
 
 const {
 	saveTelemetry
 } = require('../../telemetrysdk');
+let {
+	selectFields
+} = require('dbsdk');
 
 // Generic telemetry JSON structure
 const telemetryStructure = {
@@ -119,10 +121,10 @@ const addAgnosticDataAndSave = (telemetryData, actor, timestamp) => {
 				}
 			}
 
-			return _getMacAddr();
+			return _getDeviceID();
 		})
-        .then(macAddr => {
-			const deviceID = macAddr;
+        .then(response => {
+			const deviceID = response[0].dev_id;
 
 			telemetryData = {
 				...telemetryData,
@@ -164,17 +166,16 @@ const _formatTimestamp = timestamp => {
     return `${date} ${time}`;
 }
 
-const _getMacAddr = () => {
+const _getDeviceID = () => {
 	let defer = q.defer();
 
-	mac.getMac((err, addr) => {
-		if(err) {
-			console.log('Error encountered while fetching mac address.', err);
-			defer.reject(err);
-		} else {
-			defer.resolve(addr);
-		}
-	});
+	selectFields({dbName : 'device_mgmt', tableName : 'device', columns : ["dev_id"]})
+	.then(response => {
+		defer.resolve(response);
+	}).catch(e => {
+		console.log(e);
+		defer.reject(e);
+	})
 
     return defer.promise;
 }
