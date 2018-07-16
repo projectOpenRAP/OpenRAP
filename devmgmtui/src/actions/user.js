@@ -15,7 +15,7 @@ export const getAllUser = () => (dispatch) => {
 
 export const deleteUser = (user, actor, cb) => (dispatch) => {
     const params = {
-        "timestamp": new Date(),
+        "timestamp": `${new Date().getTime()}`,
         actor
     }
 

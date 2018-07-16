@@ -1,11 +1,67 @@
 let path = require('path');
 let { exec } = require('child_process');
 let q = require('q');
+let { saveCronTelemetryData } = require('./middlewares/telemetry.middleware.js');
 
 const {
 	isInternetActive,
     saveTelemetry
 } = require('../telemetrysdk');
+
+const telemetryStructure = {
+	'eid': '', // Event ID
+	'ets': '', // Event timestamp
+	'ver': '', // Structure version
+	'mid': '', // Message ID
+	'actor': {
+		'id': '', // ID of the entity causing the event
+		'type': '' // Type of entity
+	},
+	'context': {
+		'channel': '', // Where event occurred
+		'pdata': {
+			'id': '', // Device ID
+			'pid': '', // Process ID
+			'ver': '' // Version of the firmware
+		},
+		'env': '', // Event environment
+		'sid': '', // Optional
+		'did': '', // Optional
+		'cdata': [{ // Optional
+			'type':'',
+			'id': ''
+		}],
+		'rollup': { // Optional
+			'l1': '',
+			'l2': '',
+			'l3': '',
+			'l4': ''
+		}
+	},
+	'object': { // Optional
+		'id': '',
+		'type': '',
+		'ver': '',
+		'rollup': {
+			'l1': '',
+			'l2': '',
+			'l3': '',
+			'l4': ''
+		}
+	},
+	'edata': { // Event spcific data
+		'event': '',
+		'value': '',
+		'actor': '',
+		'actorDetails': '',
+        'params': [
+            {
+                'timestamp': ''
+            }
+        ]
+	},
+	'tags': ['']
+}
 
 let internetConnectivitySkeleton = {
         edata: {
@@ -42,24 +98,23 @@ let generateTelemetry = (telemetryType, telemetryValue) => {
     let telemetryNow = null;
     switch(telemetryType) {
         case 'internetConnected' :
-            telemetryNow = internetConnectivitySkeleton;
+            telemetryNow = telemetryStructure;
             telemetryNow.edata.message = telemetryValue ? "Established Internet connectivity" : "Lost Internet connectivity";
             break;
         case 'usersConnected' :
-            telemetryNow = usersConnectedSkeleton;
+            telemetryNow = telemetryStructure;
             telemetryNow.edata.params[0].count = parseInt(telemetryValue);
             break;
         default :
             break;
-        if (telemetryNow !== null) {
-            let now = new Date();
-            let nowAsString = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate() + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
-            telemetryNow.edata.params[0].timestamp = nowAsString;
-            console.log("Generated " + telemetryType);
-        }
     }
-
-    saveTelemetry(telemetryNow, 'devmgmt');
+    if (telemetryNow !== null) {
+        let now = new Date();
+        let nowAsString = now.getUTCFullYear() + '-' + now.getUTCMonth() + '-' + now.getUTCDate() + ' ' + now.getUTCHours() + ':' + now.getUTCMinutes() + ':' + now.getUTCSeconds();
+        telemetryNow.edata.params[0].timestamp = nowAsString;
+        console.log("Generated " + telemetryType);
+    }
+    saveCronTelemetryData(telemetryNow, 'devmgmt');
 }
 
 let repeatedlyCheckForInternet = () => {
