@@ -33,7 +33,7 @@ class SideNav extends Component {
                             <Icon name='home' />
                             Home
                         </Menu.Item> : null }
-                        {this.props.auth.user.permissions.search(/VIEW_USERS|ALL/) >= 0 ? <Menu.Item name='users' active={this.state.currentLocation === '/users'} as={Link} name='users' to={'/users'}>
+                        {this.props.auth.user.permissions.search(/VIEW_USERS|ALL/) >= 0 ? <Menu.Item name='users' active={this.state.currentLocation === '/users'} as={Link} to={'/users'}>
                             <Icon name='users' />
                             Users
                         </Menu.Item> : null }
