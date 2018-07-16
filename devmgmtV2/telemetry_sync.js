@@ -21,7 +21,7 @@ let storeKey = key => {
 }
 
 let getKey = () => {
-    fs.openSync(config.keyFile, 'a+');
+    fs.closeSync(fs.openSync(config.keyFile, 'a+')); // Creating file if it doesn't exist
     return fs.readFileSync(config.keyFile, 'utf-8');
 }
 
