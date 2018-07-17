@@ -16,20 +16,56 @@ const { config } = require('./config');
 const plugin = 'devmgmt';
 const telemetryPath = '/home/admin/telemetry';
 
-let storeKey = key => {
-    return fs.writeFileSync(config.keyFile, key);
-}
-
 let getKey = () => {
-    fs.closeSync(fs.openSync(config.keyFile, 'a+')); // Creating file if it doesn't exist
-    return fs.readFileSync(config.keyFile, 'utf-8');
+	let defer = q.defer();
+
+	const fileName = config.keyFile;
+	const errMsg = 'Error occurred while fetching key.';
+
+	fs.open(fileName, 'a+', (err, fd) => {
+        if(err) {
+            if(err.code === 'EEXIST') {
+				defer.resolve(undefined);
+            } else {
+				console.log(errMsg, err);
+				defer.reject(err);
+			}
+        } else {
+			fs.readFile(fileName, 'utf-8', (err, data) => {
+				if(!err) {
+					defer.resolve(data);
+				} else {
+					console.log(errMsg, err);
+	            	defer.reject(err);
+				}
+			});
+		}
+
+		fs.close(fd, err => console.log(err || ''));
+    });
+
+	return defer.promise;
 }
 
-let isAuthenticated = () => {
+let storeKey = key => {
+	let defer = q.defer();
+
+	fs.writeFile(config.keyFile, key, (err) => {
+		if(err) {
+			console.log('Erro occurred while storing the key. ', err);
+			defer.reject(err);
+		}
+
+		defer.resolve(null);
+	});
+
+	return defer.promise;
+}
+
+let isAuthenticated = apikey => {
     let defer = q.defer();
 
     const url = config.telemetryAPI.hello;
-    const apikey = getKey();
 
 	if(apikey.length === 0) {
         defer.resolve({
@@ -111,11 +147,10 @@ let markAsResolved = ({ fullPath, fileName }) => {
 	}
 }
 
-let sendTelemetry = ({ fullPath, fileName, buffer }) => {
+let sendTelemetry = ({ fullPath, fileName, buffer }, apikey) => {
 	let defer = q.defer();
 
 	const url = config.telemetryAPI.upload;
-	const apikey = getKey();
 	const formData = {
 		file : fs.createReadStream(fullPath)
 	};
@@ -145,7 +180,7 @@ let sendTelemetry = ({ fullPath, fileName, buffer }) => {
 	return defer.promise;
 }
 
-let retryFailedUploads = () => {
+let retryFailedUploads = apikey => {
 	const toUpload = fs.readdirSync(`${telemetryPath}/zip`)
 						.filter(file => file.endsWith('_failed'));
 
@@ -157,7 +192,7 @@ let retryFailedUploads = () => {
 			fullPath : `${telemetryPath}/zip/${file}`
 		}
 
-		return sendTelemetry(data)
+		return sendTelemetry(data, apikey)
 			.then(res => {
 				const body = JSON.parse(res.body);
 
@@ -176,37 +211,41 @@ let retryFailedUploads = () => {
 let initiateTelemetrySync = () => {
 	console.log('Initiated telemetry sync.');
 
+	let apikey;
+
     cron.schedule('*/30 * * * * *', () => {
         isInternetActive()
+			.then(getKey)
 			.then(isAuthenticated)
 			.then(res => {
-		        if(!res.authenticated) {
-		            return authenticateUser();
-		        } else {
-		            return {
-		                success : true,
-		                keyCached : true,
-		                key : res.key
-		            };
-		        }
+		    	if(!res.authenticated) {
+		    		return authenticateUser();
+		    	} else {
+					return {
+						success : true,
+						key : res.key,
+						keyExists : true
+					};
+				}
 		    })
 		    .then(res => {
 		        if(res.success) {
-					if(!res.keyCached) {
-						console.log('User authenticated.');
-						storeKey(res.key);
-					}
-					// console.log('Response:', res);
+					apikey = res.key;
 
-					return getTelemetryData(plugin, 1)
+					if(!res.keyExists) {
+						console.log('User authenticated.');
+						// console.log('Response:', res);
+						return storeKey(apikey);
+					}
 		        } else {
-		            throw 'Couldn\'t authenticate user.';
+					throw 'Couldn\'t authenticate user.';
 		        }
 		    })
+			.then(res => getTelemetryData(plugin, 1))
             .then(res => {
 				if(res.success) {
 					const data = zipContents(plugin, res.data);
-					return sendTelemetry(data);
+					return sendTelemetry(data, apikey);
 				} else {
 					throw res.msg;
 				}
@@ -216,7 +255,7 @@ let initiateTelemetrySync = () => {
 
 				if(body.success) {
 					console.log('Telemetry synced. Server response:', body);
-					return retryFailedUploads();
+					return retryFailedUploads(apikey);
 				} else {
 					markAsFailed(res);
 					throw 'Error occurred while syncing telemetry. Server response: ' + res.body;
