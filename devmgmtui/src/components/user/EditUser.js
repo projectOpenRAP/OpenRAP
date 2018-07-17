@@ -76,6 +76,16 @@ class EditUser extends Component {
           }
           this.setState({permissions});
         }
+        let disabledFlag = { ...this.state.disabledFlag };
+        if (this.state.permissions['perm2'] || this.state.permissions['perm3'] || this.state.permissions['perm4']) {
+            disabledFlag.perm1 = true;
+        }
+        if (this.state.permissions['perm6'] || this.state.permissions['perm7']) {
+            disabledFlag.perm5 = true;
+        }
+        this.setState({
+            disabledFlag
+        });
         document.title = "Edit User";
     }
 
@@ -127,10 +137,13 @@ class EditUser extends Component {
 
     handleAllPermissionsGrant() {
       var permissions = this.state.permissions
+      let disabledFlag = { ...this.state.disabledFlag }
       for (let i in permissions) {
         permissions[i] = true;
       }
-      this.setState({ permissions }, this.setAllEnabled);
+      disabledFlag.perm1 = true;
+      disabledFlag.perm5 = true;
+      this.setState({ permissions, disabledFlag }, this.setAllEnabled);
     }
 
     handleSubmit() {
@@ -159,7 +172,12 @@ class EditUser extends Component {
         var permissionsList = Object.entries(this.state.permissions).map(([permLabel, set]) => {
             return (
                 <div key={permLabel}>
-                    <Checkbox label={this.state.permissionsAsStrings[permLabel]} checked={set} disabled={this.state.disabledFlag[permLabel]} onChange={this.handlePermissionsChange(permLabel)} />
+                    <Checkbox
+                        label={this.state.permissionsAsStrings[permLabel]}
+                        checked={set}
+                        disabled={this.state.disabledFlag[permLabel]}
+                        onChange={this.handlePermissionsChange(permLabel)}
+                    />
 
                     <Divider horizontal/>
                 </div>

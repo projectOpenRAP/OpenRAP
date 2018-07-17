@@ -4,9 +4,6 @@ import { BrowserRouter, Route } from 'react-router-dom'
 import { connect } from 'react-redux';
 import * as actions from './actions/config';
 
-import axios from 'axios'
-import { BASE_URL } from './config/config';
-
 import Login from './components/auth/Login'
 import CreateUser from './components/user/CreateUser'
 import EditUser from './components/user/EditUser'
