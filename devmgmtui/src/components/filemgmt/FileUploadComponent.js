@@ -23,7 +23,10 @@ class FileUploadComponent extends Component {
       files.push(fileList[i]);
     }
     this.props.updateUploadableFiles(files);
-    //this.setState({files, fileNames});
+
+    // Allow selecting same file(s) twice for upload
+    document.getElementById('fileinput').value = null;
+    document.getElementById('folderinput').value = null;
   }
 
   enableAutomaticUpload() {
