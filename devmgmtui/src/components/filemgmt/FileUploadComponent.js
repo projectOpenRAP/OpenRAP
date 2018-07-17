@@ -24,7 +24,7 @@ class FileUploadComponent extends Component {
     }
     this.props.updateUploadableFiles(files);
 
-    // Allow selecting same file(s) twice for upload
+    // Allow selecting same file(s) more than once for upload
     document.getElementById('fileinput').value = null;
     document.getElementById('folderinput').value = null;
   }
