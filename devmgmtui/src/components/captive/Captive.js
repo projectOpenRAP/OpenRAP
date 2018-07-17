@@ -132,7 +132,7 @@ class Captive extends Component {
                 <div style={captiveStyles.container2}>
                   <Header as={'h3'}>Current Captive Portal: </Header>
                   <Segment style={{height:'100%'}}>
-                    <iframe id = 'captiveframe' src='http://openrap.com/' width='100%' height='100%'></iframe>
+                    <iframe title='Captive Portal' id = 'captiveframe' src='http://openrap.com/' width='100%' height='100%'></iframe>
                   </Segment>
                 </div>
               </Grid.Column>

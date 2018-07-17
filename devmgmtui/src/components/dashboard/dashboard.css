@@ -1,0 +1,7 @@
+.progress-bar-content .progress{
+    right: .2em !important;
+}
+.progress-bar-content .label{
+    top: 5% !important;
+    vertical-align: middle !important;
+}

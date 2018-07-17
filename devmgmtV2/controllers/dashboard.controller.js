@@ -8,6 +8,7 @@ const path = require('path');
 const exec = require('child_process').exec;
 
 const { config } = require('../config');
+let { selectFields } = require('dbsdk');
 
 let getInternetStatus = (req, res) => {
     dns.lookup('google.com', (err) => {
@@ -86,6 +87,24 @@ let getSystemVersion = (req,res) => {
     })
 }
 
+let getDeviceID = (req,res) => {
+    let responseData = {
+        retrieveSuccessful : true,
+        deviceID : undefined,
+        msg : 'Successfully retrieved Mac address'
+    }
+
+    selectFields({dbName : 'device_mgmt', tableName : 'device', columns : ["dev_id"]})
+        .then(response => {
+            responseData.deviceID = response[0].dev_id;
+            return res.status(200).json(responseData);
+        }, reject => {
+            responseData.retrieveSuccessful = false;
+            responseData.msg = err;
+            return res.status(200).json(responseData);
+        });
+}
+
 module.exports = {
     getInternetStatus,
     getLastRefresh,
@@ -93,5 +112,6 @@ module.exports = {
     getSystemMemory,
     getSystemSpace,
     getSystemCpu,
-    getSystemVersion
+    getSystemVersion,
+    getDeviceID
 }

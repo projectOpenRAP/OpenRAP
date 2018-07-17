@@ -39,7 +39,11 @@ class FileMgmt extends Component {
                 <Header as='h1'>File Management</Header>
               </Grid.Column>
               <Grid.Column>
-                <Header as='h1'>File Upload</Header>
+                { this.props.auth.user.permissions.search(/UPLOAD_FILES|ALL/) >= 0 ?
+                    <Header as='h1'>File Upload</Header>
+                    :
+                    null
+                }
               </Grid.Column>
             </Grid.Row>
             <Grid.Row>
