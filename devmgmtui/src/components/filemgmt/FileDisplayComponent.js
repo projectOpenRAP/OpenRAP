@@ -161,16 +161,26 @@ class FileDisplayComponent extends Component {
         Currently at : {this.props.filemgmt.currentDir}
       </div>
       <Divider></Divider>
-      <Button animated color='linkedin' onClick={this.selectAll.bind(this)}>
-        <Button.Content visible>{this.state.allSelected && this.props.filemgmt.selectedFiles.length ? 'Uns' : 'S'}elect All</Button.Content>
-        <Button.Content hidden><Icon name='check circle' /></Button.Content>
-      </Button>
-      <span style={{float:'right'}}>
-        <Button animated  onClick={this.deleteSelected.bind(this)} negative>
-          <Button.Content visible>Delete Selected</Button.Content>
-          <Button.Content hidden><Icon name='remove circle' /></Button.Content>
-        </Button>
-      </span>
+      {this.props.auth.user.permissions.search(/DELETE_FILES|ALL/) >= 0 ?
+          <span>
+              <Button animated color='linkedin' onClick={this.selectAll.bind(this)}>
+                <Button.Content visible>{this.state.allSelected && this.props.filemgmt.selectedFiles.length ? 'Uns' : 'S'}elect All</Button.Content>
+                <Button.Content hidden><Icon name='check circle' /></Button.Content>
+              </Button>
+          </span>
+          :
+          null
+      }
+      {this.props.auth.user.permissions.search(/DELETE_FILES|ALL/) >= 0 ?
+          <span style={{float:'right'}}>
+            <Button animated  onClick={this.deleteSelected.bind(this)} negative>
+              <Button.Content visible>Delete Selected</Button.Content>
+              <Button.Content hidden><Icon name='remove circle' /></Button.Content>
+            </Button>
+          </span>
+          :
+          null
+      }
       <Divider></Divider>
         <div>
           {this.renderFileDisplayComponent()}
