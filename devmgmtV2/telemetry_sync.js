@@ -56,7 +56,7 @@ let storeKey = key => {
 			defer.reject(err);
 		}
 
-		defer.resolve(null);
+		defer.resolve();
 	});
 
 	return defer.promise;
@@ -246,7 +246,7 @@ let initiateTelemetrySync = () => {
 					throw 'Couldn\'t authenticate user.';
 		        }
 		    })
-			.then(res => getTelemetryData(plugin, 1))
+			.then(() => getTelemetryData(plugin, 1))
             .then(res => {
 				if(res.success) {
 					const data = zipContents(plugin, res.data);
