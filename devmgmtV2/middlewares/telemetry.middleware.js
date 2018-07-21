@@ -150,18 +150,18 @@ const addAgnosticDataAndSave = (telemetryData, actor, timestamp) => {
     }
 
 const _formatTimestamp = timestamp => {
-	const pad = number => number < 10 ? '0' + number : number;
+	const padWithZeroes = number => number < 10 ? '0' + number.toString() : number.toString();
 
 	const date = [
-		timestamp.getFullYear(),
-		pad(timestamp.getMonth()+1),
-		pad(timestamp.getDate())
+		timestamp.getFullYear().toString(),
+		padWithZeroes(timestamp.getMonth()+1),
+		padWithZeroes(timestamp.getDate())
 	].join('-');
 
 	const time = [
-		pad(timestamp.getHours()),
-		pad(timestamp.getMinutes()),
-		pad(timestamp.getSeconds())
+		padWithZeroes(timestamp.getHours()),
+		padWithZeroes(timestamp.getMinutes()),
+		padWithZeroes(timestamp.getSeconds())
 	].join(':');
 
     return `${date} ${time}`;
