@@ -116,7 +116,10 @@ let authenticateUser = () => {
 			defer.reject(err);
 		} else {
 			console.log('Authenticating user...');
-			defer.resolve(JSON.parse(body));
+			defer.resolve({
+				...JSON.parse(body),
+				keyExists : false
+			});
 		}
 	});
 
@@ -223,7 +226,9 @@ let initiateTelemetrySync = () => {
 		    	} else {
 					return {
 						success : true,
+						msg : null,
 						key : res.key,
+						consumer_id : null,
 						keyExists : true
 					};
 				}
