@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const q = require('q');
 const exec = require('child_process').exec;
+const process = require('process');
 
 const {
 	saveTelemetry
@@ -102,7 +103,7 @@ const addAgnosticDataAndSave = (telemetryData, actor, timestamp) => {
 		'context': {
 			'channel' : 'OpenRAP',
 			'pdata' : {
-				'pid' : require('process').pid,
+				'pid' : process.pid
 			},
 			'env' : 'Device Management'
 		}
