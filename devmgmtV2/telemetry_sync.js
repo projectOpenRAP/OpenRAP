@@ -22,27 +22,14 @@ let getKey = () => {
 	const fileName = config.keyFile;
 	const errMsg = 'Error occurred while fetching key.';
 
-	fs.open(fileName, 'a+', (err, fd) => {
-        if(err) {
-            if(err.code === 'EEXIST') {
-				defer.resolve(undefined);
-            } else {
-				console.log(errMsg, err);
-				defer.reject(err);
-			}
-        } else {
-			fs.readFile(fileName, 'utf-8', (err, data) => {
-				if(!err) {
-					defer.resolve(data);
-				} else {
-					console.log(errMsg, err);
-	            	defer.reject(err);
-				}
-			});
+	fs.readFile(fileName, { flag : 'a+', encoding : 'utf-8' }, (err, data) => {
+		if(!err) {
+			defer.resolve(data);
+		} else {
+			console.log(errMsg);
+        	defer.reject(err);
 		}
-
-		fs.close(fd, err => console.log(err || ''));
-    });
+	});
 
 	return defer.promise;
 }
