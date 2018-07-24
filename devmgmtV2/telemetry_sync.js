@@ -16,28 +16,41 @@ const { config } = require('./config');
 const plugin = 'devmgmt';
 const telemetryPath = '/home/admin/telemetry';
 
-let getKey = () => {
+let deleteFile = file => {
 	let defer = q.defer();
 
-	const fileName = config.keyFile;
-	const errMsg = 'Error occurred while fetching key.';
-
-	fs.readFile(fileName, { flag : 'a+', encoding : 'utf-8' }, (err, data) => {
-		if(!err) {
-			defer.resolve(data);
+	fs.unlink(file, err => {
+		if(err) {
+			defer.reject(err);
 		} else {
-			console.log(errMsg);
-        	defer.reject(err);
+			defer.resolve();
 		}
 	});
 
 	return defer.promise;
 }
 
-let storeKey = key => {
+let getKey = () => {
 	let defer = q.defer();
 
-	fs.writeFile(config.keyFile, key, (err) => {
+	const fileName = config.keyFile;
+
+	fs.readFile(fileName, { flag : 'a+', encoding : 'utf-8' }, (err, data) => {
+		if(err) {
+			console.log('Error occurred while fetching the key.');
+			defer.resolve({ success : false, err });
+		} else {
+			defer.resolve({ success : true, data });
+		}
+	});
+
+	return defer.promise;
+}
+
+let storeKey = apikey => {
+	let defer = q.defer();
+
+	fs.writeFile(config.keyFile, apikey, (err) => {
 		if(err) {
 			console.log('Erro occurred while storing the key. ', err);
 			defer.reject(err);
@@ -49,12 +62,16 @@ let storeKey = key => {
 	return defer.promise;
 }
 
+let deleteKey = () => {
+	return deleteFile(config.keyFile);
+}
+
 let isAuthenticated = apikey => {
     let defer = q.defer();
 
     const url = config.telemetryAPI.hello;
 
-	if(apikey.length === 0) {
+	if(!apikey) {
         defer.resolve({
             authenticated : false,
             key : undefined
@@ -73,13 +90,13 @@ let isAuthenticated = apikey => {
 	            console.log('Forbidden.');
 	            defer.resolve({
 	                authenticated : false,
-	                key : apikey
+	                apikey
 	            });
 	        } else {
 	            console.log('Allowed.');
 	            defer.resolve({
 	                authenticated : true,
-	                key : apikey
+	                apikey
 	            });
 	        }
 	    });
@@ -113,36 +130,30 @@ let authenticateUser = () => {
 	return defer.promise;
 }
 
-let markAsFailed = ({ fullPath, fileName }) => {
-	if(!fileName.endsWith('_failed')) {
-		fs.rename(fullPath, `${fullPath}_failed`, err => {
-			if(err) {
-				throw err;
-			}
+let fetchTelemetryFiles = () => {
+	let defer = q.defer();
 
-			console.log(`Failed to sync ${fileName}. Will try re-uploading later.`);
-		});
-	}
+	const zipPath = `${telemetryPath}/zip`;
+
+	fs.readdir(zipPath, (err, files) => {
+		if(err) {
+			console.log('Error occurred while fetching failed uploads.');
+			defer.reject(err);
+		} else {
+			files = files.map(file => `${zipPath}/${file}`); // list of full paths instead of just the file name
+			defer.resolve(files);
+		}
+	});
+
+	return defer.promise;
 }
 
-let markAsResolved = ({ fullPath, fileName }) => {
-	if(fileName.endsWith('_failed')) {
-		fs.rename(fullPath, fullPath.substring(0, fullPath.lastIndexOf('_')), err => {
-			if(err) {
-				throw err;
-			}
-
-			// console.log('Marked as resolved.', fullPath);
-		});
-	}
-}
-
-let sendTelemetry = ({ fullPath, fileName, buffer }, apikey) => {
+let sendTelemetry = (file, apikey) => {
 	let defer = q.defer();
 
 	const url = config.telemetryAPI.upload;
 	const formData = {
-		file : fs.createReadStream(fullPath)
+		file : fs.createReadStream(file)
 	};
 
 	const options = {
@@ -152,50 +163,19 @@ let sendTelemetry = ({ fullPath, fileName, buffer }, apikey) => {
 	};
 
 	// console.log(JSON.stringify(options, null, 4));
-	console.log('Sending telemetry...');
 
 	request.post(options, (err, httpRes, body) => {
 		if(err) {
-			markAsFailed({ fullPath, fileName });
 			defer.reject(err);
 		} else {
 			defer.resolve({
-				fullPath,
-				fileName,
-				body
+				file,
+				...JSON.parse(body)
 			});
 		}
 	});
 
 	return defer.promise;
-}
-
-let retryFailedUploads = apikey => {
-	const toUpload = fs.readdirSync(`${telemetryPath}/zip`)
-						.filter(file => file.endsWith('_failed'));
-
-	// console.log('Retrying failed uploads:', toUpload);
-
-	return q.allSettled(toUpload.map(file => {
-		const data = {
-			fileName : file,
-			fullPath : `${telemetryPath}/zip/${file}`
-		}
-
-		return sendTelemetry(data, apikey)
-			.then(res => {
-				const body = JSON.parse(res.body);
-
-				if(body.success) {
-					markAsResolved(data);
-				}
-
-				return res;
-			})
-			.catch(error => {
-				throw error;
-			})
-	}));
 }
 
 let initiateTelemetrySync = () => {
@@ -206,6 +186,14 @@ let initiateTelemetrySync = () => {
     cron.schedule('*/30 * * * * *', () => {
         isInternetActive()
 			.then(getKey)
+			.then(res => {
+				if(res.success) {
+					return res.data;
+				} else {
+					// console.log(res.err);
+					return deleteKey();
+				}
+			})
 			.then(isAuthenticated)
 			.then(res => {
 		    	if(!res.authenticated) {
@@ -214,7 +202,7 @@ let initiateTelemetrySync = () => {
 					return {
 						success : true,
 						msg : null,
-						key : res.key,
+						key : res.apikey,
 						consumer_id : null,
 						keyExists : true
 					};
@@ -236,25 +224,26 @@ let initiateTelemetrySync = () => {
 			.then(() => getTelemetryData(plugin, 1))
             .then(res => {
 				if(res.success) {
-					const data = zipContents(plugin, res.data);
-					return sendTelemetry(data, apikey);
+					return zipContents(plugin, res.data);
 				} else {
 					throw res.msg;
 				}
 			})
-			.then(res => {
-				const body = JSON.parse(res.body);
-
-				if(body.success) {
-					console.log('Telemetry synced. Server response:', body);
-					return retryFailedUploads(apikey);
-				} else {
-					markAsFailed(res);
-					throw 'Error occurred while syncing telemetry. Server response: ' + res.body;
-				}
+			.then(fetchTelemetryFiles)
+			.then(toUpload => {
+				console.log('Sending telemetry...');
+				return q.allSettled(toUpload.map(file => sendTelemetry(file, apikey)));
 			})
 			.then(res => {
-				// console.log('Status after retyring upload:\n', res);
+				res.forEach(({ value }) => {
+					if(value.success) {
+						console.log(`Synced '${value.file}'.`);
+						deleteFile(value.file);
+					} else {
+						// console.log('Server response: ', value);
+						console.log(`Failed to sync '${value.file}'. Will try uploading again.`);
+					}
+ 				});
 			})
             .catch(error => {
                 console.log('Telemetry not synced.');
