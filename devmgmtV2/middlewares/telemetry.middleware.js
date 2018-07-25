@@ -4,7 +4,8 @@ const uniqid = require('uniqid');
 const fs = require('fs');
 const q = require('q');
 const exec = require('child_process').exec;
-const { addAgnosticDataAndSave } = require('../helpers/telemtry.helper.js');
+
+const { addAgnosticDataAndSave } = require('../helpers/telemetry.helper.js');
 
 // Generic telemetry JSON structure
 const telemetryStructure = {
@@ -58,18 +59,18 @@ const telemetryStructure = {
 }
 
 const _formatTimestamp = timestamp => {
-	const pad = number => number < 10 ? '0' + number : number;
+	const padWithZeroes = number => number < 10 ? '0' + number.toString() : number.toString();
 
 	const date = [
-		timestamp.getFullYear(),
-		pad(timestamp.getMonth()+1),
-		pad(timestamp.getDate())
+		timestamp.getFullYear().toString(),
+		padWithZeroes(timestamp.getMonth()+1),
+		padWithZeroes(timestamp.getDate())
 	].join('-');
 
 	const time = [
-		pad(timestamp.getHours()),
-		pad(timestamp.getMinutes()),
-		pad(timestamp.getSeconds())
+		padWithZeroes(timestamp.getHours()),
+		padWithZeroes(timestamp.getMinutes()),
+		padWithZeroes(timestamp.getSeconds())
 	].join(':');
 
     return `${date} ${time}`;
@@ -234,7 +235,6 @@ const saveTelemetryData = (req, res, next) => {
 
 			break;
 	}
-
 
 	/*
 	* Populating event-agnostic telemetry data

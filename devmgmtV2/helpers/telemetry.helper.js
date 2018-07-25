@@ -2,12 +2,10 @@ const prc = require('process');
 const fs = require('fs');
 const uniqid = require('uniqid');
 const path = require('path');
-let {
-	selectFields
-} = require('dbsdk');
-const {
-	saveTelemetry
-} = require('/opt/opencdn/telemetrysdk');
+const q = require('q');
+
+const { selectFields } = require('dbsdk');
+const { saveTelemetry } = require('/opt/opencdn/telemetrysdk');
 
 const _getDeviceID = () => {
 	let defer = q.defer();
@@ -41,61 +39,48 @@ const _getSystemVersion = () => {
 
 let addAgnosticDataAndSave = (telemetryData, actor, timestamp) => {
     let defer = q.defer();
-    telemetryData = {
-		...telemetryData,
-		'ets' : timestamp.getTime(),
-		'ver' : '3.0',
-		'actor' : {
-			'id' : actor
-		},
-		'context': {
-			'channel' : 'OpenRAP',
-			'pdata' : {
-				'pid' : prc.pid,
-			},
-			'env' : 'Device Management'
-		}
-	}
 
-	_getSystemVersion()
-		.then(systemVersion => {
-			telemetryData = {
-				...telemetryData,
-				'context': {
-					...telemetryData.context,
-					'pdata' : {
-						...telemetryData.context.pdata,
-						'ver' : systemVersion.replace(/\n$/, '')
-					}
-				}
-			}
+	const promises = [
+		_getSystemVersion(),
+		_getDeviceID()
+	];
 
-			return _getDeviceID();
-		})
-        .then(response => {
-			const deviceID = response[0].dev_id;
+	q.all(promises)
+		.then(values => {
+			const systemVersion = values[0].replace(/\n$/, '');
+			const deviceID = values[1][0].dev_id;
 
 			telemetryData = {
 				...telemetryData,
+				'ets' : timestamp.getTime(),
+				'ver' : '3.0',
+				'actor' : {
+					'id' : actor
+				},
 				'mid' : uniqid(`${deviceID}-`),
 				'context': {
-					...telemetryData.context,
+					'channel' : 'OpenRAP',
 					'pdata' : {
-						...telemetryData.context.pdata,
+						'pid' : prc.pid,
+						'ver' : systemVersion,
 						'id' : deviceID
 					},
+					'env' : 'Device Management'
 				}
-			}
-			console.log('Saving telemetry'); // JSON.stringify(telemetryData, null, 4))
+			};
+
+			console.log('Saving telemetry.'); // JSON.stringify(telemetryData, null, 4))
 			saveTelemetry(telemetryData, 'devmgmt');
-            return defer.resolve();
-        })
-        .catch(err => {
-            console.log(err);
-            return defer.reject();
-        });
-        return defer.promise;
-    }
+
+            defer.resolve();
+		})
+		.catch(err => {
+			console.log(err);
+			defer.reject();
+		});
+
+	return defer.promise;
+}
 
 module.exports = {
     addAgnosticDataAndSave
