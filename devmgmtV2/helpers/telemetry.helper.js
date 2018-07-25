@@ -2,6 +2,8 @@ const prc = require('process');
 const fs = require('fs');
 const uniqid = require('uniqid');
 const path = require('path');
+const q = require('q');
+
 let {
 	selectFields
 } = require('dbsdk');

@@ -137,7 +137,7 @@ let fetchTelemetryFiles = () => {
 
 	fs.readdir(zipPath, (err, files) => {
 		if(err) {
-			console.log('Error occurred while fetching failed uploads.');
+			console.log('Error occurred while fetching telemetry files to be uploaded.');
 			defer.reject(err);
 		} else {
 			files = files.map(file => `${zipPath}/${file}`); // list of full paths instead of just the file name
