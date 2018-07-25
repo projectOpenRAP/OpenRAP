@@ -2,7 +2,6 @@
 
 const uniqid = require('uniqid');
 const fs = require('fs');
-const path = require('path');
 const q = require('q');
 const exec = require('child_process').exec;
 const process = require('process');
@@ -13,6 +12,7 @@ const {
 let {
 	selectFields
 } = require('dbsdk');
+const { addAgnosticDataAndSave } = require('../helpers/telemtry.helper.js');
 
 // Generic telemetry JSON structure
 const telemetryStructure = {
@@ -65,90 +65,6 @@ const telemetryStructure = {
 	'tags': ['']
 }
 
-const _formatBytes = (bytes, decimals) => {
-	if(bytes === 0) return '0 Bytes';
-	const k = 1024,
-		dm = decimals || 2,
-		sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-		i = Math.floor(Math.log(bytes) / Math.log(k));
-
-	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-}
-
-const _getSystemVersion = () => {
-	let defer = q.defer();
-
-	const cdn = '/opt/opencdn/CDN/version.txt';
-
-	fs.readFile(cdn, 'utf-8', (err, data) => {
-		if(err) {
-			defer.reject(err);
-		} else {
-			defer.resolve(data);
-		}
-	});
-
-    return defer.promise;
-}
-
-const addAgnosticDataAndSave = (telemetryData, actor, timestamp) => {
-    let defer = q.defer();
-    telemetryData = {
-		...telemetryData,
-		'ets' : timestamp.getTime(),
-		'ver' : '3.0',
-		'actor' : {
-			'id' : actor
-		},
-		'context': {
-			'channel' : 'OpenRAP',
-			'pdata' : {
-				'pid' : process.pid
-			},
-			'env' : 'Device Management'
-		}
-	}
-
-	_getSystemVersion()
-		.then(systemVersion => {
-			telemetryData = {
-				...telemetryData,
-				'context': {
-					...telemetryData.context,
-					'pdata' : {
-						...telemetryData.context.pdata,
-						'ver' : systemVersion.replace(/\n$/, '')
-					}
-				}
-			}
-
-			return _getDeviceID();
-		})
-        .then(response => {
-			const deviceID = response[0].dev_id;
-
-			telemetryData = {
-				...telemetryData,
-				'mid' : uniqid(`${deviceID}-`),
-				'context': {
-					...telemetryData.context,
-					'pdata' : {
-						...telemetryData.context.pdata,
-						'id' : deviceID
-					},
-				}
-			}
-			console.log('Saving telemetry'); // JSON.stringify(telemetryData, null, 4))
-			saveTelemetry(telemetryData, 'devmgmt');
-            return defer.resolve();
-        })
-        .catch(err => {
-            console.log(err);
-            return defer.reject();
-        });
-        return defer.promise;
-    }
-
 const _formatTimestamp = timestamp => {
 	const padWithZeroes = number => number < 10 ? '0' + number.toString() : number.toString();
 
@@ -167,18 +83,14 @@ const _formatTimestamp = timestamp => {
     return `${date} ${time}`;
 }
 
-const _getDeviceID = () => {
-	let defer = q.defer();
+const _formatBytes = (bytes, decimals) => {
+	if(bytes === 0) return '0 Bytes';
+	const k = 1024,
+		dm = decimals || 2,
+		sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+		i = Math.floor(Math.log(bytes) / Math.log(k));
 
-	selectFields({dbName : 'device_mgmt', tableName : 'device', columns : ["dev_id"]})
-	.then(response => {
-		defer.resolve(response);
-	}).catch(e => {
-		console.log(e);
-		defer.reject(e);
-	})
-
-    return defer.promise;
+	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
 
@@ -341,18 +253,6 @@ const saveTelemetryData = (req, res, next) => {
 	}).catch(err => console.log(err));
 }
 
-const saveCronTelemetryData = eData => {
-    let timestamp = new Date();
-    let actor = "127.0.0.1";
-    addAgnosticDataAndSave(eData, actor, timestamp).then(value => {
-        return;
-    }).catch(err => {
-        console.log(err);
-        return;
-    });
-}
-
 module.exports = {
-	saveTelemetryData,
-    saveCronTelemetryData
+	saveTelemetryData
 }
