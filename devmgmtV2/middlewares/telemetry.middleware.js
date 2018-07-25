@@ -4,14 +4,7 @@ const uniqid = require('uniqid');
 const fs = require('fs');
 const q = require('q');
 const exec = require('child_process').exec;
-const process = require('process');
 
-const {
-	saveTelemetry
-} = require('../../telemetrysdk');
-let {
-	selectFields
-} = require('dbsdk');
 const { addAgnosticDataAndSave } = require('../helpers/telemetry.helper.js');
 
 // Generic telemetry JSON structure
@@ -242,7 +235,6 @@ const saveTelemetryData = (req, res, next) => {
 
 			break;
 	}
-
 
 	/*
 	* Populating event-agnostic telemetry data
