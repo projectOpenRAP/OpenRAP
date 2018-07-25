@@ -7,7 +7,7 @@ let {
 } = require('dbsdk');
 const {
 	saveTelemetry
-} = require('../../telemetrysdk');
+} = require('/opt/opencdn/telemetrysdk');
 
 const _getDeviceID = () => {
 	let defer = q.defer();
@@ -26,7 +26,7 @@ const _getDeviceID = () => {
 const _getSystemVersion = () => {
 	let defer = q.defer();
 
-	const cdn = path.join(__dirname, '../../CDN/version.txt');
+	const cdn = path.join(__dirname, '/opt/opencdn/CDN/version.txt');
 
 	fs.readFile(cdn, 'utf-8', (err, data) => {
 		if(err) {
