@@ -12,7 +12,7 @@ const {
 let {
 	selectFields
 } = require('dbsdk');
-const { addAgnosticDataAndSave } = require('../helpers/telemtry.helper.js');
+const { addAgnosticDataAndSave } = require('../helpers/telemetry.helper.js');
 
 // Generic telemetry JSON structure
 const telemetryStructure = {
