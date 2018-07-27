@@ -3,7 +3,6 @@
 const uniqid = require('uniqid');
 const fs = require('fs');
 const q = require('q');
-const exec = require('child_process').exec;
 
 const { addAgnosticDataAndSave } = require('../helpers/telemetry.helper.js');
 
@@ -86,8 +85,6 @@ const _formatBytes = (bytes, decimals) => {
 	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-
-// TODO Refactor this
 const saveTelemetryData = (req, res, next) => {
 	const actor = req.body.actor || req.query.actor || req.params['actor'];
 	const timestamp = new Date(parseInt(req.body.timestamp || req.query.timestamp));
