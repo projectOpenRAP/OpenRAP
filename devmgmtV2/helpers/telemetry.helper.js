@@ -24,7 +24,7 @@ const _getDeviceID = () => {
 const _getSystemVersion = () => {
 	let defer = q.defer();
 
-	const cdn = path.join(__dirname, '/opt/opencdn/CDN/version.txt');
+	const cdn = '/opt/opencdn/CDN/version.txt';
 
 	fs.readFile(cdn, 'utf-8', (err, data) => {
 		if(err) {
