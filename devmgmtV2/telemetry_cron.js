@@ -1,7 +1,7 @@
 let path = require('path');
 let { exec } = require('child_process');
 let q = require('q');
-let { saveCronTelemetryData } = require('./middlewares/telemetry.middleware.js');
+let { addAgnosticDataAndSave } = require("./helpers/telemetry.helper.js");
 
 const {
 	isInternetActive,
@@ -135,7 +135,7 @@ let repeatedlyCheckForInternet = () => {
 }
 
 let repeatedlyCheckUsers = () => {
-    const cmd = path.join(__dirname, '../CDN/getall_stations.sh');
+    const cmd = '/opt/opencdn/CDN/getall_stations.sh';
     exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
         // console.log('Error: ' + err);
         console.log('stdout: ' + stdout);
@@ -155,4 +155,15 @@ let repeatedlyCheckUsers = () => {
 module.exports = {
     repeatedlyCheckForInternet,
     repeatedlyCheckUsers
+}
+
+const saveCronTelemetryData = eData => {
+    let timestamp = new Date();
+    let actor = "127.0.0.1";
+    addAgnosticDataAndSave(eData, actor, timestamp).then(value => {
+        return;
+    }).catch(err => {
+        console.log(err);
+        return;
+    });
 }

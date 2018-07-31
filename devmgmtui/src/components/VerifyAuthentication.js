@@ -9,12 +9,6 @@ export default function(ComposedComponent) {
             }
         }
 
-        componentWillUpdate(nextProps) {
-            if (!nextProps.authenticated) {
-                this.props.history.push('/');
-            }
-        }
-
         render () {
             return <ComposedComponent {...this.props} />
         }
