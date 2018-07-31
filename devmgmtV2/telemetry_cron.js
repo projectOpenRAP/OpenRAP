@@ -108,7 +108,7 @@ let generateTelemetry = (telemetryType, telemetryValue) => {
         default :
             break;
     }
-    if (telemetryNow !== null) {
+    if (telemetryNow) {
         let now = new Date();
         let nowAsString = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate() + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
         telemetryNow.edata.params[0].timestamp = nowAsString;
