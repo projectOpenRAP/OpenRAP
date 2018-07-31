@@ -20,7 +20,7 @@ log = logging.getLogger('ORAP')
 GOARCH='arm'
 gopath = base_dir + 'build/go/'
 apiserver_parent_dir = gopath + "src/github.com/projectOpenRAP/OpenRAP/"
-syncthing_dir = gopath + "src/github.com/syncthing/syncthing"
+syncthing_dir = gopath + "src/github.com/syncthing/syncthing/"
 
 # Device management server
 dmserver_dir = base_dir + 'devmgmtV2'
@@ -361,7 +361,7 @@ class Device(object):
         run_cmd(cmd)
 
         # Compiling Syncthing and moving the executable to the CDN directory
-        cmd = "cd " + syncthing_dir + " && env CGO_ENABLED=0 go run ./build.go -pkgdir " + (gopath + "pkg/linux_arm") + " -goos linux -goarch " + GOARCH + " build && mv ./syncthing " + (self.imgdir + "CDN/")
+        cmd = "cd " + syncthing_dir + " && env CGO_ENABLED=0 go run build.go -pkgdir " + (gopath + "pkg/linux_arm") + " -goos linux -goarch " + GOARCH + " build && mv ./syncthing " + (self.imgdir + "CDN/")
         run_cmd(cmd)
 
         #TODO: Copy the devicemgmt code
