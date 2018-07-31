@@ -351,7 +351,7 @@ const formatTimestamp = timestamp => {
 }
 
 let storeTimestamp = (req, res, next) => {
-    const timestamp = new Date(req.body.timestamp || req.query.timestamp);
+    const timestamp = new Date(parseInt(req.body.timestamp || req.query.timestamp));
 
     fs.writeFile(path.join(config.FS_ROOT, '.meta'), formatTimestamp(timestamp), function (err) {
         if (err) {
