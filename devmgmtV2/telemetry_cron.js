@@ -141,7 +141,7 @@ let repeatedlyCheckUsers = () => {
         console.log('stdout: ' + stdout);
         // console.log('stderr: ' + stderr);
         // console.log("Checking user status...");
-        if (err === null) {
+        if (!err) {
             let usersConnected = stdout;
             if (usersConnected !== numberOfUsers) {
                 console.log("Logging users telemetry");
