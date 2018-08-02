@@ -47,6 +47,9 @@ systemctl restart appserver
 systemctl enable devmgmt
 systemctl restart devmgmt
 
+systemctl enable syncthing
+systemctl restart syncthing
+
 reboot
 
 exit 0

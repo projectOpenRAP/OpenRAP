@@ -20,6 +20,7 @@ log = logging.getLogger('ORAP')
 GOARCH='arm'
 gopath = base_dir + 'build/go/'
 apiserver_parent_dir = gopath + "src/github.com/projectOpenRAP/OpenRAP/"
+syncthing_dir = gopath + "src/github.com/syncthing/syncthing/"
 
 # Device management server
 dmserver_dir = base_dir + 'devmgmtV2'
@@ -138,6 +139,9 @@ def golang_init():
 
 
         cmd = "go get github.com/mohae/deepcopy"
+        run_cmd(cmd)
+
+        cmd = "git clone https://github.com/syncthing/syncthing " + syncthing_dir
         run_cmd(cmd)
 
     return
@@ -354,6 +358,10 @@ class Device(object):
         # Compile golang apiserver; create the executable in CDN directory
         log.info("go env path " + os.environ['GOPATH'])
         cmd = "cd " + self.imgdir + "CDN/" + " && env CGO_ENABLED=0 GOOS=linux " + "GOARCH=" + GOARCH + "  go build github.com/projectOpenRAP/OpenRAP/searchServer"
+        run_cmd(cmd)
+
+        # Compiling Syncthing and moving the executable to the CDN directory
+        cmd = "cd " + syncthing_dir + " && env CGO_ENABLED=0 go run build.go -pkgdir " + (gopath + "pkg/linux_arm") + " -goos linux -goarch " + GOARCH + " build && mv ./syncthing " + (self.imgdir + "CDN/")
         run_cmd(cmd)
 
         #TODO: Copy the devicemgmt code
