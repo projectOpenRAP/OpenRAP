@@ -365,7 +365,7 @@ let uploadTelemetryDirectory = () => {
 
 let startUploadngTelemetry = () => {
     console.log("EkStep telemetry shall now be uploaded.");
-    cron.schedule("*/2 * * * *", () => {
+    cron.schedule("*/3 * * * *", () => {
         loggingInit().then(value => {
             return generateToken();
         }).then(value => {
