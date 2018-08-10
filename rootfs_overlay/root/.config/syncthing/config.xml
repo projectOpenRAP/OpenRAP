@@ -46,7 +46,7 @@
         <overwriteRemoteDeviceNamesOnConnect>false</overwriteRemoteDeviceNamesOnConnect>
         <tempIndexMinBlocks>10</tempIndexMinBlocks>
         <trafficClass>0</trafficClass>
-        <defaultFolderPath>~</defaultFolderPath>
+        <defaultFolderPath>/home/admin/GoK</defaultFolderPath>
         <setLowPriority>true</setLowPriority>
         <minHomeDiskFreePct>0</minHomeDiskFreePct>
     </options>
