@@ -5,6 +5,7 @@ let q = require('q');
 let request = require('request');
 let fs = require('fs');
 let dns = require('dns');
+let cron = require('node-cron');
 let registerURL = 'https://api.ekstep.in/api-manager/v1/consumer/cdn_device/credential/register';
 let telemetryURL = 'https://api.ekstep.in/data/v3/telemetry';
 let appJwt = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJvcGVucmFwLXYxIn0.OtUIioaagXzOLLZNsPoh-E2pHjsZ6ka-cyP9lLDIW38';
@@ -85,7 +86,7 @@ let generateJwt = (key, secret) => {
     let options = {
         algorithm : 'RS256'
     }
-    jwt.sign(payload, secret, options, (err, token) => {
+    jwt.sign(payload, secret, (err, token) => {
         if (err) {
             return defer.reject({err});
         } else {
@@ -120,13 +121,13 @@ let requestTokenGeneration = (options) => {
         if(err) {
             logger.log("error", "Error : " + err/* + " \nStatus Code: " + resp.statusCode*/);
             //TODO: Add code to try again [DONE]
-            setTimeout(() => requestTokenGeneration(options), 10000);
             return defer.reject(err);
         } else {
             let statusCode = resp.statusCode;
             if (parseInt(statusCode / 100) != 2) {
                 //TODO: Add code to try again [DONE]
-                setTimeout(() => {requestTokenGeneration(options)}, 10000);
+                console.log("Bad status code");
+                console.log(statusCode);
                 return defer.reject(statusCode);
             }
             parsedBody = JSON.parse(body);
@@ -156,10 +157,10 @@ let generateToken = () => {
     let defer = q.defer();
     if (currentTokenStatus != 0) {
         //Token already exists
-        return
+        console.log("Token exists!");
     }
-
     let deviceKey = random(16);
+    console.log("Generated random " + deviceKey);
     let payload = {
         id : "ekstep.cdn.pinut",
         ver : "2.0",
@@ -180,7 +181,7 @@ let generateToken = () => {
     }
     let statusCode = 0;
     requestTokenGeneration(options).then(value => {
-        return defer.reslove();
+        return defer.resolve();
     }).catch(e => {
         return defer.reject(e);
     });
@@ -361,12 +362,14 @@ let uploadTelemetryDirectory = () => {
     return defer.promise;
 }
 
-loggingInit().then(value => {
-    return generateToken();
-}).then(value => {
-    console.log("Success");
-}).catch(e => {
-    console.log("Error");
-    console.log(e);
-    console.log("Finished with errors");
+cron.schedule("*/15 * * * * *", () => {
+    loggingInit().then(value => {
+        return generateToken();
+    }).then(value => {
+        console.log("Success");
+    }).catch(e => {
+        console.log("Error");
+        console.log(e);
+        console.log("Finished with errors");
+    });
 });
