@@ -750,6 +750,34 @@ let deleteEcarData = (dir, file) => {
 /*
     Post extraction methods, called if extraction is successful and data needs to be post-processed.
 */
+
+let getInternalFolder = (folder) => {
+    let defer = q.defer();
+    fs.readdir(folder, (err, files) => {
+        if (err) {
+            console.log("Error 758");
+            console.log(err);
+            return defer.reject(null);
+        } else {
+            console.log(files);
+            let internalFolder = null;
+            for (let i = 0; i < files.length; i++) {
+                console.log(folder + files[i]);
+                fs.stat(folder + files[i], (err, stats) => {
+                    if (err) {
+                        console.log(folder + files[i]);
+                        console.log("767");
+                    } else if (stats.isDirectory()) {
+                        console.log("directory found");
+                        return defer.resolve(files[i]);
+                    }
+                });
+            }
+        }
+    });
+    return defer.promise;
+}
+
 let doPostExtraction = (dir, file) => {
     let defer = q.defer();
     let fileNameAsFolder = file.slice(0, file.lastIndexOf('.')) + '/';
@@ -774,8 +802,11 @@ let doPostExtraction = (dir, file) => {
         console.log("Moved JSON file: " + file);
         return createFolderIfNotExists(dir + 'xcontent/');
     }).then(resolve => {
-        let folderName = file.match(/do_\d+/);
-        return moveFileWithPromise(dir + fileNameAsFolder + folderName[0], dir + 'xcontent/' + folderName[0]);
+        return getInternalFolder(dir + fileNameAsFolder);
+    }).then(value => {
+        console.log("internal folder name found");
+        let folderName = value;
+        return moveFileWithPromise(dir + fileNameAsFolder + folderName, dir + 'xcontent/' + folderName);
     }).then(value => {
         console.log("Moved XContnet: " + file);
         return deleteDir(dir + fileNameAsFolder);
@@ -784,6 +815,8 @@ let doPostExtraction = (dir, file) => {
         return defer.resolve(value);
     }).catch(e => {
         console.log("Wrong ecar format for " + file);
+        console.log(e);
+        return defer.reject({err: e});
         deleteEcarData(dir, file).then(value => {
             return defer.reject({err : e});
         }).catch(err => {
