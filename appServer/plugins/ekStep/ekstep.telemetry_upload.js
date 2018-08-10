@@ -125,12 +125,12 @@ let requestTokenGeneration = (options) => {
         } else {
             let statusCode = resp.statusCode;
             if (parseInt(statusCode / 100) != 2) {
-                //TODO: Add code to try again [DONE]
                 console.log("Bad status code");
                 console.log(statusCode);
                 return defer.reject(statusCode);
             }
             parsedBody = JSON.parse(body);
+            console.log("We got a body " + body);
             deviceKey = parsedBody.result.key;
             deviceSecret = parsedBody.result.secret;
             console.log("Key is " + deviceKey + " and secret is " + deviceSecret);
@@ -362,14 +362,22 @@ let uploadTelemetryDirectory = () => {
     return defer.promise;
 }
 
-cron.schedule("*/15 * * * * *", () => {
-    loggingInit().then(value => {
-        return generateToken();
-    }).then(value => {
-        console.log("Success");
-    }).catch(e => {
-        console.log("Error");
-        console.log(e);
-        console.log("Finished with errors");
+
+let startUploadngTelemetry = () => {
+    console.log("EkStep telemetry shall now be uploaded.");
+    cron.schedule("*/2 * * * *", () => {
+        loggingInit().then(value => {
+            return generateToken();
+        }).then(value => {
+            console.log("Success");
+        }).catch(e => {
+            console.log("Error");
+            console.log(e);
+            console.log("Finished with errors");
+        });
     });
-});
+}
+
+module.exports = {
+    startUploadngTelemetry
+}

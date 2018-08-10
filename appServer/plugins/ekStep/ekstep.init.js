@@ -7,6 +7,7 @@ let { deleteDir } = require('../../../filesdk');
 let { exec } = require('child_process');
 let { initializeESDB } = require('./ekstep.db_restart.js');
 let { addDocument } = require('../../../searchsdk/index.js');
+let { startUploadngTelemetry } = require('./ekstep.telemetry_upload.js');
 
 
 
@@ -101,6 +102,11 @@ let jsonDocsToDb = (dir) => {
 }
 
 let initialize = () => {
+
+    /*
+    initialize telemetry upload
+    */
+    startUploadngTelemetry();
     /*
         read all ecars and add to search index
     */
@@ -144,6 +150,10 @@ let initialize = () => {
     Initializes plugin metadata
 */
 initialize();
+
+/*
+    Initializes telemetry upload
+*/
 
 module.exports = {
     initializeEkstepData
