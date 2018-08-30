@@ -10,6 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "q": "^1.5.1",
-    "request": "^2.83.0"
+    "request": "^2.88.0"
   }
 }
