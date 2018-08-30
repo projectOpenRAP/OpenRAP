@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+    mysql:
+        build: ./docker_db
+        container_name: mysql
+        #volumes:
+        #   - mysql:/var/lib/mysql/data
+
+    server:
+        build: .
+        container_name: server
+        environment: #TODO check which ones are optional
+            - USER=root
+            - HOME=/root
+            - NODE_PATH=/opt/opencdn
+            - PATH=$PATH:$NODE_PATH
+        depends_on:
+            - mysql
+        ports:
+            - "8080:8080" # devmgmt
+            - "9090:9090" # appServer
+            - "3000:3000" # devmgmt_ui
+            - "6969:80"
+
+        #volumes:
+        #   mysql:

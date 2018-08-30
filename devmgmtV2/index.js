@@ -49,15 +49,15 @@ app.listen(8080, err => {
             repeatedlyCheckUsers();
         });
 
-        console.log("server running on port 8080");
-        exec('mysql -u root -proot < /opt/opencdn/devmgmtV2/init.sql', (err, stdout, stderr) => {
-          if (err) {
-            console.log(err);
-            console.log("error in init script");
-          } else {
-            console.log("init script success");
-          }
-        });
+       // console.log("server running on port 8080");
+     //   exec('mysql -u root -proot < /opt/opencdn/devmgmtV2/init.sql', (err, stdout, stderr) => {
+         // if (err) {
+         //   console.log(err);
+          //  console.log("error in init script");
+         // } else {
+          //  console.log("init script success");
+         // }
+       // });
         exec('NODE_PATH=$NODE_PATH:"/opt/opencdn/" node /opt/opencdn/devmgmtV2/writeToDB.js', (err, stdout, stderr) => {
           if (err) {
             console.log(err);

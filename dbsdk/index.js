@@ -5,7 +5,7 @@ let q = require('q');
 
 let returnConfig = (dbname = 'test') => {
     return {
-        host:'localhost',
+        host:'mysql',
         user: 'root',
         password : 'root',
         database : dbname
