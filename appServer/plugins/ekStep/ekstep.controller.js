@@ -2,6 +2,7 @@ let q  = require('q');
 let FormData = require('form-data');
 let { extractZip, deleteDir } = require('../../../filesdk');
 let fs = require('fs');
+var zlib = require('zlib');
 let { BASE_URL, HOME_EXT, SEARCH_EXT, ID_MIDDLE, TELEMETRY_EXT, ECAR_MIDDLE } = require('./config.js');
 let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices, advancedSearch } = require('../../../searchsdk/index.js');
 let baseInt = 0;
@@ -345,7 +346,7 @@ let getHomePage = (req, res) => {
         }
     */
     let parsedReq = req.body;
-    //console.log(parsedReq);
+    console.log(JSON.stringify(parsedReq, null, 4));
     let loadedJson = {};
     let responseStructure = {};
     let query = {};
@@ -405,6 +406,7 @@ let getHomePage = (req, res) => {
         responseStructure.ver = parsedReq.ver;
         responseStructure.id = parsedReq.id;
         responseStructure.resmsgid = '0211201a-c91e-41d6-ad25-392de813124c';
+        console.log(JSON.stringify(responseStructure, null, 4));
         return res.status(200).json(responseStructure);
     }).catch(e => {
         console.log(e);
@@ -497,6 +499,7 @@ let getEcarById = (req, res) => {
 let telemetryData = (req, res) => {
     //console.log(req.files);
     let body = JSON.stringify(req.body);
+    console.log(req.headers);
     //return res.status(200).json({success: true});
     //let fileData = req.files;
     //let oldPath = fileData.file.path;
@@ -513,16 +516,30 @@ let telemetryData = (req, res) => {
     })
     .then(value => {
         responseStructure = value.data;
-        fs.writeFile(telemetryDir + newFileName, body, (err) => {
-            responseStructure.ts = new Date();
+        let nzip = zlib.createGzip();
+        nzip.pipe(fs.createWriteStream(telemetryDir + newFileName));
+        nzip.write(body);
+        nzip.end();
+        responseStructure.ts = new Date();
+        return res.status(200).json(responseStructure);
+        /*
+        zlib.createGzip(new Buffer(body, 'utf-8'), (err, data) => {
             if (err) {
-                responseStructure.status = "error";
-                responseStructure.errmsg = err;
-                return res.status(500).json(responseStructure);
+                console.log("ERR");
+                console.log(err);
             } else {
-                return res.status(200).json(responseStructure);
+                fs.writeFile(telemetryDir + newFileName, data, (err) => {
+                    responseStructure.ts = new Date();
+                    if (err) {
+                        responseStructure.status = "error";
+                        responseStructure.errmsg = err;
+                        return res.status(500).json(responseStructure);
+                    } else {
+                        return res.status(200).json(responseStructure);
+                    }
+                });
             }
-        });
+        });*/
     }).catch(e => {
         responseStructure.status = "error";
         responseStructure.errmsg = e;
@@ -750,9 +767,45 @@ let deleteEcarData = (dir, file) => {
 /*
     Post extraction methods, called if extraction is successful and data needs to be post-processed.
 */
+
+let moveInternalFolders = (dir, fileNameAsFolder) => {
+    let folder = dir + fileNameAsFolder;
+    let defer = q.defer();
+    fs.readdir(folder, (err, files) => {
+        if (err) {
+            console.log("Error 758");
+            console.log(err);
+            return defer.reject(null);
+        } else {
+            console.log(files);
+            let internalFolder = null;
+            moveFilePromises = [];
+            for (let i = 0; i < files.length; i++) {
+                console.log(folder + files[i]);
+                fs.stat(folder + files[i], (err, stats) => {
+                    if (err) {
+                        console.log(folder + files[i]);
+                        console.log("767");
+                    } else if (stats.isDirectory()) {
+                        console.log("directory found");
+                        moveFilePromises.push(moveFileWithPromise(folder + internalFolder, dir + 'xcontent/' + internalFolder));
+                        return defer.resolve(files[i]);
+                    }
+                });
+            }
+            q.all(moveFilePromises).then(value => {
+                return defer.resolve();
+            }).catch(e => {
+                return defer.reject(e);
+            });
+        }
+    });
+    return defer.promise;
+}
+
 let doPostExtraction = (dir, file) => {
     let defer = q.defer();
-    let fileNameAsFolder = file.slice(0, file.lastIndexOf('.')) + '/';
+    let fileNameAsFolder = file.slice(0, -5) + '/';
       /*
         1. Transfer the ecar file to ecar_files Directory
         2. Rename manifest.json to name of ecar file and sent to json_files
@@ -765,25 +818,28 @@ let doPostExtraction = (dir, file) => {
         return createFolderIfNotExists(dir + 'json_dir/');
     }).then(resolve => {
         let jsonFile = dir + fileNameAsFolder + 'manifest.json';
+        console.log("Attempting to play with " + jsonFile);
         return changeDownloadUrl(jsonFile, file);
     }).then(resolve => {
         console.log("Modded JSON file: " + file);
         let jsonFile = resolve.jsonFile;
+        console.log("Attempted to play with " + jsonFile);
         return moveFileWithPromise(jsonFile, dir + 'json_dir/' + file + '.json');
     }).then(resolve => {
         console.log("Moved JSON file: " + file);
         return createFolderIfNotExists(dir + 'xcontent/');
     }).then(resolve => {
-        let folderName = file.match(/do_\d+/);
-        return moveFileWithPromise(dir + fileNameAsFolder + folderName[0], dir + 'xcontent/' + folderName[0]);
+        return moveInternalFolders(dir, fileNameAsFolder);
     }).then(value => {
-        console.log("Moved XContnet: " + file);
+        console.log("Moved XContent: " + file);
         return deleteDir(dir + fileNameAsFolder);
     }).then(value => {
         console.log("Deleted directory: " + file);
         return defer.resolve(value);
     }).catch(e => {
         console.log("Wrong ecar format for " + file);
+        console.log(e);
+        return defer.reject({err: e});
         deleteEcarData(dir, file).then(value => {
             return defer.reject({err : e});
         }).catch(err => {
@@ -795,12 +851,18 @@ let doPostExtraction = (dir, file) => {
 
 let performExtraction = (parentDir, fileName, folderName) => {
     let defer = q.defer();
+    console.log("Attempting to extract");
+    console.log(parentDir + fileName);
+    console.log(parentDir + folderName);
     extractZip(parentDir + fileName, parentDir + folderName)
     .then(value => {
+        console.log("Completed extraction, 842");
         return defer.resolve(value);
     }, reason => {
         //console.log(reason);
         return defer.reject({err : 'Cannot extract this file'});
+    }).catch(e => {
+        console.log("You are the culprit 848");
     });
     return defer.promise;
 }
