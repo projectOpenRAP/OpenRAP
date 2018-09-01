@@ -788,6 +788,7 @@ let moveInternalFolders = (dir, fileNameAsFolder) => {
                         console.log("767");
                     } else if (stats.isDirectory()) {
                         console.log("directory found");
+                        internalFolder = files[i];
                         moveFilePromises.push(moveFileWithPromise(folder + internalFolder, dir + 'xcontent/' + internalFolder));
                         return defer.resolve(files[i]);
                     }
