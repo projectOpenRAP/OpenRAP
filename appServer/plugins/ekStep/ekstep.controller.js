@@ -89,6 +89,8 @@ let cleanKeys = (fieldList) => {
 	    'audience',
         'os',
 	    'tags',
+        'attributions',
+        'childNodes'
     ]
 
     let newFieldList = {};
