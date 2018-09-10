@@ -370,11 +370,11 @@ let getHomePage = (req, res) => {
         let deviceId = parsedReq.id;
         let ets = parsedReq.ets;
         let request = parsedReq.request;
-        let context = request.context;
-        let contentid = context.contentid;
-        let did = context.did;
-        let dlang = context.dlang;
-        let uid = context.uid;
+        //let context = request.context;
+        //let contentid = context.contentid;
+        //let did = context.did;
+        //let dlang = context.dlang;
+        //let uid = context.uid;
         let ver = parsedReq.ver;
         let filters = request.filters;
         let queryString = '';
@@ -921,6 +921,36 @@ let createFolderToExtractFiles = (dir, file) => {
     return defer.promise;
 }
 
+let syncMadhi = (req, res) => {
+	let profile = req.params.profile;
+	let response =  {
+		success: false,
+		data: [],
+		err: undefined
+	};
+
+	console.log('Syncing', profile, 'data.');
+
+	loadSkeletonJson('syncData')
+		.then(profileData => {
+			response = {
+				...response,
+				success: true,
+				data: profileData.data[profile],
+				err: null
+			}
+
+			res.status(200).json(response);
+		})
+		.catch(err => {
+			response = {
+				...response,
+				err
+			}
+
+			res.status(200).json(response);
+		});
+}
 
 module.exports = {
     getHomePage,
@@ -929,5 +959,6 @@ module.exports = {
     telemetryData,
     extractFile,
     performRecommendation,
-    createFolderIfNotExists
+    createFolderIfNotExists,
+	syncMadhi
 }
