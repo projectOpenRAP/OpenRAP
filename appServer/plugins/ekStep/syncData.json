@@ -1,0 +1,9 @@
+{
+	"teacher": [
+		["TEACHER", "CHENNAI", "ADYAR", "CBHSS Saidapet", "ENGLISH", "MONOGRADE", "Bharathwaj", "MALE", "MASTERS IN ENGLISH", "0-5", "T_CHN_ADR_001_001"],
+		["TEACHER", "VELLORE", "ARAKKONAM", "Government School", "ENGLISH", "MULTIGRADE", "Sundaravalli", "Female", "BACHELORS IN TAMIL MEDIUM", "5-10", "test"]
+	],
+	"student": [
+		["CHENNAI", "ADYAR", "1", "ADR", "TEST_SCHOOL", "A", "MAS_ADR_001_002", "Ashok", "MALE"]
+	]
+}
