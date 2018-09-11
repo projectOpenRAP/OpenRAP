@@ -25,7 +25,7 @@ restore_files()
 	done
 }
 
-reboot()
+reboot_device()
 {
 	echo "Rebooting device"
 	reboot now
@@ -50,7 +50,7 @@ systemctl restart devmgmt
 systemctl enable syncthing
 systemctl restart syncthing
 
-reboot
+reboot_device
 
 exit 0
 
