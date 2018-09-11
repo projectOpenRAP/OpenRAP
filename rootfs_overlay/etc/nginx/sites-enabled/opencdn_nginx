@@ -12,7 +12,7 @@ server {
 	location / {
 		# First attempt to serve request as file, then
 		# as directory, then look up @ekstep.
-		
+
         try_files $uri $uri/ @ekstep;
 	}
 
@@ -83,7 +83,7 @@ server {
 		proxy_send_timeout          999999;
 		proxy_read_timeout          999999;
 		send_timeout                999999;
-		client_max_body_size        0
+		client_max_body_size        0;
 
 		#try_files $uri $uri/ @ekstep;
 	}
