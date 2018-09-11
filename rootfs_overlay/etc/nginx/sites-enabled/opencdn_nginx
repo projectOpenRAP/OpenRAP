@@ -11,15 +11,24 @@ server {
 
 	location / {
 		# First attempt to serve request as file, then
-		# as directory, then fall back to displaying a 404.
-        try_files $uri $uri/ @ekstep;
+		# as directory, then look up @ekstep.
 
+        try_files $uri $uri/ @ekstep;
 	}
 
     location @ekstep {
-        # First attempt to serve request as file, then
-        # as directory, then fall back to displaying a 404.
+		# On encountering a 404 here, it will
+		# resort to @sunbird, and then fallback
+		# to displaying 404.
+
         root /home/admin/ekstep/;
+        proxy_intercept_errors on;
+        recursive_error_pages on;
+        error_page 404 = @sunbird;
+    }
+
+	location @sunbird {
+        root /home/admin/sunbird/;
     }
 
 	#
@@ -74,7 +83,7 @@ server {
 		proxy_send_timeout          999999;
 		proxy_read_timeout          999999;
 		send_timeout                999999;
-		client_max_body_size        0
+		client_max_body_size        0;
 
 		#try_files $uri $uri/ @ekstep;
 	}

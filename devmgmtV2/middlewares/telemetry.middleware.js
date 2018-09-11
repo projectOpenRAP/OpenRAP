@@ -2,16 +2,9 @@
 
 const uniqid = require('uniqid');
 const fs = require('fs');
-const path = require('path');
 const q = require('q');
-const exec = require('child_process').exec;
 
-const {
-	saveTelemetry
-} = require('../../telemetrysdk');
-let {
-	selectFields
-} = require('dbsdk');
+const { addAgnosticDataAndSave } = require('../helpers/telemetry.helper.js');
 
 // Generic telemetry JSON structure
 const telemetryStructure = {
@@ -64,6 +57,24 @@ const telemetryStructure = {
 	'tags': ['']
 }
 
+const _formatTimestamp = timestamp => {
+	const padWithZeroes = number => number < 10 ? '0' + number.toString() : number.toString();
+
+	const date = [
+		timestamp.getFullYear().toString(),
+		padWithZeroes(timestamp.getMonth()+1),
+		padWithZeroes(timestamp.getDate())
+	].join('-');
+
+	const time = [
+		padWithZeroes(timestamp.getHours()),
+		padWithZeroes(timestamp.getMinutes()),
+		padWithZeroes(timestamp.getSeconds())
+	].join(':');
+
+    return `${date} ${time}`;
+}
+
 const _formatBytes = (bytes, decimals) => {
 	if(bytes === 0) return '0 Bytes';
 	const k = 1024,
@@ -74,114 +85,6 @@ const _formatBytes = (bytes, decimals) => {
 	return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-const _getSystemVersion = () => {
-	let defer = q.defer();
-
-	const cdn = path.join(__dirname, '../../CDN/version.txt');
-
-	fs.readFile(cdn, 'utf-8', (err, data) => {
-		if(err) {
-			defer.reject(err);
-		} else {
-			defer.resolve(data);
-		}
-	});
-
-    return defer.promise;
-}
-
-const addAgnosticDataAndSave = (telemetryData, actor, timestamp) => {
-    let defer = q.defer();
-    telemetryData = {
-		...telemetryData,
-		'ets' : timestamp.getTime(),
-		'ver' : '3.0',
-		'actor' : {
-			'id' : actor
-		},
-		'context': {
-			'channel' : 'OpenRAP',
-			'pdata' : {
-				'pid' : require('process').pid,
-			},
-			'env' : 'Device Management'
-		}
-	}
-
-	_getSystemVersion()
-		.then(systemVersion => {
-			telemetryData = {
-				...telemetryData,
-				'context': {
-					...telemetryData.context,
-					'pdata' : {
-						...telemetryData.context.pdata,
-						'ver' : systemVersion.replace(/\n$/, '')
-					}
-				}
-			}
-
-			return _getDeviceID();
-		})
-        .then(response => {
-			const deviceID = response[0].dev_id;
-
-			telemetryData = {
-				...telemetryData,
-				'mid' : uniqid(`${deviceID}-`),
-				'context': {
-					...telemetryData.context,
-					'pdata' : {
-						...telemetryData.context.pdata,
-						'id' : deviceID
-					},
-				}
-			}
-			console.log('Saving telemetry'); // JSON.stringify(telemetryData, null, 4))
-			saveTelemetry(telemetryData, 'devmgmt');
-            return defer.resolve();
-        })
-        .catch(err => {
-            console.log(err);
-            return defer.reject();
-        });
-        return defer.promise;
-    }
-
-const _formatTimestamp = timestamp => {
-	const pad = number => number < 10 ? '0' + number : number;
-
-	const date = [
-		timestamp.getFullYear(),
-		pad(timestamp.getMonth()+1),
-		pad(timestamp.getDate())
-	].join('-');
-
-	const time = [
-		pad(timestamp.getHours()),
-		pad(timestamp.getMinutes()),
-		pad(timestamp.getSeconds())
-	].join(':');
-
-    return `${date} ${time}`;
-}
-
-const _getDeviceID = () => {
-	let defer = q.defer();
-
-	selectFields({dbName : 'device_mgmt', tableName : 'device', columns : ["dev_id"]})
-	.then(response => {
-		defer.resolve(response);
-	}).catch(e => {
-		console.log(e);
-		defer.reject(e);
-	})
-
-    return defer.promise;
-}
-
-
-// TODO Refactor this
 const saveTelemetryData = (req, res, next) => {
 	const actor = req.body.actor || req.query.actor || req.params['actor'];
 	const timestamp = new Date(parseInt(req.body.timestamp || req.query.timestamp));
@@ -330,7 +233,6 @@ const saveTelemetryData = (req, res, next) => {
 			break;
 	}
 
-
 	/*
 	* Populating event-agnostic telemetry data
 	*/
@@ -340,18 +242,6 @@ const saveTelemetryData = (req, res, next) => {
 	}).catch(err => console.log(err));
 }
 
-const saveCronTelemetryData = eData => {
-    let timestamp = new Date();
-    let actor = "127.0.0.1";
-    addAgnosticDataAndSave(eData, actor, timestamp).then(value => {
-        return;
-    }).catch(err => {
-        console.log(err);
-        return;
-    });
-}
-
 module.exports = {
-	saveTelemetryData,
-    saveCronTelemetryData
+	saveTelemetryData
 }

@@ -1,7 +1,7 @@
 let path = require('path');
 let { exec } = require('child_process');
 let q = require('q');
-let { saveCronTelemetryData } = require('./middlewares/telemetry.middleware.js');
+let { addAgnosticDataAndSave } = require("./helpers/telemetry.helper.js");
 
 const {
 	isInternetActive,
@@ -108,9 +108,9 @@ let generateTelemetry = (telemetryType, telemetryValue) => {
         default :
             break;
     }
-    if (telemetryNow !== null) {
+    if (telemetryNow) {
         let now = new Date();
-        let nowAsString = now.getUTCFullYear() + '-' + now.getUTCMonth() + '-' + now.getUTCDate() + ' ' + now.getUTCHours() + ':' + now.getUTCMinutes() + ':' + now.getUTCSeconds();
+        let nowAsString = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate() + ' ' + now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
         telemetryNow.edata.params[0].timestamp = nowAsString;
         console.log("Generated " + telemetryType);
     }
@@ -135,15 +135,16 @@ let repeatedlyCheckForInternet = () => {
 }
 
 let repeatedlyCheckUsers = () => {
-    const cmd = path.join(__dirname, '../../CDN/getall_stations.sh');
+    const cmd = '/opt/opencdn/CDN/getall_stations.sh';
     exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
         // console.log('Error: ' + err);
-        // console.log('stdout: ' + stdout);
+        console.log('stdout: ' + stdout);
         // console.log('stderr: ' + stderr);
         // console.log("Checking user status...");
-        if (err !== null) {
-            let usersConnected = stdout.trim();
+        if (!err) {
+            let usersConnected = stdout;
             if (usersConnected !== numberOfUsers) {
+                console.log("Logging users telemetry");
                 numberOfUsers = usersConnected;
                 generateTelemetry('usersConnected', usersConnected);
             }
@@ -154,4 +155,15 @@ let repeatedlyCheckUsers = () => {
 module.exports = {
     repeatedlyCheckForInternet,
     repeatedlyCheckUsers
+}
+
+const saveCronTelemetryData = eData => {
+    let timestamp = new Date();
+    let actor = "127.0.0.1";
+    addAgnosticDataAndSave(eData, actor, timestamp).then(value => {
+        return;
+    }).catch(err => {
+        console.log(err);
+        return;
+    });
 }
