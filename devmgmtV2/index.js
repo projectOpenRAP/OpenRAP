@@ -37,6 +37,7 @@ require('./routes/filemgmt.routes.js')(app);
 require('./routes/ssid.routes.js')(app);
 require('./routes/captive.routes.js')(app);
 require('./routes/config.routes.js')(app);
+require('./routes/cloud.routes.js')(app);
 
 app.listen(8080, err => {
     if (err)
