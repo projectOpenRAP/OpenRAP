@@ -25,5 +25,8 @@
     "uniqid": "^5.0.3",
     "unzip": "^0.1.11",
     "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "eslint": "^5.6.1"
   }
 }
