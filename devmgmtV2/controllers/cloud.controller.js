@@ -11,8 +11,11 @@ let getState = () => {
 		userToken,
 		authToken,
 		baseUrl,
-		searchUrlSuffix
+		searchUrlSuffix,
+		filter
 	} = config.cloudAPI;
+
+	let { keysToUse } = filter;
 
 	// console.log({config});
 
@@ -30,6 +33,11 @@ let getState = () => {
 		searchUrl: (suffix) => {
 			searchUrlSuffix = suffix || searchUrlSuffix;
 			return `${baseUrl}${searchUrlSuffix}`;
+		},
+
+		keysToUse: (keys) => {
+			keysToUse = keys || keysToUse;
+			return keysToUse;
 		}
 	};
 };
@@ -91,6 +99,16 @@ let searchSunbirdCloud = (queryString = '') => {
 	return request(options);
 };
 
+let filterObjectKeys = (obj = {}, keysToUse = Object.keys(obj)) => {
+	let filteredObj = {};
+	keysToUse.forEach(key => filteredObj[key] = obj[key]);
+	return filteredObj;
+}
+
+let filterKeysInObjectList = (results, keysToUse) => {
+	return results.map(obj => filterObjectKeys(obj, keysToUse));
+}
+
 let searchContent = (req, res) => {
 	
 	let response = {
@@ -98,6 +116,8 @@ let searchContent = (req, res) => {
 		err: null,
 		hits: null
 	};
+
+	const state = getState();
 
 	searchSunbirdCloud(req.query.query)
 		.then(body => {
@@ -107,10 +127,12 @@ let searchContent = (req, res) => {
 
 			console.log('Search request processed.');
 
+			const hits = filterKeysInObjectList(body.result.content, state.keysToUse()); 
+
 			response = {
 				...response,
 				success: true,
-				hits: body.result
+				hits
 			};
 
 			res.status(200).json(response);
