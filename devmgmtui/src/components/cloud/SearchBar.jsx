@@ -42,12 +42,32 @@ function SearchBar(props) {
 	return (
 		<Grid.Row columns={2} style={styles.parent}>
 			<Grid.Column width={14} style={styles.leftCol}>
-				<Header size='huge' style={styles.header}>{searchHeading}</Header>
-				<Input input={<input style={styles.input} />} value={props.input} onChange={props.handleInputChange} onKeyUp={props.handleKeyUp} fluid placeholder='Start typing...' />
+				<Header size='huge' style={styles.header}>
+					{searchHeading}
+				</Header>
+				
+				<Input
+					input={<input style={styles.input} />}
+					value={props.input}
+					onChange={props.handleInputChange}
+					onKeyUp={props.handleKeyUp}
+					fluid
+					placeholder='Start typing...'
+				/>
 			</Grid.Column>
 
-			<Grid.Column width={2} textAlign='center' verticalAlign='middle' style={styles.rightCol}>
-				<Icon name='search' fitted size='huge' onClick={props.handleClick}/>
+			<Grid.Column
+				width={2}
+				textAlign='center'
+				verticalAlign='middle'
+				style={styles.rightCol}
+			>
+				<Icon
+					name='search'
+					fitted
+					size='huge'
+					onClick={props.handleClick}
+				/>
 			</Grid.Column>
 		</Grid.Row>
 	);

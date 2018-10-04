@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 
 import * as actions from '../../actions/cloud';
 
-import { Container, Grid, Segment, Input, Header, Button, Icon } from 'semantic-ui-react';
-
+import { Grid } from 'semantic-ui-react';
 
 import SearchBar from './SearchBar';
 import Results from './Results';
@@ -13,8 +12,16 @@ import Downloads from './Downloads';
 import SideNav from '../common/Sidebar';
 
 
-// const styles = {
-// };
+const styles = {
+	bottomRow: {
+		height: '100rem',
+		padding: '0px'
+	},
+	parentDiv: {
+		width: '100%',
+		height: '100%'
+	}
+};
 
 class CloudDownload extends Component {
 
@@ -77,7 +84,7 @@ class CloudDownload extends Component {
 						</Grid.Column>	
 					</Grid.Row> */}
 
-					<Grid.Row columns={2} style={{ height: '100rem', padding: '0px' }}>
+					<Grid.Row columns={2} style={styles.bottomRow}>
 						<Results content={this.props.cloud.content} />
 
 						<Downloads />
@@ -93,7 +100,7 @@ class CloudDownload extends Component {
 	
 	render() {
 		return (
-			<div style = {{width: '100%', height: '100%'}}>
+			<div style={styles.parentDiv}>
 				{this.getCloudDownloadComponent()}
 			</div>
 		);
