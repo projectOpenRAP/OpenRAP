@@ -125,9 +125,9 @@ let searchContent = (req, res) => {
 				throw new Error(body.params.err);
 			}
 
-			console.log('Search request processed.');
+			console.log('Search request processed. Total hits: ', body.result.count);
 
-			const hits = filterKeysInObjectList(body.result.content, state.keysToUse()); 
+			const hits = filterKeysInObjectList(body.result.content, state.keysToUse());
 
 			response = {
 				...response,
