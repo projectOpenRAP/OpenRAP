@@ -23,7 +23,7 @@ function SearchBar(props) {
 		header: {
 			padding: '48px 0px 0px 64px',
 			margin: '0px',
-			fontWeight: 'lighter'
+			fontWeight: 'normal'
 		},
 
 		input: {

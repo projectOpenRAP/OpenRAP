@@ -1,8 +1,18 @@
 import axios from 'axios';
 import { BASE_URL } from '../config/config';
 
-export const searchContent = (queryString = '', cb) => (dispatch) => {
-	axios.get(`${BASE_URL}/cloud/search?query=${queryString}`)
+
+export const clearCurrentContent = (cb) => (dispatch) => {
+	dispatch({
+		type: 'SEARCH_CONTENT',
+		payload: []
+	});
+
+	cb(null);
+};
+
+export const searchContent = (queryString = '', limit, offset, cb) => (dispatch) => {
+	axios.get(`${BASE_URL}/cloud/search?query=${queryString}&limit=${limit}&offset=${offset}`)
 		.then(({ data }) => {
 			if(data.success) {
 				dispatch({
@@ -15,7 +25,7 @@ export const searchContent = (queryString = '', cb) => (dispatch) => {
 				dispatch({
 					type: 'SEARCH_CONTENT',
 					payload: []
-				});    
+				});
 
 				throw new Error(data.err);
 			}

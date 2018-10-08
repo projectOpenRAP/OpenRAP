@@ -7,8 +7,8 @@ import {
 	Input
 } from 'semantic-ui-react';
 
-function ResultSection(props) {
-	const searchHeading = 'Search for Collections, Workbooks, Stories and more';
+function DownloadSection(props) {
+	// const searchHeading = 'Search for Collections, Workbooks, Stories and more';
 
 	const styles = {
 		parent: {
@@ -23,4 +23,4 @@ function ResultSection(props) {
 	);
 }
 
-export default ResultSection;
+export default DownloadSection;

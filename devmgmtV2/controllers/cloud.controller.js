@@ -63,7 +63,7 @@ let getHeaders = () => {
 	};
 };
 
-let getSearchBody = (queryString) => {
+let getSearchBody = (queryString = '', limit, offset) => {
 	const pattern = 'YYYY/MM/DD HH:mm:ss';
 	const timestamp = getTimestamp(pattern);
 
@@ -76,7 +76,9 @@ let getSearchBody = (queryString) => {
 			'query': queryString,
 			'filters': {
 				'contentType': ['Collection', 'Story', 'Worksheet', 'TextBook', 'Course', 'LessonPlan', 'Resource']
-			}
+			},
+			limit,
+			offset
 		}
 	};
 };
@@ -89,9 +91,9 @@ let getRequestOptions = (method, uri, body, headers, json = true) => ({
 	json // Automatically stringifies the body to JSON
 });
 
-let searchSunbirdCloud = (queryString = '') => {
+let searchSunbirdCloud = ({ query, limit, offset }) => {
 	const state = getState();
-	const body = getSearchBody(queryString);
+	const body = getSearchBody(query, +limit, +offset);
 	const headers = getHeaders();
 	const uri = state.searchUrl();
 	const options = getRequestOptions('POST', uri, body, headers);
@@ -105,7 +107,7 @@ let filterObjectKeys = (obj = {}, keysToUse = Object.keys(obj)) => {
 	return filteredObj;
 }
 
-let filterKeysInObjectList = (results, keysToUse) => {
+let filterKeysInObjectList = (results = [], keysToUse) => {
 	return results.map(obj => filterObjectKeys(obj, keysToUse));
 }
 
@@ -119,7 +121,7 @@ let searchContent = (req, res) => {
 
 	const state = getState();
 
-	searchSunbirdCloud(req.query.query)
+	searchSunbirdCloud(req.query)
 		.then(body => {
 			if (!(body.params.status === 'successful')) {
 				throw new Error(body.params.err);

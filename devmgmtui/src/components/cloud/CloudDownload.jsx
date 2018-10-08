@@ -6,15 +6,18 @@ import * as actions from '../../actions/cloud';
 import { Grid } from 'semantic-ui-react';
 
 import SearchBar from './SearchBar';
+import ContentArea from './ContentArea';
 import Results from './Results';
 import Downloads from './Downloads';
 
 import SideNav from '../common/Sidebar';
 
+// TODO Check how to fetch more than 99 search hits. Possible limit on the content being returned.
+// TODO Add content fetch at the beginning
 
 const styles = {
 	bottomRow: {
-		height: '100rem',
+		height: 'calc(100vh - 228px)',
 		padding: '0px'
 	},
 	parentDiv: {
@@ -41,7 +44,7 @@ class CloudDownload extends Component {
 	handleSearch() {
 		console.log(`Searched for \"${this.state.input}\"`);
 
-		this.props.searchContent(this.state.input, (err) => {
+		this.props.searchContent(this.state.input, 30, 1, (err) => {
 			if(err) {
 				console.log('Error occurred while performing search. Following is the response returned by the server: ');
 				console.log(err);
@@ -67,22 +70,16 @@ class CloudDownload extends Component {
 		});
 	}
 
-	getCloudDownloadComponent() {
+	renderCloudDownloadComponent() {
 		return (
 			<SideNav>
-				<Grid divided='vertically'>
+				<Grid divided='vertically' style={styles.parent}>
 					<SearchBar
 						handleKeyUp={this.handleKeyUp}
 						handleInputChange={this.handleInputChange}
 						handleClick={this.handleClick}
 						value={this.state.input}
 					/>
-
-					{/* <Grid.Row columns={1} style={{ height: '16em', padding: '0px' }}>
-						<Grid.Column stretched color='red'>
-							
-						</Grid.Column>	
-					</Grid.Row> */}
 
 					<Grid.Row columns={2} style={styles.bottomRow}>
 						<Results content={this.props.cloud.content} />
@@ -101,7 +98,7 @@ class CloudDownload extends Component {
 	render() {
 		return (
 			<div style={styles.parentDiv}>
-				{this.getCloudDownloadComponent()}
+				{this.renderCloudDownloadComponent()}
 			</div>
 		);
 	}

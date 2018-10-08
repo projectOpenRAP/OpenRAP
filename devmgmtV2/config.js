@@ -28,7 +28,8 @@ module.exports = {
 					'lastPublishedOn',
 					'name',
 					'status',
-					'description'
+					'description',
+					'creator'
 				]
 			}
 		}
