@@ -1,14 +1,6 @@
 import React from 'react';
 
-import {
-	Segment,
-	Table,
-	Checkbox,
-	Icon,
-	Image,
-	Header,
-	Statistic
-} from 'semantic-ui-react';
+import { Segment, Table, Checkbox, Icon, Image, Header, Statistic } from 'semantic-ui-react';
 
 import './cloud.css';
 

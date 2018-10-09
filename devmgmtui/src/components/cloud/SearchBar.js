@@ -1,11 +1,6 @@
 import React from 'react';
 
-import {
-	Grid,
-	Icon,
-	Header,
-	Input
-} from 'semantic-ui-react';
+import { Grid, Icon, Header, Input } from 'semantic-ui-react';
 
 function SearchBar(props) {
 	const searchHeading = 'Search for Collections, Workbooks, Stories and more';

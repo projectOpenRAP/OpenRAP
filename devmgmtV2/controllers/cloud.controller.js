@@ -1,7 +1,9 @@
 'use strict';
 
-let request = require('request-promise');
+let request = require('request');
+let q = require('q');
 let moment = require('moment');
+
 let {
 	config
 } = require('../config');
@@ -18,22 +20,22 @@ let getState = () => {
 	let { keysToUse } = filter;
 
 	return {
-		userToken: (token) => {
+		userToken(token) {
 			userToken = token || userToken;
 			return userToken;
 		},
 
-		authToken: (token) => {
+		authToken(token) {
 			authToken = token || authToken;
 			return authToken;
 		},
 
-		searchUrl: (suffix) => {
+		searchUrl(suffix) {
 			searchUrlSuffix = suffix || searchUrlSuffix;
 			return `${baseUrl}${searchUrlSuffix}`;
 		},
 
-		keysToUse: (keys) => {
+		keysToUse(keys) {
 			keysToUse = keys || keysToUse;
 			return keysToUse;
 		}
@@ -41,6 +43,20 @@ let getState = () => {
 };
 
 let getTimestamp = (pattern) => moment().format(pattern);
+
+let requestWithPromise = (options) => {
+	let defer = q.defer();
+
+	request(options, (err, res) => {
+		if(err) {
+			defer.reject(err);
+		} else {
+			defer.resolve(res);
+		}
+	});
+
+	return defer.promise;
+};
 
 let getHeaders = () => {
 	const pattern = 'YYYY-MM-DD HH:mm:ss:SSSZZ';
@@ -96,7 +112,7 @@ let searchSunbirdCloud = ({ query, limit, offset }) => {
 	const uri = state.searchUrl();
 	const options = getRequestOptions('POST', uri, body, headers);
 
-	return request(options);
+	return requestWithPromise(options);
 };
 
 let filterObjectKeys = (obj = {}, keysToUse = Object.keys(obj)) => {
@@ -120,7 +136,7 @@ let searchContent = (req, res) => {
 	const state = getState();
 
 	searchSunbirdCloud(req.query)
-		.then(body => {
+		.then(({ body }) => {
 			if (!(body.params.status === 'successful')) {
 				throw new Error(body.params.err);
 			}

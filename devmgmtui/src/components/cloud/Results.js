@@ -1,8 +1,6 @@
 import React from 'react';
 
-import {
-	Grid
-} from 'semantic-ui-react';
+import { Grid } from 'semantic-ui-react';
 
 import ContentArea from './ContentArea';
 
