@@ -1,15 +1,10 @@
 import React from 'react';
 
 import {
-	Grid,
-	Icon,
-	Header,
-	Input
+	Grid
 } from 'semantic-ui-react';
 
 function DownloadSection(props) {
-	// const searchHeading = 'Search for Collections, Workbooks, Stories and more';
-
 	const styles = {
 		parent: {
 			margin: '0'

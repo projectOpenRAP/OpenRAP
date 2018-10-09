@@ -6,13 +6,11 @@ import * as actions from '../../actions/cloud';
 import { Grid } from 'semantic-ui-react';
 
 import SearchBar from './SearchBar';
-import ContentArea from './ContentArea';
 import Results from './Results';
 import Downloads from './Downloads';
 
 import SideNav from '../common/Sidebar';
 
-// TODO Check how to fetch more than 99 search hits. Possible limit on the content being returned.
 // TODO Add content fetch at the beginning
 
 const styles = {
@@ -42,8 +40,6 @@ class CloudDownload extends Component {
 	}
 
 	handleSearch() {
-		console.log(`Searched for \"${this.state.input}\"`);
-
 		this.props.searchContent(this.state.input, 30, 1, (err) => {
 			if(err) {
 				console.log('Error occurred while performing search. Following is the response returned by the server: ');

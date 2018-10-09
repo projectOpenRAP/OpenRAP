@@ -4,7 +4,7 @@ let request = require('request-promise');
 let moment = require('moment');
 let {
 	config
-} = require('../config'); // get config.js
+} = require('../config');
 
 let getState = () => {
 	let {
@@ -16,8 +16,6 @@ let getState = () => {
 	} = config.cloudAPI;
 
 	let { keysToUse } = filter;
-
-	// console.log({config});
 
 	return {
 		userToken: (token) => {
@@ -88,7 +86,7 @@ let getRequestOptions = (method, uri, body, headers, json = true) => ({
 	uri,
 	body,
 	headers,
-	json // Automatically stringifies the body to JSON
+	json
 });
 
 let searchSunbirdCloud = ({ query, limit, offset }) => {
@@ -129,8 +127,6 @@ let searchContent = (req, res) => {
 
 			const count = body.result.count;
 			const content = filterKeysInObjectList(body.result.content, state.keysToUse());
-			
-			console.log('Search request processed. Total hits: ', count);
 
 			response = {
 				...response,

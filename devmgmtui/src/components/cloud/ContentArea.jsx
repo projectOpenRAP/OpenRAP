@@ -14,9 +14,7 @@ import './cloud.css';
 
 const styles = {
 	parent: {
-		overflowY: 'scroll',
-		// height: 'calc(100vh - 320px)'
-		// height: '320px'
+		overflowY: 'scroll'
 	}
 };
 

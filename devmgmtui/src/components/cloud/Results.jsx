@@ -1,12 +1,7 @@
 import React from 'react';
 
 import {
-	Grid,
-	Table,
-	Checkbox,
-	Icon,
-	Header,
-	Input
+	Grid
 } from 'semantic-ui-react';
 
 import ContentArea from './ContentArea';
