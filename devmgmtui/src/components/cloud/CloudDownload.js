@@ -34,28 +34,40 @@ class CloudDownload extends Component {
 		};
 
 		this.handleSearch = this.handleSearch.bind(this);
-		this.handleClick = this.handleClick.bind(this);
-		this.handleKeyUp = this.handleKeyUp.bind(this);		
+		this.handleSearchClick = this.handleSearchClick.bind(this);
+		this.handleSearchKeyUp = this.handleSearchKeyUp.bind(this);		
 		this.handleInputChange = this.handleInputChange.bind(this);
+		this.handleLoadMoreClick = this.handleLoadMoreClick.bind(this);
 	}
 
-	handleSearch() {
-		this.props.searchContent(this.state.input, 30, 1, (err) => {
+	handleSearch(queryString, limit, offset) {
+		this.props.searchContent(queryString, limit, offset, (err) => {
 			if(err) {
 				console.log('Error occurred while performing search. Following is the response returned by the server: ');
 				console.log(err);
+				
+				alert("Trouble fetching content from Sunbird server.");
+			}
+		});
+	}
+	
+	handleSearchClick() {
+		this.props.clearCurrentContent(err => {
+			if(err) {
+				console.log('Error occurred while clearing content. Error: ');
+				console.log(err);
+				
+				alert("Some mess-up happened while searching for content. Try again.");
+			} else {
+				this.handleSearch(this.state.input, this.props.cloud.limit, this.props.cloud.offset);
 			}
 		});
 	}
 
-	handleClick() {
-		this.handleSearch();
-	}
-
-	handleKeyUp(event) {
+	handleSearchKeyUp(event) {
 		if(event.keyCode === 13) {
 			event.preventDefault();
-			this.handleSearch();
+			this.handleSearchClick();
 		}
 	}
 
@@ -66,19 +78,40 @@ class CloudDownload extends Component {
 		});
 	}
 
+	handleLoadMoreClick() {
+		const {
+			queryString,
+			limit,
+			offset
+		} = this.props.cloud;
+
+		const newOffset = offset + limit;
+
+		this.handleSearch(queryString, limit, newOffset);
+	}
+
 	renderCloudDownloadComponent() {
+		const moreContent = this.props.cloud.count > this.props.cloud.offset;
+
 		return (
 			<SideNav>
 				<Grid divided='vertically' style={styles.parent}>
 					<SearchBar
-						handleKeyUp={this.handleKeyUp}
+						handleKeyUp={this.handleSearchKeyUp}
 						handleInputChange={this.handleInputChange}
-						handleClick={this.handleClick}
+						handleClick={this.handleSearchClick}
 						value={this.state.input}
 					/>
 
 					<Grid.Row columns={2} style={styles.bottomRow}>
-						<Results content={this.props.cloud.content} count={this.props.cloud.count} />
+						<Results
+							content={this.props.cloud.content}
+							count={this.props.cloud.count}
+							handleLoadMoreClick={this.handleLoadMoreClick}
+							loading={this.props.cloud.searching}
+							query={this.props.cloud.queryString}
+							moreContent={moreContent}
+						/>
 
 						<Downloads />
 					</Grid.Row>
@@ -89,6 +122,8 @@ class CloudDownload extends Component {
 
 	componentDidMount() {
 		document.title = 'Cloud Download';
+		
+		this.handleSearchClick();
 	}
 	
 	render() {

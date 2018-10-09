@@ -127,15 +127,35 @@ function renderTable(content) {
 	);
 }
 
+function renderNoResultsFound(query) {
+	return (
+		<div style={{ paddingTop: '16vh' }}>
+			<Icon name='search' size='massive'/>
+			<h2>No results found for "{query}".</h2>
+		</div>
+	);
+}
+
 function ContentArea(props) {
 	const {
 		content,
-		loading
+		loading,
+		count,
+		query
 	} = props;
 
 	return (
-		<Segment padded loading={loading} style={styles.parent}>
-			{content && renderTable(content)}
+		<Segment
+			padded
+			textAlign='center'
+			loading={loading}
+			style={styles.parent}
+		>
+			{
+				count > 0
+					? renderTable(content)
+					: renderNoResultsFound(query)
+			}
 		</Segment>
 	);
 }
