@@ -82,7 +82,7 @@ class CloudDownload extends Component {
 					/>
 
 					<Grid.Row columns={2} style={styles.bottomRow}>
-						<Results content={this.props.cloud.content} />
+						<Results content={this.props.cloud.content} count={this.props.cloud.count} />
 
 						<Downloads />
 					</Grid.Row>

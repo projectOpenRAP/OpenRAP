@@ -105,11 +105,11 @@ let filterObjectKeys = (obj = {}, keysToUse = Object.keys(obj)) => {
 	let filteredObj = {};
 	keysToUse.forEach(key => filteredObj[key] = obj[key]);
 	return filteredObj;
-}
+};
 
 let filterKeysInObjectList = (results = [], keysToUse) => {
 	return results.map(obj => filterObjectKeys(obj, keysToUse));
-}
+};
 
 let searchContent = (req, res) => {
 	
@@ -127,14 +127,18 @@ let searchContent = (req, res) => {
 				throw new Error(body.params.err);
 			}
 
-			console.log('Search request processed. Total hits: ', body.result.count);
-
-			const hits = filterKeysInObjectList(body.result.content, state.keysToUse());
+			const count = body.result.count;
+			const content = filterKeysInObjectList(body.result.content, state.keysToUse());
+			
+			console.log('Search request processed. Total hits: ', count);
 
 			response = {
 				...response,
 				success: true,
-				hits
+				hits: {
+					count,
+					content
+				}
 			};
 
 			res.status(200).json(response);

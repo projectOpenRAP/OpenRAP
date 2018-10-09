@@ -5,7 +5,8 @@ import { BASE_URL } from '../config/config';
 export const clearCurrentContent = (cb) => (dispatch) => {
 	dispatch({
 		type: 'SEARCH_CONTENT',
-		payload: []
+		content: [],
+		count: 0
 	});
 
 	cb(null);
@@ -17,14 +18,16 @@ export const searchContent = (queryString = '', limit, offset, cb) => (dispatch)
 			if(data.success) {
 				dispatch({
 					type: 'SEARCH_CONTENT',
-					payload: data.hits
+					content: data.hits.content,
+					count: data.hits.count
 				});
 
 				cb(null);
 			} else {
 				dispatch({
 					type: 'SEARCH_CONTENT',
-					payload: []
+					content: [],
+					count: 0
 				});
 
 				throw new Error(data.err);

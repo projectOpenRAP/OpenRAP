@@ -21,12 +21,15 @@ const styles = {
 };
 
 function ResultSection(props) {
-	const { content } = props;
+	const {
+		content,
+		count
+	} = props;
 
 	return (
 		<Grid.Column stretched width={12} style={styles.parent}>		
 			{
-				content && content.length > 0
+				content && count > 0
 					? <ContentArea loading={false} content={content}/>
 					: <ContentArea loading={true} content={null}/>
 			}

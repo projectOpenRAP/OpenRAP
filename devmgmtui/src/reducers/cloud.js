@@ -3,7 +3,8 @@ export default function (state = {}, action) {
 		case 'SEARCH_CONTENT':
 			return {
 				...state,
-				content: action.payload
+				content: action.content,
+				count: action.count
 			};
 		default:
 			return state;
