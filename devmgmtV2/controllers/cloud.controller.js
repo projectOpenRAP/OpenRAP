@@ -185,6 +185,7 @@ let searchContent = (req, res) => {
 				}
 			};
 
+			res.set('Cache-Control', ' no-store, no-cache');
 			res.status(200).json(response);
 		})
 		.catch(err => {
