@@ -43,7 +43,6 @@ class CloudDownload extends Component {
 	handleSearch(queryString, limit, offset) {
 		this.props.searchContent(queryString, limit, offset, (err) => {
 			if(err) {
-				console.log('Error occurred while performing search. Following is the response returned by the server: ');
 				console.log(err);
 				
 				alert("Trouble fetching content from Sunbird server.");
