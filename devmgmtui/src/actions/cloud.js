@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { BASE_URL } from '../config/config';
 
-
 export const clearCurrentContent = (cb) => (dispatch) => {
 	dispatch({
 		type: 'CLEAR_CONTENT',
@@ -9,7 +8,7 @@ export const clearCurrentContent = (cb) => (dispatch) => {
 			content: [],
 			count: 0,
 			queryString: '',
-			offest: 1,
+			offset: 1,
 			searching: false
 		}
 	});
@@ -22,7 +21,7 @@ export const searchContent = (queryString = '', limit, offset, cb) => (dispatch)
 		type: 'SEARCHING_CONTENT',
 		payload: true
 	});
-	
+
 	axios.get(`${BASE_URL}/cloud/search?query=${queryString}&limit=${limit}&offset=${offset}`)
 		.then(({ data }) => {
 			if(data.success) {
