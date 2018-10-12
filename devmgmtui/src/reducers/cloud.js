@@ -3,6 +3,7 @@ const defaultState = {
 	count: 0,
 	limit: 33,
 	offset: 1,
+	queryString: '',
 	searching: false
 };
 
