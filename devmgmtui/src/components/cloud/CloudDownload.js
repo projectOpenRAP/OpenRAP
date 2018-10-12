@@ -11,8 +11,6 @@ import Downloads from './Downloads';
 
 import SideNav from '../common/Sidebar';
 
-// TODO Add content fetch at the beginning
-
 const styles = {
 	bottomRow: {
 		height: 'calc(100vh - 228px)',
@@ -58,7 +56,7 @@ class CloudDownload extends Component {
 				
 				alert("Some mess-up happened while searching for content. Try again.");
 			} else {
-				this.handleSearch(this.state.input, this.props.cloud.limit, this.props.cloud.offset);
+				this.handleSearch(this.state.input, this.props.cloud.limit, 1);
 			}
 		});
 	}
@@ -123,6 +121,8 @@ class CloudDownload extends Component {
 		document.title = 'Cloud Download';
 		
 		this.handleSearchClick();
+
+		console.log('inside DID MOUNT');
 	}
 	
 	render() {
