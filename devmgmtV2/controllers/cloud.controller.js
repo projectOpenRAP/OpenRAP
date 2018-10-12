@@ -115,10 +115,34 @@ let searchSunbirdCloud = ({ query, limit, offset }) => {
 	return requestWithPromise(options);
 };
 
+let fetchImage = (src) => {
+	const options = {
+		...getRequestOptions('GET', src),
+		encoding: null
+	};
+
+	return requestWithPromise(options);
+};
+
+let replaceUrlWithImageData = (obj) => {
+	const src = obj.appIcon || 'https://react.semantic-ui.com/images/wireframe/image.png';
+
+	return fetchImage(src)
+		.then(({ body }) => {
+			const res = {
+				...obj,
+				appIcon: body.toString('base64')
+			};
+
+			return res;
+		});
+};
+
 let filterObjectKeys = (obj = {}, keysToUse = Object.keys(obj)) => {
 	let filteredObj = {};
 	keysToUse.forEach(key => filteredObj[key] = obj[key]);
-	return filteredObj;
+
+	return replaceUrlWithImageData(filteredObj);
 };
 
 let filterKeysInObjectList = (results = [], keysToUse) => {
@@ -134,6 +158,9 @@ let searchContent = (req, res) => {
 	};
 
 	const state = getState();
+	
+	let count = 0;
+	let content = [];
 
 	searchSunbirdCloud(req.query)
 		.then(({ body }) => {
@@ -141,8 +168,13 @@ let searchContent = (req, res) => {
 				throw new Error(body.params.err);
 			}
 
-			const count = body.result.count;
-			const content = filterKeysInObjectList(body.result.content, state.keysToUse());
+			count = body.result.count;
+
+			const contentPromises = filterKeysInObjectList(body.result.content, state.keysToUse());
+			return q.allSettled(contentPromises);
+		})
+		.then(data => {
+			content = data.map(item => item.value);
 
 			response = {
 				...response,
