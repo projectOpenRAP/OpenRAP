@@ -148,6 +148,8 @@ function ContentArea(props) {
 		query
 	} = props;
 
+	const hasContent = count > 0 && content && content.length > 0;
+
 	return (
 		<Segment
 			padded
@@ -156,7 +158,7 @@ function ContentArea(props) {
 			style={styles.parent}
 		>
 			{
-				count > 0
+				hasContent
 					? renderTable(content)
 					: renderNoResultsFound(query)
 			}
