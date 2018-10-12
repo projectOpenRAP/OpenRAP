@@ -7,6 +7,12 @@ import './cloud.css';
 const styles = {
 	parent: {
 		overflowY: 'scroll'
+	},
+	about: {
+		color: 'grey',
+		display: 'inline',
+		fontSize: '16px',
+		justifyItems: 'center'
 	}
 };
 
@@ -37,7 +43,6 @@ function renderDetailsCard(data) {
 		appIcon
 	} = data;
 
-	appIcon = appIcon || 'https://react.semantic-ui.com/images/wireframe/image.png';
 	name = name ? truncateExcess(name, 40) : 'Untitled';
 	description = description ? truncateExcess(description, 96) : 'No description';
 	contentType = contentType || 'Type N/A';
@@ -55,14 +60,13 @@ function renderDetailsCard(data) {
 		size
 	].join(' \u2027 ');
 
-
 	return (
 		<Segment basic>
 			<Header as='h2'>
-				<Image rounded spaced='right' src={appIcon} />
+				<Image rounded spaced='right' src={`data:image/jpeg;base64,${appIcon}`} alt='app_icon' />
 				<Header.Content>
 					{name}
-					<span style={{ color: 'grey', display: 'inline', fontSize: '16px', justifyItems: 'center' }}>{about.toString()}</span>
+					<span style={styles.about}>{about.toString()}</span>
 					<Header.Subheader>{description}</Header.Subheader>
 				</Header.Content>
 			</Header>
