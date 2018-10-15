@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Grid } from 'semantic-ui-react';
+import { Grid, Button } from 'semantic-ui-react';
 
 function DownloadSection(props) {
 	const styles = {
@@ -11,7 +11,7 @@ function DownloadSection(props) {
 
 	return (
 		<Grid.Column stretched width={4} style={styles.parent}>
-    
+			<Button onClick={props.handleDownload}> Download </Button>
 		</Grid.Column>
 	);
 }

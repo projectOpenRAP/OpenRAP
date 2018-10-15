@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Segment, Table, Checkbox, Icon, Image, Header, Statistic } from 'semantic-ui-react';
+import { Segment, Table, Checkbox, Icon, Image, Header, Statistic, Button } from 'semantic-ui-react';
 
 import './cloud.css';
 
@@ -74,7 +74,7 @@ function renderDetailsCard(data) {
 	);
 }
 
-function renderRow(data, key) {
+function renderRow(data, key, handleDownload) {
 	return (
 		<Table.Row key={key}>
 			<Table.Cell collapsing>
@@ -90,17 +90,20 @@ function renderRow(data, key) {
 			</Table.Cell>
 
 			<Table.Cell collapsing>
-
-				<a href={data.downloadUrl} download>
-					<Icon name='cloud download' size='huge' color='blue' />
-				</a>
+				<Button 
+					primary
+					basic
+					icon='download'
+					size='massive'
+					onClick={() => handleDownload(data.downloadUrl)}
+				/>
 			</Table.Cell>
 		</Table.Row>
 	);
 }
 	
-function renderBody(content) {
-	const rows = content.map((item, index) => renderRow(item, index));
+function renderBody(content, handleDownload) {
+	const rows = content.map((item, index) => renderRow(item, index, handleDownload));
 
 	return (
 		<Table.Body>
@@ -119,9 +122,9 @@ function renderBody(content) {
 // 	);
 // }
 
-function renderTable(content) {
+function renderTable(content, handleDownload) {
 	// const header = renderHeader(content);
-	const body = renderBody(content);
+	const body = renderBody(content, handleDownload);
 
 	return (
 		<Table className='ui very basic table' striped>
@@ -135,7 +138,7 @@ function renderNoResultsFound(query) {
 	return (
 		<div style={{ paddingTop: '16vh' }}>
 			<Icon name='search' size='massive'/>
-			<h2>No results found for "{query}".</h2>
+			<h2>No results found for "{query}"</h2>
 		</div>
 	);
 }
@@ -145,7 +148,9 @@ function ContentArea(props) {
 		content,
 		loading,
 		count,
-		query
+		query,
+
+		handleDownload
 	} = props;
 
 	const hasContent = count > 0 && content && content.length > 0;
@@ -159,7 +164,7 @@ function ContentArea(props) {
 		>
 			{
 				hasContent
-					? renderTable(content)
+					? renderTable(content, handleDownload)
 					: renderNoResultsFound(query)
 			}
 		</Segment>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Grid, Button, Icon } from 'semantic-ui-react';
+import { Grid, Button } from 'semantic-ui-react';
 
 import ContentArea from './ContentArea';
 
@@ -26,7 +26,10 @@ function ResultSection(props) {
 		count,
 		loading,
 		query,
-		moreContent
+		moreContent,
+
+		handleDownload,
+		handleLoadMoreClick
 	} = props;
 
 	const disabled = !moreContent;
@@ -39,12 +42,13 @@ function ResultSection(props) {
 				content={content}
 				count={count}
 				query={query}
+				handleDownload={handleDownload}
 			/>
 			
 			<Button 
 				primary
 				disabled={disabled}
-				onClick={props.handleLoadMoreClick}
+				onClick={handleLoadMoreClick}
 				style={styles.loadButton}
 				loading={loading}
 			>
