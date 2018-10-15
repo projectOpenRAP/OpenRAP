@@ -11,7 +11,6 @@ function DownloadSection(props) {
 
 	return (
 		<Grid.Column stretched width={4} style={styles.parent}>
-			<Button onClick={props.handleDownload}> Download </Button>
 		</Grid.Column>
 	);
 }
