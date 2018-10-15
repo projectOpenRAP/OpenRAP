@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "aria2": "^4.0.3",
     "axios": "^0.17.1",
     "draft-js": "^0.10.5",
     "draftjs-to-html": "^0.8.2",
