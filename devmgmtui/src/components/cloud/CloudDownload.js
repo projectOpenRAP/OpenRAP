@@ -11,6 +11,8 @@ import Results from './Results';
 import Downloads from './Downloads';
 import SideNav from '../common/Sidebar';
 
+import { CLOUD_DOWNLOAD_CONFIG } from '../../config/config';
+
 const styles = {
 	bottomRow: {
 		height: 'calc(100vh - 228px)',
@@ -25,10 +27,10 @@ const styles = {
 class DownloadManager {
 
 	constructor(params) {
-		this.aria2 = new Aria2();
+		this.aria2 = new Aria2(CLOUD_DOWNLOAD_CONFIG);
 		this.connected = false;
 		this.dir = params.dir;
-
+		
 		this.registerWithEvents();
 	}
 
@@ -38,9 +40,11 @@ class DownloadManager {
 	}
 
 	async connect() {
+		console.log('Connecting to ws...', this.connected);
+
 		if(!this.connected) {
 			try {
-				await this.aria2.open();
+				const connectStatus = await this.aria2.open();
 				this.connected = true;
 				
 				console.log('Connection established.');
@@ -77,7 +81,7 @@ class CloudDownload extends Component {
 			input: ''	
 		};
 
-		this.downloadManager = new DownloadManager('/home/admin/');
+		this.downloadManager = new DownloadManager('/home/admin'); // TODO: Make download path configurable
 
 		this.handleSearch = this.handleSearch.bind(this);
 		this.handleSearchClick = this.handleSearchClick.bind(this);
@@ -136,8 +140,8 @@ class CloudDownload extends Component {
 		this.handleSearch(queryString, limit, newOffset);
 	}
 
-	handleDownload(uri) {
-		const result = this.downloadManager.downloadData(uri);
+	async handleDownload(uri) {
+		const downloadStatus = await this.downloadManager.downloadData(uri);
 
 		// if(result.value !== -1) {
 		// 	console.log({ GUID: result.value });
