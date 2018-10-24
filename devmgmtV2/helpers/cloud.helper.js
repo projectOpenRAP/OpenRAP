@@ -1,33 +1,14 @@
 const q = require('q');
 const jwt = require('jsonwebtoken');
+const request = require('request');
+let moment = require('moment');
+
+
 let {
 	config
 } = require('../config');
 
-
-let generateOriginalJWTs = () => {
-	let defer = q.defer();
-	registerSunbirdApp()
-	.then(value => {
-		key = value.key;
-		secret = value.secret;
-		return generateJwt(key, secret);
-	}).then(value => {
-		token = value.token;
-		return registerSunbirdDevice(token);
-	}).then(value => {
-		key = value.key;
-		secret = value.secret;
-		return generateJwt(key, secret);
-	}).then(value => {
-		token = value.token;
-		config.cloudAPI.authToken = token;
-		return defer.resolve({success: true})
-	}).catch(err => {
-		return defer.reject({err});
-	});
-	return defer.promise;
-}
+let getTimestamp = (pattern) => moment().format(pattern);
 
 let generateJwt = (key, secret) => {
     let defer = q.defer();
