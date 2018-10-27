@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Aria2 from 'aria2';
 
 import * as actions from '../../actions/cloud';
 
@@ -10,8 +9,7 @@ import SearchBar from './SearchBar';
 import Results from './Results';
 import Downloads from './Downloads';
 import SideNav from '../common/Sidebar';
-
-import { CLOUD_DOWNLOAD_CONFIG } from '../../config/config';
+import DownloadManager from './DownloadManager';
 
 const styles = {
 	bottomRow: {
@@ -23,54 +21,6 @@ const styles = {
 		height: '100%'
 	}
 };
-
-class DownloadManager {
-
-	constructor(params) {
-		this.aria2 = new Aria2(CLOUD_DOWNLOAD_CONFIG);
-		this.connected = false;
-		this.dir = params.dir;
-		
-		this.registerWithEvents();
-	}
-
-	registerWithEvents() {
-		this.aria2.on('onDownloadStart', m => console.log(m));
-		this.aria2.on('onDownloadComplete', m => console.log(m));
-	}
-
-	async connect() {
-		console.log('Connecting to ws...', this.connected);
-
-		if(!this.connected) {
-			try {
-				const connectStatus = await this.aria2.open();
-				this.connected = true;
-				
-				console.log('Connection established.');
-			} catch(err) {
-				console.log('Not able to connect.');
-			}
-		} else {
-			console.log('Already connected.');
-		}
-	}
-
-	async downloadData(uri) {
-		if (this.connected) {
-			try {
-				let guid = await this.aria2.call('addUri', [uri], { dir: this.dir });
-				return guid;
-			} catch(err) {
-				console.log('Error occurred while queuing download.', err);
-				return -1;
-			}
-		} else {
-			console.log('Connection not established. Please connect first.');
-			return -1;
-		}
-	}
-}
 
 class CloudDownload extends Component {
 
