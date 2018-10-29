@@ -76,29 +76,30 @@ function renderDetailsCard(data) {
 
 function renderRow(data, key, handleDownload) {
 	return (
-		<Table.Row key={key}>
-			<Table.Cell collapsing>
-				{/* <Checkbox style={{ width: '20px' }} /> */}
+		data && 
+			<Table.Row key={key}>
+				<Table.Cell collapsing>
+					{/* <Checkbox style={{ width: '20px' }} /> */}
 
-				<Statistic size='tiny'>
-					<Statistic.Value>{(key+1) + '.'}</Statistic.Value>
-				</Statistic>
-			</Table.Cell>
+					<Statistic size='tiny'>
+						<Statistic.Value>{(key+1) + '.'}</Statistic.Value>
+					</Statistic>
+				</Table.Cell>
 
-			<Table.Cell>
-				{renderDetailsCard(data)}
-			</Table.Cell>
+				<Table.Cell>
+					{renderDetailsCard(data)}
+				</Table.Cell>
 
-			<Table.Cell collapsing>
-				<Button 
-					primary
-					basic
-					icon='download'
-					size='massive'
-					onClick={() => handleDownload(data.downloadUrl)}
-				/>
-			</Table.Cell>
-		</Table.Row>
+				<Table.Cell collapsing>
+					<Button 
+						primary
+						basic
+						icon='download'
+						size='massive'
+						onClick={() => handleDownload(data.downloadUrl)}
+					/>
+				</Table.Cell>
+			</Table.Row>
 	);
 }
 	
