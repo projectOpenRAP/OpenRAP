@@ -9,8 +9,7 @@ const styles = {
 		backgroundColor: 'white',
 		margin: '0px',
 		padding: '32px 32px 32px 48px',
-		height: 'calc(100vh - 240px)',
-		minHeight: 'calc(100vh - 240px)'
+		height: 'calc(100vh - 240px)'
 	},
 	loadButton: {
 		maxHeight: '40px',
