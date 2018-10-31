@@ -28,10 +28,8 @@ class CloudDownload extends Component {
 		super(props);
 
 		this.state = {
-			input: ''	
+			input: ''
 		};
-
-		this.downloadManager = new DownloadManager('/home/admin'); // TODO: Make download path configurable
 
 		this.handleSearch = this.handleSearch.bind(this);
 		this.handleSearchClick = this.handleSearchClick.bind(this);
@@ -39,8 +37,37 @@ class CloudDownload extends Component {
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.handleLoadMoreClick = this.handleLoadMoreClick.bind(this);
 		this.handleDownload = this.handleDownload.bind(this);
+		this.addDownload = this.addDownload.bind(this);
+		this.removeDownload = this.removeDownload.bind(this);
+		
+		this.downloadManager = new DownloadManager('/home/genghiskh/Desktop/ecar'); // TODO: Make download path configurable
+		this.downloadManager.onDownloadComplete(this.removeDownload);
 	}
 
+	addDownload(guid, name, size) {
+		let {
+			downloads
+		} = this.props.cloud;
+
+		downloads.push({
+			guid,
+			name,
+			size
+		});
+
+		this.props.updateDownloadQueue(downloads, () => console.log('Queued: ', guid));
+	}
+	
+	removeDownload(guid) {
+		let {
+			downloads
+		} = this.props.cloud;
+
+		downloads = downloads.filter(item => item.guid !== guid);
+
+		this.props.updateDownloadQueue(downloads, () => console.log('Done: ', guid));
+	}
+	
 	handleSearch(queryString, limit, offset) {
 		this.props.searchContent(queryString, limit, offset, (err) => {
 			if(err) {
@@ -90,14 +117,14 @@ class CloudDownload extends Component {
 		this.handleSearch(queryString, limit, newOffset);
 	}
 
-	async handleDownload(uri) {
-		const downloadStatus = await this.downloadManager.downloadData(uri);
-
-		// if(result.value !== -1) {
-		// 	console.log({ GUID: result.value });
-		// } else {
-		// 	alert('Couldn\'t download: ', result);
-		// }
+	async handleDownload(name, size, uri) {
+		const guid = await this.downloadManager.downloadData(uri);
+		
+		if (guid !== -1) {
+			this.addDownload(guid, name, size);
+		} else {
+			alert('Not able to download ', size);
+		}
 	}
 
 	renderCloudDownloadComponent() {
@@ -124,7 +151,7 @@ class CloudDownload extends Component {
 							handleDownload={this.handleDownload}
 						/>
 
-						<Downloads />
+						<Downloads downloads={this.props.cloud.downloads}/>
 					</Grid.Row>
 				</Grid>
 			</SideNav>

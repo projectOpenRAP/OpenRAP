@@ -45,3 +45,12 @@ export const searchContent = (queryString = '', limit, offset, cb) => (dispatch)
 			cb(err);
 		});
 };
+
+export const updateDownloadQueue = (downloads, cb) => (dispatch) => {
+	dispatch({
+		type: 'UPDATE_DOWNLOAD_QUEUE',
+		payload: downloads
+	});
+
+	cb(null);
+};

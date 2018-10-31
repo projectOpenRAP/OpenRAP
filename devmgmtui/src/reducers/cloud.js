@@ -4,7 +4,8 @@ const defaultState = {
 	limit: 33,
 	offset: 1,
 	queryString: '',
-	searching: false
+	searching: false,
+	downloads: []
 };
 
 export default function (state = defaultState, action) {
@@ -29,6 +30,11 @@ export default function (state = defaultState, action) {
 			return {
 				...state,
 				...payload
+			};
+		case 'UPDATE_DOWNLOAD_QUEUE':
+			return {
+				...state,
+				downloads: payload
 			};
 		default:
 			return state;

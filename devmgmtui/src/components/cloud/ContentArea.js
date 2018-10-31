@@ -21,7 +21,7 @@ function truncateExcess(text, threshold = 147) {
 	return `${text.substring(0, threshold)}${suffix}`;
 }
 
-function formatBytes(bytes, decimals) {
+function formatBytes(bytes = 0, decimals) {
 	if(bytes === 0) return '0 Bytes';
 	const k = 1024,
 		dm = decimals || 2,
@@ -96,7 +96,7 @@ function renderRow(data, key, handleDownload) {
 						basic
 						icon='download'
 						size='massive'
-						onClick={() => handleDownload(data.downloadUrl)}
+						onClick={() => handleDownload(data.name, formatBytes(data.size, 1), data.downloadUrl)}
 					/>
 				</Table.Cell>
 			</Table.Row>
