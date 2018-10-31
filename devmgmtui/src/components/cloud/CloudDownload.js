@@ -40,7 +40,7 @@ class CloudDownload extends Component {
 		this.addDownload = this.addDownload.bind(this);
 		this.removeDownload = this.removeDownload.bind(this);
 		
-		this.downloadManager = new DownloadManager('/home/genghiskh/Desktop/ecar'); // TODO: Make download path configurable
+		this.downloadManager = new DownloadManager('/home/admin/sunbird'); // TODO: Make download path configurable
 		this.downloadManager.onDownloadComplete(this.removeDownload);
 	}
 
