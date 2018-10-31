@@ -8,20 +8,7 @@ export default class DownloadManager {
 	constructor(dir) {
 		this.connected = false;
 		this.dir = dir;
-		this.aria2 = aria2;	
-		this.registerWithEvents();
-	}
-
-	async handleDownloadComplete(guid) {
-		const { files } = await this.aria2.call('tellStatus', guid);
-		alert(`Successfully downloaded content at "${files[0].path}".`);
-	}
-
-	registerWithEvents() {
-		// this.aria2.on('onDownloadStart', m => console.log(m));
-		this.aria2.on('onDownloadComplete', ([params]) => {
-			this.handleDownloadComplete(params.gid);
-		});
+		this.aria2 = aria2;
 	}
 
 	async connect() {
@@ -52,5 +39,22 @@ export default class DownloadManager {
 			console.log('Connection not established. Please connect first.');
 			return -1;
 		}
+	}
+
+	onDownloadComplete(cb) {
+		this.aria2.on('onDownloadComplete', ([params]) => {
+			cb(params.gid);
+		});
+	}
+
+	onDownloadStart(cb) {
+		this.aria2.on('onDownloadStart', ([params]) => {
+			cb(params.gid);
+		});
+	}
+
+	async getDetails(guid) {
+		const details = await this.aria2.call('tellStatus', guid);
+		return details;
 	}
 }
