@@ -46,7 +46,19 @@ export const searchContent = (queryString = '', limit, offset, cb) => (dispatch)
 		});
 };
 
+const sortByStatus = (downloads, statusMap) => {
+	return downloads.sort((a, b) => statusMap[a.status] - statusMap[b.status]);
+};
+
 export const updateDownloadQueue = (downloads, cb) => (dispatch) => {
+	const statusMap = {
+		'ongoing': 1,
+		'failed': 2,
+		'done': 3
+	};
+
+	downloads = sortByStatus(downloads, statusMap);
+	
 	dispatch({
 		type: 'UPDATE_DOWNLOAD_QUEUE',
 		payload: downloads
