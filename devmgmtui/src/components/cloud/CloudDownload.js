@@ -56,7 +56,8 @@ class CloudDownload extends Component {
 			guid,
 			name,
 			size,
-			uri
+			uri,
+			status: 'ongoing'
 		});
 
 		this.props.updateDownloadQueue(downloads, () => console.log('Queued: ', guid));
@@ -70,7 +71,7 @@ class CloudDownload extends Component {
 		downloads = downloads.map(item => {
 			if(item.guid === oldGuid) {
 				item.guid = newGuid;
-				item.failed = false;
+				item.status = 'ongoing';
 			}
 
 			return item;
@@ -85,7 +86,13 @@ class CloudDownload extends Component {
 			downloads
 		} = this.props.cloud;
 
-		downloads = downloads.filter(item => item.guid !== guid);
+		downloads = downloads.map(item => {
+			if(item.guid === guid) {
+				item.status = 'done';
+			}
+
+			return item;
+		});
 
 		this.props.updateDownloadQueue(downloads, () => console.log('Done: ', guid));
 	}
@@ -95,7 +102,13 @@ class CloudDownload extends Component {
 			downloads
 		} = this.props.cloud;
 
-		downloads = downloads.map(item => item.guid === guid ? item = { ...item, failed: true } : item);
+		downloads = downloads.map(item => {
+			if(item.guid === guid) {
+				item.status = 'failed';
+			}
+
+			return item;
+		});
 
 		this.props.updateDownloadQueue(downloads, () => console.log('Failed: ', guid));
 	}
@@ -105,7 +118,7 @@ class CloudDownload extends Component {
 			if(err) {
 				console.log(err);
 				
-				alert("Trouble fetching content from Sunbird server.");
+				alert('Trouble fetching content from Sunbird server.');
 			}
 		});
 	}
@@ -116,7 +129,7 @@ class CloudDownload extends Component {
 				console.log('Error occurred while clearing content. Error: ');
 				console.log(err);
 				
-				alert("Some mess-up happened while searching for content. Try again.");
+				alert('Some mess-up happened while searching for content. Try again.');
 			} else {
 				this.handleSearch(this.state.input, this.props.cloud.limit, 1);
 			}
@@ -158,13 +171,13 @@ class CloudDownload extends Component {
 		let newGuid = null;
 
 		let alreadyQueued = false;
-		let failed = false;
+		let status;
 
 		downloads.forEach(item => {
 			if(item.uri === uri) {
 				oldGuid = item.guid;
 				alreadyQueued = true;
-				failed = item.failed;
+				status = item.status;
 			}
 		});
 
@@ -177,16 +190,22 @@ class CloudDownload extends Component {
 				alert('Not able to download', name);
 			}
 		} else {
-			if(failed) {
-				newGuid = await this.downloadManager.downloadData(uri);
-		
-				if(newGuid !== -1) {
-					this.updateDownloadGuid(oldGuid, newGuid);
-				} else {
-					alert('Not able to download', name);
-				}
-			} else {
-				alert(`"${name}" is already being downloaded.`);
+			switch(status) {
+				case 'ongoing':
+					alert(`"${name}" is being downladed.`);
+					break;
+				case 'done':
+					alert(`"${name}" has been downlaoded.`);
+					break;
+				case 'failed':
+					newGuid = await this.downloadManager.downloadData(uri);
+
+					if(newGuid !== -1) {
+						this.updateDownloadGuid(oldGuid, newGuid);
+					} else {
+						alert(`Not able to download "${name}".`);
+					}
+					break;
 			}
 		}
 	}

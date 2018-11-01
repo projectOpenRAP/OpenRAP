@@ -25,8 +25,16 @@ function DownloadCard(props) {
 	const {
 		name,
 		size,
-		failed
+		status
 	} = props;
+
+	let cardStatusIndicator = null;
+
+	switch(status) {
+		case 'ongoing': cardStatusIndicator = <Loader active />; break;
+		case 'done': cardStatusIndicator = <Icon name='check circle' size='big' color='green' />; break;
+		case 'failed': cardStatusIndicator = <Icon name='warning circle' size='big' color='red' />; break;
+	}
 
 	return (
 		<Segment compact style={styles.downloadCard}>
@@ -41,11 +49,7 @@ function DownloadCard(props) {
 				</Grid.Column>
 
 				<Grid.Column width={3} textAlign='center' verticalAlign='middle'>
-					{
-						!failed
-							?	<Loader active />
-							:	<Icon name='warning circle' size='big' color='red' />
-					}
+					{ cardStatusIndicator }
 				</Grid.Column>
 			</Grid>
 		</Segment>
@@ -56,7 +60,7 @@ function renderDownloadCards(downloads) {
 	const downloadCards = downloads.map((item, index) => {
 		return (
 			<List.Item key={index}>
-				<DownloadCard name={item.name} size={item.size} failed={item.failed} />
+				<DownloadCard name={item.name} size={item.size} status={item.status} />
 			</List.Item>
 		);
 	});
