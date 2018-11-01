@@ -66,3 +66,17 @@ export const updateDownloadQueue = (downloads, cb) => (dispatch) => {
 
 	cb(null);
 };
+
+export const loadContent = (cb) => (dispatch) => {
+	axios.put(`${BASE_URL}/file/apply`)
+		.then(response => {
+			if(response.data.success) {
+				cb(null);
+			} else {
+				throw new Error(response.data.message);
+			}
+		})
+		.catch(error => {
+			cb(error);
+		});
+};
