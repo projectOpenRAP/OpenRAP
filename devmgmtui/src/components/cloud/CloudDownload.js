@@ -37,7 +37,8 @@ class CloudDownload extends Component {
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.handleLoadMoreClick = this.handleLoadMoreClick.bind(this);
 		this.handleDownload = this.handleDownload.bind(this);
-		this.addDownload = this.addDownload.bind(this);
+		this.addNewDownload = this.addNewDownload.bind(this);
+		this.updateDownloadGuid = this.updateDownloadGuid.bind(this);
 		this.removeDownload = this.removeDownload.bind(this);
 		this.handleFailedDownload = this.handleFailedDownload.bind(this);
 		
@@ -46,34 +47,39 @@ class CloudDownload extends Component {
 		this.downloadManager.onDownloadError(this.handleFailedDownload);
 	}
 
-	addDownload(guid, name, size) {
+	addNewDownload(guid, name, size, uri) {
 		let {
 			downloads
 		} = this.props.cloud;
 
-		let alreadyQueued = false;
+		downloads.push({
+			guid,
+			name,
+			size,
+			uri
+		});
+
+		this.props.updateDownloadQueue(downloads, () => console.log('Queued: ', guid));
+	}
+
+	updateDownloadGuid(oldGuid, newGuid) {
+		let {
+			downloads
+		} = this.props.cloud;
 
 		downloads = downloads.map(item => {
-			if(item.name === name) {
-				item.guid = guid;
+			if(item.guid === oldGuid) {
+				item.guid = newGuid;
 				item.failed = false;
-				alreadyQueued = true;
 			}
 
 			return item;
 		});
 
-		if(!alreadyQueued) {
-			downloads.push({
-				guid,
-				name,
-				size
-			});
-		}
-
-		this.props.updateDownloadQueue(downloads, () => console.log('Queued: ', guid));
+		this.props.updateDownloadQueue(downloads, () => console.log(`Updated ${oldGuid} to ${newGuid}`));
 	}
-	
+
+	// TODO: Add a getter for tellActive under DownloadManager and clear any dangling downloads inside removeDownload().
 	removeDownload(guid) {
 		let {
 			downloads
@@ -144,12 +150,44 @@ class CloudDownload extends Component {
 	}
 
 	async handleDownload(name, size, uri) {
-		const guid = await this.downloadManager.downloadData(uri);
-		
-		if (guid !== -1) {
-			this.addDownload(guid, name, size);
+		let {
+			downloads
+		} = this.props.cloud;
+
+		let oldGuid = null;
+		let newGuid = null;
+
+		let alreadyQueued = false;
+		let failed = false;
+
+		downloads.forEach(item => {
+			if(item.uri === uri) {
+				oldGuid = item.guid;
+				alreadyQueued = true;
+				failed = item.failed;
+			}
+		});
+
+		if(!alreadyQueued) {
+			newGuid = await this.downloadManager.downloadData(uri);
+			
+			if(newGuid !== -1) {
+				this.addNewDownload(newGuid, name, size, uri);
+			} else {
+				alert('Not able to download', name);
+			}
 		} else {
-			alert('Not able to download ', name);
+			if(failed) {
+				newGuid = await this.downloadManager.downloadData(uri);
+		
+				if(newGuid !== -1) {
+					this.updateDownloadGuid(oldGuid, newGuid);
+				} else {
+					alert('Not able to download', name);
+				}
+			} else {
+				alert(`"${name}" is already being downloaded.`);
+			}
 		}
 	}
 
