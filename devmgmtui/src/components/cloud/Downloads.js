@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Grid, Segment, Header, Loader, Icon } from 'semantic-ui-react';
+import { Grid, Segment, Header, Loader, Icon, List, Transition } from 'semantic-ui-react';
 
 const styles = {
 	parent: {
@@ -53,12 +53,18 @@ function DownloadCard(props) {
 }
 
 function renderDownloadCards(downloads) {
-	const downloadCards = downloads.map((item, index) => <DownloadCard key={index} name={item.name} size={item.size} failed={item.failed} />);
+	const downloadCards = downloads.map((item, index) => {
+		return (
+			<List.Item key={index}>
+				<DownloadCard name={item.name} size={item.size} failed={item.failed} />
+			</List.Item>
+		);
+	});
 
 	return (
-		<div style={styles.downloadCardList}>
+		<Transition.Group as={List} duration={200}>
 			{downloadCards}
-		</div>
+		</Transition.Group>
 	);
 }
 
