@@ -24,7 +24,8 @@ const styles = {
 function DownloadCard(props) {
 	const {
 		name,
-		size
+		size,
+		failed
 	} = props;
 
 	return (
@@ -39,8 +40,12 @@ function DownloadCard(props) {
 					</Header>
 				</Grid.Column>
 
-				<Grid.Column width={3} textAlign='center'>
-					<Loader active />
+				<Grid.Column width={3} textAlign='center' verticalAlign='middle'>
+					{
+						!failed
+							?	<Loader active />
+							:	<Icon name='warning circle' size='big' color='red' />
+					}
 				</Grid.Column>
 			</Grid>
 		</Segment>
@@ -48,7 +53,7 @@ function DownloadCard(props) {
 }
 
 function renderDownloadCards(downloads) {
-	const downloadCards = downloads.map((item, index) => <DownloadCard key={index} name={item.name} size={item.size} />);
+	const downloadCards = downloads.map((item, index) => <DownloadCard key={index} name={item.name} size={item.size} failed={item.failed} />);
 
 	return (
 		<div style={styles.downloadCardList}>

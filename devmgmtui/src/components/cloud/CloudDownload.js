@@ -33,15 +33,17 @@ class CloudDownload extends Component {
 
 		this.handleSearch = this.handleSearch.bind(this);
 		this.handleSearchClick = this.handleSearchClick.bind(this);
-		this.handleSearchKeyUp = this.handleSearchKeyUp.bind(this);		
+		this.handleSearchKeyUp = this.handleSearchKeyUp.bind(this);
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.handleLoadMoreClick = this.handleLoadMoreClick.bind(this);
 		this.handleDownload = this.handleDownload.bind(this);
 		this.addDownload = this.addDownload.bind(this);
 		this.removeDownload = this.removeDownload.bind(this);
+		this.handleFailedDownload = this.handleFailedDownload.bind(this);
 		
 		this.downloadManager = new DownloadManager('/home/admin/sunbird'); // TODO: Make download path configurable
 		this.downloadManager.onDownloadComplete(this.removeDownload);
+		this.downloadManager.onDownloadError(this.handleFailedDownload);
 	}
 
 	addDownload(guid, name, size) {
@@ -49,11 +51,25 @@ class CloudDownload extends Component {
 			downloads
 		} = this.props.cloud;
 
-		downloads.push({
-			guid,
-			name,
-			size
+		let alreadyQueued = false;
+
+		downloads = downloads.map(item => {
+			if(item.name === name) {
+				item.guid = guid;
+				item.failed = false;
+				alreadyQueued = true;
+			}
+
+			return item;
 		});
+
+		if(!alreadyQueued) {
+			downloads.push({
+				guid,
+				name,
+				size
+			});
+		}
 
 		this.props.updateDownloadQueue(downloads, () => console.log('Queued: ', guid));
 	}
@@ -66,6 +82,16 @@ class CloudDownload extends Component {
 		downloads = downloads.filter(item => item.guid !== guid);
 
 		this.props.updateDownloadQueue(downloads, () => console.log('Done: ', guid));
+	}
+
+	handleFailedDownload(guid) {
+		let {
+			downloads
+		} = this.props.cloud;
+
+		downloads = downloads.map(item => item.guid === guid ? item = { ...item, failed: true } : item);
+
+		this.props.updateDownloadQueue(downloads, () => console.log('Failed: ', guid));
 	}
 	
 	handleSearch(queryString, limit, offset) {
@@ -123,7 +149,7 @@ class CloudDownload extends Component {
 		if (guid !== -1) {
 			this.addDownload(guid, name, size);
 		} else {
-			alert('Not able to download ', size);
+			alert('Not able to download ', name);
 		}
 	}
 

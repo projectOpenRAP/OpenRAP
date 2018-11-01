@@ -53,6 +53,12 @@ export default class DownloadManager {
 		});
 	}
 
+	onDownloadError(cb) {
+		this.aria2.on('onDownloadError', ([params]) => {
+			cb(params.gid);
+		});
+	}
+
 	async getDetails(guid) {
 		const details = await this.aria2.call('tellStatus', guid);
 		return details;
