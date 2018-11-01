@@ -13,6 +13,9 @@ const styles = {
 		display: 'inline',
 		fontSize: '16px',
 		justifyItems: 'center'
+	},
+	noResults: {
+		paddingTop: '16vh'
 	}
 };
 
@@ -137,7 +140,7 @@ function renderTable(content, handleDownload) {
 
 function renderNoResultsFound(query) {
 	return (
-		<div style={{ paddingTop: '16vh' }}>
+		<div style={styles.noResults}>
 			<Icon name='search' size='massive'/>
 			<h2>No results found for "{query}"</h2>
 		</div>
