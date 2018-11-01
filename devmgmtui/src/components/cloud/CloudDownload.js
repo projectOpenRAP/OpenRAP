@@ -41,6 +41,7 @@ class CloudDownload extends Component {
 		this.updateDownloadGuid = this.updateDownloadGuid.bind(this);
 		this.removeDownload = this.removeDownload.bind(this);
 		this.handleFailedDownload = this.handleFailedDownload.bind(this);
+		this.handleLoadContentClick = this.handleLoadContentClick.bind(this);
 		
 		this.downloadManager = new DownloadManager('/home/admin/sunbird'); // TODO: Make download path configurable
 		this.downloadManager.onDownloadComplete(this.removeDownload);
@@ -210,6 +211,23 @@ class CloudDownload extends Component {
 		}
 	}
 
+	handleLoadContentClick() {
+		if(window.confirm('Some services might be interrupted for a moment. Do you still wish to proceed?')) {
+			this.props.loadContent(err => {
+				if (err) {
+					console.log('Error occured while applying changes.');
+					console.log(err);
+
+					alert('Failed to apply changes.');
+				} else {
+					alert('Changes applied successfully.');
+				}
+			});
+		} else {
+			alert('No changes were applied.');
+		}
+	}
+
 	renderCloudDownloadComponent() {
 		const moreContent = this.props.cloud.count > this.props.cloud.offset;
 
@@ -234,7 +252,10 @@ class CloudDownload extends Component {
 							handleDownload={this.handleDownload}
 						/>
 
-						<Downloads downloads={this.props.cloud.downloads}/>
+						<Downloads
+							downloads={this.props.cloud.downloads}
+							handleLoadContentClick={this.handleLoadContentClick}
+						/>
 					</Grid.Row>
 				</Grid>
 			</SideNav>

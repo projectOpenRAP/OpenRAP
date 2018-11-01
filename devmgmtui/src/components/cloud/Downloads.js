@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Grid, Segment, Header, Loader, Icon, List, Transition } from 'semantic-ui-react';
+import { Grid, Segment, Header, Loader, Icon, List, Transition, Button } from 'semantic-ui-react';
 
 const styles = {
 	parent: {
@@ -18,6 +18,10 @@ const styles = {
 	noDownloads: {
 		paddingTop: '16vh',
 		textAlign: 'center'
+	},
+	loadContent: {
+		fontSize: '16px',
+		width: '100%'
 	}
 };
 
@@ -49,7 +53,7 @@ function DownloadCard(props) {
 				</Grid.Column>
 
 				<Grid.Column width={3} textAlign='center' verticalAlign='middle'>
-					{ cardStatusIndicator }
+					{cardStatusIndicator}
 				</Grid.Column>
 			</Grid>
 		</Segment>
@@ -95,18 +99,39 @@ function isListEmpty(list) {
 	return flag;
 }
 
+function renderLoadContentButton(clickHandler) {
+	return (
+		<Button
+			primary
+			onClick={clickHandler}
+			style={styles.loadContent}
+		>
+			Load Content Into Plugin
+		</Button>
+	);
+}
+
+function renderDownloadCardsAndLoadContentButton(downloads, loadContentClickHandler) {
+	return (
+		<div>
+			{renderLoadContentButton(loadContentClickHandler)}
+			{renderDownloadCards(downloads)}
+		</div>
+	);
+}
+
 function Downloads(props) {
 	const {
-		downloads
+		downloads,
+		handleLoadContentClick
 	} = props;
 
 	return (
-		<Grid.Column stretched width={4} style={styles.parent}>
+		<Grid.Column stretched width={4} style={styles.parent}>		
 			{
 				isListEmpty(downloads)
 					? renderNoDownloads()
-					: renderDownloadCards(downloads)
-
+					: renderDownloadCardsAndLoadContentButton(downloads, handleLoadContentClick)
 			}
 		</Grid.Column>
 	);
