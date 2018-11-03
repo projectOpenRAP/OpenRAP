@@ -53,6 +53,11 @@ class SideNav extends Component {
                           <Icon name='eye' />
                           Modify Captive Portal
                         </Menu.Item> : null }
+                        
+                        { this.props.auth.user.permissions.search(/ALL/) >= 0 ? <Menu.Item name='cloud_download' active={this.state.currentLocation === '/cloud'} as={Link} to={'/cloud'}>
+                          <Icon name='cloud download' />
+                          Cloud Download
+                        </Menu.Item> : null }
 
                         <Menu.Item name='logout' as={Link} to={'/'} onClick={this.handleLogout.bind(this)}>
                             <Icon name='log out' />
