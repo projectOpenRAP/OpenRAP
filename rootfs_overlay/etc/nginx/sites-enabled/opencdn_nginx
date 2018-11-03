@@ -1,3 +1,13 @@
+# WebSocket config for aria2
+upstream websocket {
+	server localhost:6800;
+}
+
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
 # Default server configuration
 #
 server {
@@ -46,9 +56,14 @@ server {
 	location /data {
                 proxy_pass http://127.0.0.1:9000;
 	}
-
 	location /devmgmt/api {
                 proxy_pass http://127.0.0.1:8080;
+	}
+	location /jsonrpc {
+                proxy_pass http://websocket;
+				proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection $connection_upgrade;
 	}
 	# Redirect requests for /generate_204 to open the captive portal screen
     location /generate_204 {

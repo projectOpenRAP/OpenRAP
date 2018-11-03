@@ -3,6 +3,7 @@ let FormData = require('form-data');
 let { extractZip, deleteDir } = require('../../../filesdk');
 let fs = require('fs');
 var zlib = require('zlib');
+let XLSX = require('xlsx');
 let { BASE_URL, HOME_EXT, SEARCH_EXT, ID_MIDDLE, TELEMETRY_EXT, ECAR_MIDDLE } = require('./config.js');
 let { init, createIndex, addDocument, deleteIndex, deleteDocument, getDocument, count, search, getAllIndices, advancedSearch } = require('../../../searchsdk/index.js');
 let baseInt = 0;
@@ -147,11 +148,7 @@ let cleanKeys = (fieldList) => {
 let parseResults = (values) => {
     let defer = q.defer();
     let fields = values.map(value => (JSON.parse(value.value.body).fields));
-   // console.log("Parsing");
-    //console.log("-----------");
-    //console.log(fields);
     let fieldPromises = [];
-    console.log(fields.length);
     for (let i = 0; i < fields.length; i++) {
         //console.log(fields[i]);
         fieldPromises.push(cleanKeys(fields[i]));
@@ -348,7 +345,6 @@ let getHomePage = (req, res) => {
         }
     */
     let parsedReq = req.body;
-    console.log(JSON.stringify(parsedReq, null, 4));
     let loadedJson = {};
     let responseStructure = {};
     let query = {};
@@ -408,7 +404,6 @@ let getHomePage = (req, res) => {
         responseStructure.ver = parsedReq.ver;
         responseStructure.id = parsedReq.id;
         responseStructure.resmsgid = '0211201a-c91e-41d6-ad25-392de813124c';
-        console.log(JSON.stringify(responseStructure, null, 4));
         return res.status(200).json(responseStructure);
     }).catch(e => {
         console.log(e);
@@ -499,12 +494,7 @@ let getEcarById = (req, res) => {
 }
 
 let telemetryData = (req, res) => {
-    //console.log(req.files);
     let body = JSON.stringify(req.body);
-    console.log(req.headers);
-    //return res.status(200).json({success: true});
-    //let fileData = req.files;
-    //let oldPath = fileData.file.path;
     let telemetryDir = req.ekStepData.telemetry;
     let now = new Date().getTime();
     baseInt++;
@@ -604,9 +594,6 @@ let performRecommendation = (req, res) => {
     let body = req.body;
     let query = req.query;
     let params = req.params;
-    console.log(body);
-    console.log(query);
-    console.log(params);
     return res.status(200).json({ok : 'ok'});
 }
 
@@ -779,14 +766,11 @@ let moveInternalFolders = (dir, fileNameAsFolder) => {
             console.log(err);
             return defer.reject(null);
         } else {
-            console.log(files);
             let internalFolder = null;
             moveFilePromises = [];
             for (let i = 0; i < files.length; i++) {
-                console.log(folder + files[i]);
                 fs.stat(folder + files[i], (err, stats) => {
                     if (err) {
-                        console.log(folder + files[i]);
                         console.log("767");
                     } else if (stats.isDirectory()) {
                         console.log("directory found");
@@ -855,8 +839,6 @@ let doPostExtraction = (dir, file) => {
 let performExtraction = (parentDir, fileName, folderName) => {
     let defer = q.defer();
     console.log("Attempting to extract");
-    console.log(parentDir + fileName);
-    console.log(parentDir + folderName);
     extractZip(parentDir + fileName, parentDir + folderName)
     .then(value => {
         console.log("Completed extraction, 842");
@@ -921,6 +903,25 @@ let createFolderToExtractFiles = (dir, file) => {
     return defer.promise;
 }
 
+let xlsxToJson = (file) => {
+	let defer = q.defer();
+
+	fs.readFile(file, (err, data) => {
+		if(err) {
+			defer.reject(err);
+		} else {
+			let workbook = XLSX.read(data, { type: 'buffer' });
+			let sheet_name_list = workbook.SheetNames;
+			let jsonRep = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
+			defer.resolve({ data: jsonRep });
+		}
+	});
+
+	return defer.promise;
+
+}
+
 let syncMadhi = (req, res) => {
 	let profile = req.params.profile;
 	let response =  {
@@ -929,14 +930,29 @@ let syncMadhi = (req, res) => {
 		err: undefined
 	};
 
-	console.log('Syncing', profile, 'data.');
-
-	loadSkeletonJson('syncData')
+	loadSkeletonJson('madhi_config')
 		.then(profileData => {
+			console.log('Fetching', profile, 'data.');
+
+			if (profile === 'teacher') {
+				let filePath = profileData.data[profile];
+
+				return xlsxToJson(filePath);
+			} else if (profile === 'student') {
+				return {
+					data: profileData.data[profile]
+				};
+			}
+		})
+		.then(jsonData => {
+			let { data } = jsonData;
+
+			let formattedData = data.map(item => Object.values(item));
+
 			response = {
 				...response,
 				success: true,
-				data: profileData.data[profile],
+				data: formattedData,
 				err: null
 			}
 
@@ -960,5 +976,5 @@ module.exports = {
     extractFile,
     performRecommendation,
     createFolderIfNotExists,
-	syncMadhi
+    syncMadhi
 }

@@ -50,6 +50,9 @@ systemctl restart devmgmt
 systemctl enable syncthing
 systemctl restart syncthing
 
+systemctl enable aria2
+systemctl restart aria2
+
 reboot_device
 
 exit 0
