@@ -11,6 +11,7 @@ let app = express();
 let { exec } = require('child_process');
 let { repeatedlyCheckForInternet, repeatedlyCheckUsers } = require('./telemetry_cron.js');
 let { initiateTelemetrySync } = require('./telemetry_sync');
+let { generateOriginalJWTs } = require('./helpers/cloud.helper.js');
 
 const fs = require('fs');
 const request = require('request');
@@ -43,7 +44,7 @@ app.listen(8080, err => {
     if (err)
         console.log(err);
     else {
-		initiateTelemetrySync();
+		    initiateTelemetrySync();
 
         cron.schedule("*/15 * * * * *", () => {
             repeatedlyCheckForInternet();
@@ -66,6 +67,11 @@ app.listen(8080, err => {
           } else {
             console.log(stdout);
           }
+        });
+        generateOriginalJWTs().then(value => {
+          console.log("Successfully registered to cloud");
+        }).catch(e => {
+          console.log("Error: ", e.err);
         });
     }
 });

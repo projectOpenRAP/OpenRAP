@@ -95,7 +95,7 @@ let getSearchBody = (queryString = '', limit, offset) => {
 			offset
 		}
 	};
-};
+}
 
 let getRequestOptions = (method, uri, body, headers, json = true) => ({
 	method,
@@ -105,6 +105,7 @@ let getRequestOptions = (method, uri, body, headers, json = true) => ({
 	json
 });
 
+// Search sunbird cloud with the query string, limit of results to be returned, and offset of results
 let searchSunbirdCloud = ({ query, limit, offset }) => {
 	const state = getState();
 	const body = getSearchBody(query, +limit, +offset);
@@ -149,8 +150,9 @@ let filterKeysInObjectList = (results = [], keysToUse) => {
 	return results.map(obj => filterObjectKeys(obj, keysToUse));
 };
 
+
+
 let searchContent = (req, res) => {
-	
 	let response = {
 		success: false,
 		err: null,
