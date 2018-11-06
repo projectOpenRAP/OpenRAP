@@ -11,22 +11,13 @@ const styles = {
 }
 class UserList extends Component {
 
-
     componentWillMount() {
-        if (this.props.auth && !this.props.auth.authenticated) {
-            this.props.history.push("/");
-        }
         this.props.getAllUser();
         document.title = "User List";
     }
-    componentWillReceiveProps(nextProps) {
-       if (nextProps.auth && !nextProps.auth.authenticated) {
-            this.props.history.push("/");
-        }
-    }
 
     handleDelete(key) {
-        this.props.deleteUser(key, (err,msg) => {
+        this.props.deleteUser(key, this.props.auth.user.username, (err,msg) => {
             if(!err){
                 alert("Deletion Success");
                 this.props.getAllUser();
@@ -98,7 +89,6 @@ class UserList extends Component {
             </SideNav>
         )
     } else {
-      this.props.history.push("/");
       return (null);
     }
   }

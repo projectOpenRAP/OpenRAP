@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import * as actions from '../../actions/filemgmt'
+import * as actions from '../../actions/auth'
 import { Sidebar, Menu, Icon } from 'semantic-ui-react'
 class SideNav extends Component {
     constructor(props){
@@ -19,14 +19,11 @@ class SideNav extends Component {
         })
     }
 
-    componentWillMount() {
-        if (this.props.auth && !this.props.auth.authenticated) {
-          this.props.history.push(`/`);
-        }
+    handleLogout() {
+        this.props.logout();
     }
 
     render() {
-
         if (typeof this.props.auth.user !== `undefined`) {
         return (
             <div style={{ height: '100vh' }}>
@@ -36,7 +33,7 @@ class SideNav extends Component {
                             <Icon name='home' />
                             Home
                         </Menu.Item> : null }
-                        {this.props.auth.user.permissions.search(/VIEW_USERS|ALL/) >= 0 ? <Menu.Item name='users' active={this.state.currentLocation === '/users'} as={Link} name='users' to={'/users'}>
+                        {this.props.auth.user.permissions.search(/VIEW_USERS|ALL/) >= 0 ? <Menu.Item name='users' active={this.state.currentLocation === '/users'} as={Link} to={'/users'}>
                             <Icon name='users' />
                             Users
                         </Menu.Item> : null }
@@ -56,8 +53,13 @@ class SideNav extends Component {
                           <Icon name='eye' />
                           Modify Captive Portal
                         </Menu.Item> : null }
+                        
+                        { this.props.auth.user.permissions.search(/ALL/) >= 0 ? <Menu.Item name='cloud_download' active={this.state.currentLocation === '/cloud'} as={Link} to={'/cloud'}>
+                          <Icon name='cloud download' />
+                          Cloud Download
+                        </Menu.Item> : null }
 
-                        <Menu.Item name='logout' as={Link} to={'/'} onClick={(dispatch) => dispatch({ type: "DISABLE_AUTH"})}>
+                        <Menu.Item name='logout' as={Link} to={'/'} onClick={this.handleLogout.bind(this)}>
                             <Icon name='log out' />
                             Logout
                         </Menu.Item>
@@ -74,7 +76,6 @@ class SideNav extends Component {
             </div>
         );
       } else {
-        this.props.history.push("/");
         return null;
       }
     }

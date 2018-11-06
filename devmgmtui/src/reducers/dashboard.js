@@ -16,6 +16,8 @@ export default function (state={}, action) {
             return {...state, cpuData: action.payload};
         case 'VERSION_FETCH':
             return {...state, version: action.payload};
+        case 'DEVICEID_FETCH':
+            return {...state, deviceID: action.payload};
         default:
             return state;
     }

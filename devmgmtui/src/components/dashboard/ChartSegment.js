@@ -3,60 +3,41 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../../actions/dashboard';
 
-import { Segment, Container, Grid, Icon, Header, Message } from 'semantic-ui-react';
+import { Segment, Grid, Header, Message, Progress } from 'semantic-ui-react';
 
 import PieChart from 'react-svg-piechart';
+import './dashboard.css';
 
-const maxNumberOfUsers = 25;
-const colorCodes = {
-    zeroToFifteen : ['#B2DFDB', 'teal'],
-    fifteenToTwentyFive : ['#FFE0B2', 'orange'],
-    twentyFiveAndAbove : ['#FFCDD2', 'red']
-}
+const ProgressBar = ({ numberOfUsers }) => {
 
-const UserChart = ({ numberOfUsers }) => {
-    let numberOfUsersPercent = Math.floor(((numberOfUsers) * 100) / maxNumberOfUsers);
-
-    const userChartColor = () => {
-        let colors;
-
+    const handleProgressColor = () => {
         if(numberOfUsers <= 15) {
-            colors = colorCodes.zeroToFifteen;
+            return 'green';
         } else if (numberOfUsers > 15 && numberOfUsers <= 25) {
-            colors = colorCodes.fifteenToTwentyFive;
+            return 'orange';
         } else {
-            colors = colorCodes.twentyFiveAndAbove;
+            return 'red';
         }
+    }
 
-        let data = [
-            { title: 'Current capacity', value: 100-numberOfUsersPercent, color: colors[0] },
-            { title: 'Users connected', value: numberOfUsersPercent, color: colors[1] }
-        ];
-        return data;
+    const handleProgress = () => {
+        return (
+            (numberOfUsers/25)*100
+        );
     }
 
     return (
-        <Container style={{position: 'relative', width: '100px', height: '100px'}}>
-            <div style={{position: 'absolute', width: '100%'}}>
-                <PieChart
-                    strokeLinejoin="round"
-                    strokeWidth={0.2}
-                    viewBoxSize={100}
-                    data={userChartColor()}
-                />
-            </div>
-
-            <div style={{position: 'absolute', top: '45%', left: '48%', margin: '-10%', width: '100%', height: '100%', color: 'black'}}>
-                <Icon size='large' name='users'/>
-                <br/>
-
-            </div>
-
-            <div style={{position: 'absolute', top: '70%', left: '37%', margin: '-10%', width: '100%', height: '100%', color: 'black'}}>
-                {numberOfUsers <= maxNumberOfUsers ? `${numberOfUsers} / ${maxNumberOfUsers}` : <span>&nbsp;&nbsp;>&nbsp;{maxNumberOfUsers}</span>}
-            </div>
-        </Container>
-    );
+        <div style={{marginTop: '1%'}}>
+            <Progress
+                percent={handleProgress()}
+                color={handleProgressColor()}
+                style={{marginBottom: '0'}}
+                className="progress-bar-content"
+            >
+                {numberOfUsers}/25
+            </Progress>
+        </div>
+    )
 }
 
 class ChartSegment extends Component {
@@ -69,6 +50,7 @@ class ChartSegment extends Component {
         let usersConnected = this.props.dashboard.usersConnected;
         let internetStatus = this.props.dashboard.internetStatus;
         let lastRefreshTime = this.props.dashboard.lastRefreshTime;
+        let deviceID = this.props.dashboard.deviceID;
 
         let data = [];
         let header = {};
@@ -171,8 +153,10 @@ class ChartSegment extends Component {
                         <Grid centered columns='equal'>
                             <Grid.Row centered>
                                 <Grid.Column>
-                                    <UserChart
-                                        numberOfUsers={numberOfUsersConnected}
+                                    <Message
+                                        icon='id badge'
+                                        header='Device ID'
+                                        content={deviceID}
                                     />
                                 </Grid.Column>
 
@@ -217,6 +201,21 @@ class ChartSegment extends Component {
                                         content={lastRefreshTime.data || 'Not refreshed yet'}
                                     />
                                 </Grid.Column>
+                            </Grid.Row>
+                            <Grid.Row centered>
+                                <Grid.Column>
+                                    <Message
+                                        icon='users'
+                                        header='Number of Users connected'
+                                        content={
+                                            <ProgressBar
+                                                numberOfUsers={numberOfUsersConnected}
+                                            />
+                                        }
+                                    />
+                                </Grid.Column>
+                                <Grid.Column/>
+                                <Grid.Column/>
                             </Grid.Row>
                         </Grid>
                     </Segment>

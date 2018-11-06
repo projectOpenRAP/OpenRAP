@@ -1,0 +1,12 @@
+[Unit]
+Description=aria2, "The next generation download utility."
+#After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/aria2c --enable-rpc --rpc-listen-all=true --rpc-allow-origin-all 
+PIDFile=/tmp/opencdn/aria2.pid
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

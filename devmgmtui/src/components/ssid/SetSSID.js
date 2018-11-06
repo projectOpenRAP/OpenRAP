@@ -25,16 +25,7 @@ class SetSSID extends Component {
     }
 
     componentWillMount() {
-        if (this.props.auth && !this.props.auth.authenticated) {
-            this.props.history.push("/");
-        }
         document.title = "Set SSID";
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.auth && !nextProps.auth.authenticated) {
-            this.props.history.push("/");
-        }
     }
 
     handleSSIDChange(e) {
@@ -95,6 +86,8 @@ class SetSSID extends Component {
                     {this.renderSSIDForm()}
                 </SideNav>
             )
+        } else {
+            return null;
         }
     }
 }

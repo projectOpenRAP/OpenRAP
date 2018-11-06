@@ -13,9 +13,13 @@ export const getAllUser = () => (dispatch) => {
 
 }
 
-export const deleteUser = (user,cb) => (dispatch) => {
-    console.log("calling all")
-    axios.delete(`${BASE_URL}/user/delete/${user}`)
+export const deleteUser = (user, actor, cb) => (dispatch) => {
+    const params = {
+        "timestamp": `${new Date().getTime()}`,
+        actor
+    }
+
+    axios.delete(`${BASE_URL}/user/delete/${user}`, { params })
         .then((response) => {
             console.log(response.data)
             if(response.data.deleteSuccessful){

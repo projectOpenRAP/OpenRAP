@@ -47,7 +47,7 @@ class FileDisplayComponent extends Component {
       alert('A folder needs a name.');
       return;
     }
-    this.props.createFolder(this.props.filemgmt.currentDir, this.state.newFolderName, (err, res) => {
+    this.props.createFolder(this.props.filemgmt.currentDir, this.state.newFolderName, this.props.auth.user.username, (err, res) => {
       if (err) {
         if(res.includes('EEXIST')) {
           alert('Folder already exists.');
@@ -89,7 +89,7 @@ class FileDisplayComponent extends Component {
       return;
     }
     let deleteableFiles = this.props.filemgmt.selectedFiles;
-    this.props.deleteBunchOfFiles(this.props.filemgmt.currentDir, deleteableFiles, (res) => {
+    this.props.deleteBunchOfFiles(this.props.filemgmt.currentDir, deleteableFiles, this.props.auth.user.username, (res) => {
       alert(res);
       this.props.readFolder(this.props.filemgmt.currentDir);
     });
@@ -152,7 +152,7 @@ class FileDisplayComponent extends Component {
         </span>
         <span style={{float:'right'}}>
           {this.props.auth.user.permissions.search(/UPLOAD_FILES|ALL/) >= 0 ? <span>
-            <Input action={{ color: 'blue', labelPosition: 'right', icon: 'plus', content: 'Make New Folder', onClick : this.createNewFolder.bind(this)}} placeholder='Type name here...' value={this.state.newFolderName} onChange={this.handleFolderNameChange.bind(this)} />
+            <Input action={{ color: 'blue', labelPosition: 'right', icon: 'plus', content: 'Create New Folder', onClick : this.createNewFolder.bind(this)}} placeholder='Type name here...' value={this.state.newFolderName} onChange={this.handleFolderNameChange.bind(this)} />
         </span> : null}
         </span>
       </span>
@@ -161,16 +161,26 @@ class FileDisplayComponent extends Component {
         Currently at : {this.props.filemgmt.currentDir}
       </div>
       <Divider></Divider>
-      <Button animated color='linkedin' onClick={this.selectAll.bind(this)}>
-        <Button.Content visible>{this.state.allSelected && this.props.filemgmt.selectedFiles.length ? 'Uns' : 'S'}elect All</Button.Content>
-        <Button.Content hidden><Icon name='check circle' /></Button.Content>
-      </Button>
-      <span style={{float:'right'}}>
-        <Button animated  onClick={this.deleteSelected.bind(this)} negative>
-          <Button.Content visible>Delete Selected</Button.Content>
-          <Button.Content hidden><Icon name='remove circle' /></Button.Content>
-        </Button>
-      </span>
+      {this.props.auth.user.permissions.search(/DELETE_FILES|ALL/) >= 0 ?
+          <span>
+              <Button animated color='linkedin' onClick={this.selectAll.bind(this)}>
+                <Button.Content visible>{this.state.allSelected && this.props.filemgmt.selectedFiles.length ? 'Uns' : 'S'}elect All</Button.Content>
+                <Button.Content hidden><Icon name='check circle' /></Button.Content>
+              </Button>
+          </span>
+          :
+          null
+      }
+      {this.props.auth.user.permissions.search(/DELETE_FILES|ALL/) >= 0 ?
+          <span style={{float:'right'}}>
+            <Button animated  onClick={this.deleteSelected.bind(this)} negative>
+              <Button.Content visible>Delete Selected</Button.Content>
+              <Button.Content hidden><Icon name='remove circle' /></Button.Content>
+            </Button>
+          </span>
+          :
+          null
+      }
       <Divider></Divider>
         <div>
           {this.renderFileDisplayComponent()}

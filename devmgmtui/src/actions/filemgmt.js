@@ -3,12 +3,14 @@ import { BASE_URL } from '../config/config'
 
 const CancelToken = axios.CancelToken;
 
-const getTimestamp = () => {
-    let currentTime = new Date();
-    let options = { hour: 'numeric', minute: 'numeric', hour12: true, weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+const getTimestamp = () => `${new Date().getTime()}`;
 
-    return currentTime.toLocaleString('en-IN', options);
-}
+// const getTimestamp = () => {
+//     let currentTime = new Date();
+//     let options = { hour: 'numeric', minute: 'numeric', hour12: true, weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+//
+//     return currentTime.toLocaleString('en-IN', options);
+// }
 
 export const applyChanges = (cb) => (dispatch) => {
     axios.put(`${BASE_URL}/file/apply`)
@@ -34,6 +36,7 @@ export const readFolder = (folderPath, update=true) => (dispatch) => {
       }
       dispatch({type : 'READ_DIR', payload : response.data.children});
       dispatch({type : 'OPEN_DIR', payload : folderPath});
+      localStorage.setItem('directoryData',folderPath);
   })
     .catch(e => {
       console.log(e);
@@ -41,12 +44,13 @@ export const readFolder = (folderPath, update=true) => (dispatch) => {
     })
 }
 
-export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
+export const uploadFile = (prefix, fileData, actor, cb) => (dispatch) => {
   let source = CancelToken.source();
   let data = new FormData();
   data.append('file', fileData);
   data.append('prefix', prefix);
   data.append('timestamp', getTimestamp());
+  data.append('actor', actor);
   axios.post(`${BASE_URL}/file/new`, data, {
     headers : {
       'Content-type' : 'multipart/form-data'
@@ -74,9 +78,9 @@ export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
   })
 }
 
-export const createFolder = (prefix, folderName, cb) => (dispatch) => {
+export const createFolder = (prefix, folderName, actor, cb) => (dispatch) => {
   let fullPath = encodeURIComponent(prefix + folderName);
-  axios.post(`${BASE_URL}/file/newFolder`, {path : fullPath, timestamp : getTimestamp()}).then((response) => {
+  axios.post(`${BASE_URL}/file/newFolder`, {path : fullPath, timestamp : getTimestamp(), actor}).then((response) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
@@ -87,9 +91,9 @@ export const createFolder = (prefix, folderName, cb) => (dispatch) => {
   });
 }
 
-export const deleteFolder = (prefix, folderName, cb) =>  (dispatch) => {
+export const deleteFolder = (prefix, folderName, actor, cb) =>  (dispatch) => {
   let fullPath = encodeURIComponent(prefix + folderName);
-  axios.delete(`${BASE_URL}/file/delete`, {params : {path : fullPath, timestamp : getTimestamp()}}).then((response) => {
+  axios.delete(`${BASE_URL}/file/delete`, {params : {path : fullPath, timestamp : getTimestamp(), actor}}).then((response) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
@@ -101,9 +105,9 @@ export const deleteFolder = (prefix, folderName, cb) =>  (dispatch) => {
   });
 }
 
-export const deleteFile = (prefix, folderName, cb) =>  (dispatch) => {
+export const deleteFile = (prefix, folderName, actor, cb) =>  (dispatch) => {
   let fullPath = encodeURIComponent(prefix + folderName);
-  axios.delete(`${BASE_URL}/file/delete`, {params : {path : fullPath, timestamp : getTimestamp()}}).then((response) => {
+  axios.delete(`${BASE_URL}/file/delete`, {params : {path : fullPath, timestamp : getTimestamp(), actor}}).then((response) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
@@ -147,12 +151,12 @@ export const copyBunchOfFiles = (prefix, fileList, destination, cb) => (dispatch
   })
 }
 
-export const deleteBunchOfFiles = (prefix, fileList, cb) => (dispatch) => {
+export const deleteBunchOfFiles = (prefix, fileList, actor, cb) => (dispatch) => {
   let promises = [];
   for (let i in fileList) {
     let file = encodeURIComponent(prefix + fileList[i]);
     let promise = new Promise((resolve, reject) => {
-      axios.delete(`${BASE_URL}/file/delete`, {params : {path : file, timestamp : getTimestamp()}}).then((response) => {
+      axios.delete(`${BASE_URL}/file/delete`, {params : {path : file, timestamp : getTimestamp(), actor}}).then((response) => {
         if (response.data.success) {
           resolve("success");
         } else {

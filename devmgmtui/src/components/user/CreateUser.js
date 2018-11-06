@@ -25,9 +25,6 @@ class CreateUser extends Component {
     }
 
     componentWillMount() {
-      if (this.props.auth.user.permissions.search(/ADD_USER|ALL/) < 0) {
-        this.props.history.push('/');
-      }
       document.title = "Create User";
     }
 
@@ -44,7 +41,7 @@ class CreateUser extends Component {
     }
 
     handleSubmit() {
-        this.props.createUser(this.state.user, this.state.password, (err,msg)=>{
+        this.props.createUser(this.state.user, this.state.password, this.props.auth.user.username, (err,msg)=>{
             if(err){
                 alert(msg);
             }else{
@@ -110,7 +107,6 @@ class CreateUser extends Component {
                 {this.renderCreateUser()}
             </SideNav>
         )} else {
-          this.props.history.push("/");
           return null;
         }
   }

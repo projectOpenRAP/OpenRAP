@@ -7,8 +7,11 @@ let {
     getSystemMemory,
     getSystemSpace,
     getSystemCpu,
-    getSystemVersion
+    getSystemVersion,
+    getDeviceID
 } = require("../controllers/dashboard.controller")
+
+const { saveTelemetryData } = require('../middlewares/telemetry.middleware.js');
 
 module.exports = app => {
     app.get("/dashboard/system/internetStatus", getInternetStatus);
@@ -18,4 +21,5 @@ module.exports = app => {
     app.get("/dashboard/system/space", getSystemSpace);
     app.get("/dashboard/system/cpu", getSystemCpu);
     app.get("/dashboard/system/version", getSystemVersion);
+    app.get("/dashboard/system/deviceID", getDeviceID);
 }

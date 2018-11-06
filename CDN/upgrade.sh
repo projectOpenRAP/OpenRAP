@@ -271,7 +271,7 @@ then
 	run_cmd "cp -frs $TARGET/$ROOTFS_OVERLAY/* /$MOUNT_PATH/"
 	run_cmd rm $TARGET/$CDNROOT
 else
-	run_cmd "cp -frs $TARGET/$ROOTFS_OVERLAY/* /$MOUNT_PATH/"
+    run_cmd "cp -frs $TARGET/$ROOTFS_OVERLAY/* /$MOUNT_PATH/"
 
 fi
 

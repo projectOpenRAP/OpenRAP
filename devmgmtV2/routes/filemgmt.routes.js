@@ -4,15 +4,17 @@ let {writeFileToDisk, deleteFileFromDisk, createNewFolder, openDirectory, copyFi
 let multiparty = require('connect-multiparty')
 let multipartMiddle = multiparty()
 
+const { saveTelemetryData } = require('../middlewares/telemetry.middleware.js');
+
 const setTimeout = (req, res, next) => {
   req.setTimeout(0);
   next();
 }
 
 module.exports = app => {
-  app.post('/file/new', multipartMiddle, storeTimestamp, writeFileToDisk);
-  app.delete('/file/delete', storeTimestamp, deleteFileFromDisk);
-  app.post('/file/newFolder', storeTimestamp, createNewFolder)
+  app.post('/file/new', multipartMiddle, storeTimestamp, saveTelemetryData, writeFileToDisk);
+  app.delete('/file/delete', storeTimestamp, saveTelemetryData, deleteFileFromDisk);
+  app.post('/file/newFolder', storeTimestamp, saveTelemetryData, createNewFolder)
   app.get('/file/open', openDirectory);
   app.put('/file/copy', storeTimestamp, setTimeout, copyFile);
   app.put('/file/move', storeTimestamp, moveFile);
