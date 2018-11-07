@@ -46,6 +46,8 @@ restore_files
 mkdir -p /opt/searchEngine/bleveDbDir/
 mkdir -p /home/admin/GoK/
 
+install_aria2
+
 systemctl enable searchserver
 systemctl restart searchserver
 
