@@ -31,13 +31,21 @@ reboot_device()
 	reboot now
 }
 
+install_aria2()
+{
+	echo "Installing aria2"
+	dpkg -i /tmp/aria2_deb/*
+}
+
 post_install()
 {
 echo "Running post install scripts"
 restore_files
+
 # Create a dir for searchdb (if not present)
 mkdir -p /opt/searchEngine/bleveDbDir/
 mkdir -p /home/admin/GoK/
+
 systemctl enable searchserver
 systemctl restart searchserver
 
