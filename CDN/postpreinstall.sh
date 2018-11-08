@@ -37,6 +37,12 @@ install_aria2()
 	dpkg -i /tmp/aria2_deb/*
 }
 
+remove_aria2_deb()
+{
+	echo "Cleaning aria2 deb files"
+	rm -rf /tmp/aria2_deb
+}
+
 post_install()
 {
 echo "Running post install scripts"
@@ -46,7 +52,9 @@ restore_files
 mkdir -p /opt/searchEngine/bleveDbDir/
 mkdir -p /home/admin/GoK/
 
+# Install aria2 and clean up the deb files used
 install_aria2
+remove_aria2_deb
 
 systemctl enable searchserver
 systemctl restart searchserver
