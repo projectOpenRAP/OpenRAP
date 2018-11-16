@@ -3,7 +3,7 @@
 const fs = require('fs');
 const q = require('q');
 const rimraf = require('rimraf');
-const extract = require('extract-zip')
+const unzip = require('unzip-stream');
 const targz = require('targz');
 const ncp = require('ncp').ncp;
 ncp.limit = 16;
@@ -75,12 +75,19 @@ let getInfo = (path) => {
     return defer.promise;
 }
 let extractZip = (source, destination) => {
-    let defer = q.defer();
-    extract(source, { dir: destination }, function (err) {
-        if (err) return defer.reject(err);
-        return defer.resolve("Done!!!");
-    })
-    return defer.promise;
+    return extractWithUnzipStream(source, destination);
+}
+let extractWithUnzipStream = (src, dest) => {
+	let defer = q.defer();
+
+	fs.createReadStream(src)
+		.pipe(unzip.Extract({ path: dest }))
+		.on('close', (err) => {
+			if (err) defer.reject(err);
+			else defer.resolve('Done!!!');
+        });
+
+	return defer.promise;
 }
 let extractTar = (source, destination) => {
     let defer = q.defer();
