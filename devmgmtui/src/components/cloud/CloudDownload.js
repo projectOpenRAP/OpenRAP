@@ -4,12 +4,15 @@ import { connect } from 'react-redux';
 import * as actions from '../../actions/cloud';
 
 import { Grid } from 'semantic-ui-react';
+import axios from 'axios';
 
 import SearchBar from './SearchBar';
 import Results from './Results';
 import Downloads from './Downloads';
 import SideNav from '../common/Sidebar';
 import DownloadManager from './DownloadManager';
+
+import { BASE_URL } from '../../config/config';
 
 const styles = {
 	bottomRow: {
@@ -43,12 +46,30 @@ class CloudDownload extends Component {
 		this.handleFailedDownload = this.handleFailedDownload.bind(this);
 		this.handleLoadContentClick = this.handleLoadContentClick.bind(this);
 		
-		this.downloadManager = new DownloadManager('/home/admin/sunbird'); // TODO: Make download path configurable
+		this.downloadManager = new DownloadManager('/home/genghiskh/Desktop/ecar2'); // TODO: Make download path configurable
 		this.downloadManager.onDownloadComplete(this.removeDownload);
 		this.downloadManager.onDownloadError(this.handleFailedDownload);
 	}
 
-	addNewDownload(guid, name, size, uri) {
+	fetchAndDownloadDependencies(id, ver) {
+		const parent = `${id}_${ver}.0.ecar`;
+		const url = `${BASE_URL}/cloud/dependencies/${encodeURIComponent(parent)}`;
+
+		axios.get(url)
+			.then(res => {
+				if (res.data.success) {
+					alert(`Fetched dependencies for "${parent}".`);
+				} else {
+					throw res.data.err;
+				}
+			})
+			.catch(err => {
+				alert(`Couldn\'t fetch the dependencies for "${parent}".`);
+				console.log(err)
+			});
+	}
+
+	addNewDownload(guid, name, id, ver, size, uri) {
 		let {
 			downloads
 		} = this.props.cloud;
@@ -58,6 +79,8 @@ class CloudDownload extends Component {
 			name,
 			size,
 			uri,
+			id,
+			ver,
 			status: 'ongoing'
 		});
 
@@ -90,6 +113,7 @@ class CloudDownload extends Component {
 		downloads = downloads.map(item => {
 			if(item.guid === guid) {
 				item.status = 'done';
+				this.fetchAndDownloadDependencies(item.id, item.ver);
 			}
 
 			return item;
@@ -163,7 +187,7 @@ class CloudDownload extends Component {
 		this.handleSearch(queryString, limit, newOffset);
 	}
 
-	async handleDownload(name, size, uri) {
+	async handleDownload(name, size, uri, type, id, ver) {
 		let {
 			downloads
 		} = this.props.cloud;
@@ -183,10 +207,10 @@ class CloudDownload extends Component {
 		});
 
 		if(!alreadyQueued) {
-			newGuid = await this.downloadManager.downloadData(uri);
+			newGuid = await this.downloadManager.downloadData(uri, id, ver);
 			
 			if(newGuid !== -1) {
-				this.addNewDownload(newGuid, name, size, uri);
+				this.addNewDownload(newGuid, name, id, ver, size, uri);
 			} else {
 				alert('Not able to download', name);
 			}
@@ -199,7 +223,7 @@ class CloudDownload extends Component {
 					alert(`"${name}" has been downlaoded.`);
 					break;
 				case 'failed':
-					newGuid = await this.downloadManager.downloadData(uri);
+					newGuid = await this.downloadManager.downloadData(uri, id, ver);
 
 					if(newGuid !== -1) {
 						this.updateDownloadGuid(oldGuid, newGuid);

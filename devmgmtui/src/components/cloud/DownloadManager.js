@@ -26,10 +26,16 @@ export default class DownloadManager {
 		}
 	}
 
-	async downloadData(uri) {
+	async downloadData(uri, id, ver) {
 		if (this.connected) {
 			try {
-				const guid = await this.aria2.call('addUri', [uri], { dir: this.dir });
+				// Add option to overwriting existing files
+				const options = {
+					out: `${id}_${ver}.0.ecar`,
+					dir: this.dir
+				};
+
+				const guid = await this.aria2.call('addUri', [uri], options);
 				return guid;
 			} catch(err) {
 				console.log('Error occurred while queuing download.', err);
