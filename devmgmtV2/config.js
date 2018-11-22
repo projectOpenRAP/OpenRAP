@@ -29,7 +29,8 @@ module.exports = {
 					'name',
 					'status',
 					'description',
-					'creator'
+					'creator',
+					'pkgVersion'
 				]
 			}
 		}
