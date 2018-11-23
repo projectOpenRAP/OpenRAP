@@ -51,21 +51,24 @@ class CloudDownload extends Component {
 		this.downloadManager.onDownloadError(this.handleFailedDownload);
 	}
 
+	getEcarName = (id, ver) => `${id}_${ver.toFixed(1)}.ecar`;
+
 	fetchAndDownloadDependencies(id, ver) {
-		const parent = `${id}_${ver}.0.ecar`;
+		const parent = this.getEcarName(id, ver);
 		const url = `${BASE_URL}/cloud/dependencies/${encodeURIComponent(parent)}`;
 
 		axios.get(url)
 			.then(res => {
 				if (res.data.success) {
 					alert(`Fetched dependencies for "${parent}".`);
+					console.log(res.data.data);
 				} else {
 					throw res.data.err;
 				}
 			})
 			.catch(err => {
 				alert(`Couldn\'t fetch the dependencies for "${parent}".`);
-				console.log(err)
+				console.log(err);
 			});
 	}
 
@@ -207,7 +210,7 @@ class CloudDownload extends Component {
 		});
 
 		if(!alreadyQueued) {
-			newGuid = await this.downloadManager.downloadData(uri, id, ver);
+			newGuid = await this.downloadManager.downloadData(uri, this.getEcarName(id, ver));
 			
 			if(newGuid !== -1) {
 				this.addNewDownload(newGuid, name, id, ver, size, uri);
@@ -223,7 +226,7 @@ class CloudDownload extends Component {
 					alert(`"${name}" has been downlaoded.`);
 					break;
 				case 'failed':
-					newGuid = await this.downloadManager.downloadData(uri, id, ver);
+					newGuid = await this.downloadManager.downloadData(uri, this.getEcarName(id, ver));
 
 					if(newGuid !== -1) {
 						this.updateDownloadGuid(oldGuid, newGuid);

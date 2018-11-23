@@ -3,7 +3,10 @@
 let request = require('request');
 let q = require('q');
 let moment = require('moment');
-let { extractZip } = require('../../filesdk');
+let {
+	extractZip,
+	readFile
+} = require('../../filesdk');
 
 let {
 	config
@@ -209,11 +212,20 @@ let searchContent = (req, res) => {
 		});
 };
 
+let extractDependencyIdList = (manifest, parentId) => {
+	const items = manifest.archive.items;
+	const depIdList = items
+		.map(({ identifier }) => identifier !== parentId ? identifier : null)
+		.filter(item => item !== null && item !== undefined);
+
+	return depIdList;
+}
+
 let getDependencies = (req, res) => {
 	const { parent } = req.params;
 	const src = `${config.FS_ROOT}Desktop/ecar2/${parent}`; // TODO: Make configurable
 	const dest = `/tmp/${parent}`;
-	
+
 	let responseData = {
 		success: false,
 		err: null,
@@ -222,22 +234,43 @@ let getDependencies = (req, res) => {
 
 	extractZip(src, dest)
 		.then(data => {
-			console.log(`Extraction of ${parent} COMPLETE`);
+			return readFile(`${dest}/manifest.json`);
+		})
+		.then(manifest => {
+			const parentId = parent.substring(0, parent.lastIndexOf('_'));
+			const depIdList = extractDependencyIdList(JSON.parse(manifest), parentId);
+
+
+			if (depIdList && depIdList.length > 0) {
+				const reqQuery = {
+					filters: {
+						identifier: depIdList
+					},
+					fields: ['downloadUrl', 'pdkVersion']
+				};
+	
+				return searchSunbirdCloud(reqQuery);
+			} else {
+				return null;
+			}
+		})
+		.then(depSearchResults => {
+			const depDataList = depSearchResults !== null ? depSearchResults.body.result.content : [];
 
 			responseData = {
-				...responseData.data,
+				...responseData,
 				success: true,
-				data
+				data: depDataList
 			};
 
 			res.status(200).json(responseData);
 		})
 		.catch(err => {
-			console.log(`Extraction of ${parent} FAILED`);
+			console.log(`Error occured while fetching ${parent}'s deps.`);
 			console.log(err);
 
 			responseData = {
-				...responseData.data,
+				...responseData,
 				success: false,
 				err
 			};

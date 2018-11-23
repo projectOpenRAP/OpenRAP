@@ -26,12 +26,12 @@ export default class DownloadManager {
 		}
 	}
 
-	async downloadData(uri, id, ver) {
+	async downloadData(uri, ecarName) {
 		if (this.connected) {
 			try {
 				// Add option to overwriting existing files
 				const options = {
-					out: `${id}_${ver}.0.ecar`,
+					out: ecarName,
 					dir: this.dir
 				};
 
