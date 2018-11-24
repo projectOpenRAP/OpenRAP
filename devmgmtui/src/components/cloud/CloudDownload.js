@@ -51,17 +51,42 @@ class CloudDownload extends Component {
 		this.downloadManager.onDownloadError(this.handleFailedDownload);
 	}
 
-	getEcarName = (id, ver) => `${id}_${ver.toFixed(1)}.ecar`;
+	formatBytes(bytes = 0, decimals) {
+		if(bytes === 0) return '0 Bytes';
+		const k = 1024,
+			dm = decimals || 2,
+			sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+			i = Math.floor(Math.log(bytes) / Math.log(k));
+	
+		return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+	}
 
-	fetchAndDownloadDependencies(id, ver) {
+	getEcarName(id, ver) {
+		return `${id}_${ver.toFixed(1)}.ecar`
+	}
+
+	fetchAndDownloadDependencies(id, rootName, ver) {
 		const parent = this.getEcarName(id, ver);
 		const url = `${BASE_URL}/cloud/dependencies/${encodeURIComponent(parent)}`;
 
 		axios.get(url)
 			.then(res => {
 				if (res.data.success) {
-					alert(`Fetched dependencies for "${parent}".`);
-					console.log(res.data.data);
+					// alert(`Fetched dependencies for "${parent}".`);
+					const dependencies = res.data.data;
+					
+					dependencies.forEach(item => {
+						const {
+							downloadUrl,
+							contentType,
+							identifier,
+							pkgVersion,
+							size,
+							name
+						} = item;
+
+						this.handleDownload(`${name} (Root: ${rootName})`, this.formatBytes(size, 1), downloadUrl, contentType, identifier, pkgVersion, false);
+					});
 				} else {
 					throw res.data.err;
 				}
@@ -72,7 +97,7 @@ class CloudDownload extends Component {
 			});
 	}
 
-	addNewDownload(guid, name, id, ver, size, uri) {
+	addNewDownload(guid, name, id, ver, size, uri, isRoot) {
 		let {
 			downloads
 		} = this.props.cloud;
@@ -84,6 +109,7 @@ class CloudDownload extends Component {
 			uri,
 			id,
 			ver,
+			isRoot,
 			status: 'ongoing'
 		});
 
@@ -116,7 +142,10 @@ class CloudDownload extends Component {
 		downloads = downloads.map(item => {
 			if(item.guid === guid) {
 				item.status = 'done';
-				this.fetchAndDownloadDependencies(item.id, item.ver);
+
+				if (item.isRoot) {
+					this.fetchAndDownloadDependencies(item.id, item.name, item.ver);
+				}
 			}
 
 			return item;
@@ -190,7 +219,7 @@ class CloudDownload extends Component {
 		this.handleSearch(queryString, limit, newOffset);
 	}
 
-	async handleDownload(name, size, uri, type, id, ver) {
+	async handleDownload(name, size, uri, type, id, ver, isRoot) {
 		let {
 			downloads
 		} = this.props.cloud;
@@ -213,7 +242,7 @@ class CloudDownload extends Component {
 			newGuid = await this.downloadManager.downloadData(uri, this.getEcarName(id, ver));
 			
 			if(newGuid !== -1) {
-				this.addNewDownload(newGuid, name, id, ver, size, uri);
+				this.addNewDownload(newGuid, name, id, ver, size, uri, isRoot);
 			} else {
 				alert('Not able to download', name);
 			}

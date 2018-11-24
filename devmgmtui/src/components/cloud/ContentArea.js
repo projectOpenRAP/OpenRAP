@@ -108,7 +108,7 @@ function renderRow(data, key, handleDownload) {
 						basic
 						icon='download'
 						size='massive'
-						onClick={() => handleDownload(name, formatBytes(size, 1), downloadUrl, contentType, identifier, pkgVersion)}
+						onClick={() => handleDownload(name, formatBytes(size, 1), downloadUrl, contentType, identifier, pkgVersion, true)}
 					/>
 				</Table.Cell>
 			</Table.Row>
