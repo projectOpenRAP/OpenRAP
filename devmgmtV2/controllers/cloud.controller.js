@@ -217,8 +217,9 @@ let extractDependencyIdList = (manifest, parentId) => {
 	const depIdList = items
 		.map(({ identifier }) => identifier !== parentId ? identifier : null)
 		.filter(item => item !== null && item !== undefined);
+	const uniqueDepIdList = Array.from(new Set(depIdList));
 
-	return depIdList;
+	return uniqueDepIdList;
 }
 
 let getDependencies = (req, res) => {
@@ -246,7 +247,7 @@ let getDependencies = (req, res) => {
 					filters: {
 						identifier: depIdList
 					},
-					fields: ['downloadUrl', 'pdkVersion']
+					fields: ['downloadUrl', 'pkgVersion', 'size', 'name']
 				};
 	
 				return searchSunbirdCloud(reqQuery);
