@@ -78,6 +78,15 @@ function renderDetailsCard(data) {
 }
 
 function renderRow(data, key, handleDownload) {
+	const {	
+		name,
+		size,
+		downloadUrl,
+		contentType,
+		identifier,
+		pkgVersion
+	} = data;
+
 	return (
 		data && 
 			<Table.Row key={key}>
@@ -99,7 +108,7 @@ function renderRow(data, key, handleDownload) {
 						basic
 						icon='download'
 						size='massive'
-						onClick={() => handleDownload(data.name, formatBytes(data.size, 1), data.downloadUrl)}
+						onClick={() => handleDownload(name, formatBytes(size, 1), downloadUrl, contentType, identifier, pkgVersion, true)}
 					/>
 				</Table.Cell>
 			</Table.Row>

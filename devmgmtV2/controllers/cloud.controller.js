@@ -3,6 +3,10 @@
 let request = require('request');
 let q = require('q');
 let moment = require('moment');
+let {
+	extractZip,
+	readFile
+} = require('../../filesdk');
 
 let {
 	config
@@ -48,7 +52,7 @@ let requestWithPromise = (options) => {
 	let defer = q.defer();
 
 	request(options, (err, res) => {
-		if(err) {
+		if (err) {
 			defer.reject(err);
 		} else {
 			defer.resolve(res);
@@ -58,7 +62,7 @@ let requestWithPromise = (options) => {
 	return defer.promise;
 };
 
-let getHeaders = () => {
+let getSearchHeaders = () => {
 	const pattern = 'YYYY-MM-DD HH:mm:ss:SSSZZ';
 	const timestamp = getTimestamp(pattern);
 
@@ -77,7 +81,7 @@ let getHeaders = () => {
 	};
 };
 
-let getSearchBody = (queryString = '', limit, offset) => {
+let getSearchBody = (queryString = '', limit, offset, filters = {}, fields = []) => {
 	const pattern = 'YYYY/MM/DD HH:mm:ss';
 	const timestamp = getTimestamp(pattern);
 
@@ -89,13 +93,16 @@ let getSearchBody = (queryString = '', limit, offset) => {
 		'request': {
 			'query': queryString,
 			'filters': {
+				...filters,
+				'status': ['Live'],
 				'contentType': ['Collection', 'Story', 'Worksheet', 'TextBook', 'Course', 'LessonPlan', 'Resource']
 			},
+			fields,
 			limit,
 			offset
 		}
 	};
-}
+};
 
 let getRequestOptions = (method, uri, body, headers, json = true) => ({
 	method,
@@ -106,10 +113,10 @@ let getRequestOptions = (method, uri, body, headers, json = true) => ({
 });
 
 // Search sunbird cloud with the query string, limit of results to be returned, and offset of results
-let searchSunbirdCloud = ({ query, limit, offset }) => {
+let searchSunbirdCloud = ({ query, limit, offset, filters, fields }) => {
 	const state = getState();
-	const body = getSearchBody(query, +limit, +offset);
-	const headers = getHeaders();
+	const body = getSearchBody(query, +limit, +offset, filters, fields);
+	const headers = getSearchHeaders();
 	const uri = state.searchUrl();
 	const options = getRequestOptions('POST', uri, body, headers);
 
@@ -139,18 +146,20 @@ let replaceUrlWithImageData = (obj) => {
 		});
 };
 
-let filterObjectKeys = (obj = {}, keysToUse = Object.keys(obj)) => {
+let filterObjectKeysAndAddImageData = (obj = {}, keysToUse) => {
+	const state = getState();
 	let filteredObj = {};
+
+	keysToUse = keysToUse || state.keysToUse();
+
 	keysToUse.forEach(key => filteredObj[key] = obj[key]);
 
 	return replaceUrlWithImageData(filteredObj);
 };
 
-let filterKeysInObjectList = (results = [], keysToUse) => {
-	return results.map(obj => filterObjectKeys(obj, keysToUse));
+let manipulateKeysInObjectList = (objectList = [], manipulator) => {
+	return objectList.map(obj => manipulator(obj));
 };
-
-
 
 let searchContent = (req, res) => {
 	let response = {
@@ -160,7 +169,7 @@ let searchContent = (req, res) => {
 	};
 
 	const state = getState();
-	
+
 	let count = 0;
 	let content = [];
 
@@ -172,7 +181,7 @@ let searchContent = (req, res) => {
 
 			count = body.result.count;
 
-			const contentPromises = filterKeysInObjectList(body.result.content, state.keysToUse());
+			const contentPromises = manipulateKeysInObjectList(body.result.content, filterObjectKeysAndAddImageData);
 			return q.allSettled(contentPromises);
 		})
 		.then(data => {
@@ -203,6 +212,75 @@ let searchContent = (req, res) => {
 		});
 };
 
+let extractDependencyIdList = (manifest, parentId) => {
+	const items = manifest.archive.items;
+	const depIdList = items
+		.map(({ identifier }) => identifier !== parentId ? identifier : null)
+		.filter(item => item !== null && item !== undefined);
+	const uniqueDepIdList = Array.from(new Set(depIdList));
+
+	return uniqueDepIdList;
+}
+
+let getDependencies = (req, res) => {
+	const { parent } = req.params;
+	const src = `${config.FS_ROOT}Desktop/ecar2/${parent}`; // TODO: Make configurable
+	const dest = `/tmp/${parent}`;
+
+	let responseData = {
+		success: false,
+		err: null,
+		data: null
+	};
+
+	extractZip(src, dest)
+		.then(data => {
+			return readFile(`${dest}/manifest.json`);
+		})
+		.then(manifest => {
+			const parentId = parent.substring(0, parent.lastIndexOf('_'));
+			const depIdList = extractDependencyIdList(JSON.parse(manifest), parentId);
+
+
+			if (depIdList && depIdList.length > 0) {
+				const reqQuery = {
+					filters: {
+						identifier: depIdList
+					},
+					fields: ['downloadUrl', 'pkgVersion', 'size', 'name']
+				};
+	
+				return searchSunbirdCloud(reqQuery);
+			} else {
+				return null;
+			}
+		})
+		.then(depSearchResults => {
+			const depDataList = depSearchResults !== null ? depSearchResults.body.result.content : [];
+
+			responseData = {
+				...responseData,
+				success: true,
+				data: depDataList
+			};
+
+			res.status(200).json(responseData);
+		})
+		.catch(err => {
+			console.log(`Error occured while fetching ${parent}'s deps.`);
+			console.log(err);
+
+			responseData = {
+				...responseData,
+				success: false,
+				err
+			};
+
+			res.status(200).json(responseData);
+		});
+};
+
 module.exports = {
-	searchContent
+	searchContent,
+	getDependencies
 };
