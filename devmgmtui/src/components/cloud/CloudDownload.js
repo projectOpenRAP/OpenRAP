@@ -46,7 +46,7 @@ class CloudDownload extends Component {
 		this.handleFailedDownload = this.handleFailedDownload.bind(this);
 		this.handleLoadContentClick = this.handleLoadContentClick.bind(this);
 		
-		this.downloadManager = new DownloadManager('/home/genghiskh/Desktop/ecar2'); // TODO: Make download path configurable
+		this.downloadManager = new DownloadManager('/home/admin/sunbird'); // TODO: Make download path configurable
 		this.downloadManager.onDownloadComplete(this.removeDownload);
 		this.downloadManager.onDownloadError(this.handleFailedDownload);
 	}
