@@ -132,17 +132,18 @@ let classify = (dir, file) => {
       return defer.resolve({ 'name': file, 'type': 'dir', 'ext': null, 'size': stats.size })
     } else if (stats.isFile()) {
       const ext = path.extname(file);
-      // const name = path.basename(file).replace(ext, '');
+      const name = path.basename(file).replace(ext, '');
 
       let response = { 'name': file, 'type': 'file', 'ext': 'other', 'size': stats.size };
 
       if (ext === '.ecar') {
         getEcarNameForId(file)
           .then(ecarName => {
-            // const id = name.substring(0, name.lastIndexOf('_'));
+            const id = name.substring(0, name.lastIndexOf('_'));
 
             response.name = ecarName;
-            response.ext = 'ecar';
+            response.ext = ext;
+            response.id = id;
 
             defer.resolve(response);
           }).catch(err => {
