@@ -3,6 +3,7 @@ let fs = require('fs')
 let unzip = require('unzip')
 let { exec } = require('child_process');
 const path = require('path');
+const searchsdk = require('../../searchsdk');
 
 const { config } = require('../config');
 
@@ -102,16 +103,54 @@ let getUSB = (req, res) => {
 
 }
 
+let getEcarNameForId = id => {
+  let defer = q.defer();
+
+  searchsdk.getDocument({
+    indexName: 'sb.db',
+    documentID: id
+  }).then(results => {
+    const metaData = JSON.parse(results.body);
+    const ecarName = metaData.fields["archive.items.name"][0];
+
+    defer.resolve(ecarName);
+  }).catch(err => {
+    defer.reject(err);
+  });
+
+  return defer.promise;
+}
+
 let classify = (dir, file) => {
   let defer = q.defer();
+
   fs.stat(dir + file, (err, stats) => {
     if (err) {
       console.log(err);
       return defer.reject(err);
     } else if (stats.isDirectory()) {
-      return defer.resolve({ 'name': file, 'type': 'dir', 'size': stats.size })
+      return defer.resolve({ 'name': file, 'type': 'dir', 'ext': null, 'size': stats.size })
     } else if (stats.isFile()) {
-      return defer.resolve({ 'name': file, 'type': 'file', 'size': stats.size })
+      const ext = path.extname(file);
+      // const name = path.basename(file).replace(ext, '');
+
+      let response = { 'name': file, 'type': 'file', 'ext': 'other', 'size': stats.size };
+
+      if (ext === '.ecar') {
+        getEcarNameForId(file)
+          .then(ecarName => {
+            // const id = name.substring(0, name.lastIndexOf('_'));
+
+            response.name = ecarName;
+            response.ext = 'ecar';
+
+            defer.resolve(response);
+          }).catch(err => {
+            defer.reject(err);
+          });
+      } else {
+        defer.resolve(response);
+      }
     }
   });
   return defer.promise;
@@ -169,7 +208,7 @@ let openDirectory = (req, res) => {
       children: []
     }
     for (let i = 0; i < response.length; i++) {
-      responseStructure.children.push({ 'name': response[i].value.name, 'type': response[i].value.type, 'size': response[i].value.size });
+      responseStructure.children.push({ 'name': response[i].value.name, 'type': response[i].value.type, 'ext': response[i].value.ext, 'size': response[i].value.size });
     }
     return res.status(200).json(responseStructure);
   }).catch(e => {
