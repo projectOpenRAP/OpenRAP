@@ -209,7 +209,13 @@ let openDirectory = (req, res) => {
       children: []
     }
     for (let i = 0; i < response.length; i++) {
-      responseStructure.children.push({ 'name': response[i].value.name, 'type': response[i].value.type, 'ext': response[i].value.ext, 'size': response[i].value.size });
+      responseStructure.children.push({
+        'name': response[i].value.name,
+        'type': response[i].value.type,
+        'ext': response[i].value.ext,
+        'size': response[i].value.size,
+        'id': response[i].value.id
+      });
     }
     return res.status(200).json(responseStructure);
   }).catch(e => {
@@ -225,8 +231,24 @@ let deleteFileFromDisk = (req, res) => {
     success: false,
     msg: ''
   }
+  let cmd;
+
   fileToDelete = fileToDelete.replace(/'/g, "\'\\''");
-  exec("rm -rf '" + fileToDelete + "'", (err, stdout, stderr) => {
+
+  const ext = path.extname(fileToDelete);
+  const name = path.basename(fileToDelete).replace(ext, '');
+  const dir = path.dirname(fileToDelete);
+
+  const file = path.resolve(dir, name);
+  const depends = path.resolve(dir, '..', 'json_dir', name);
+
+  if (ext === '.ecar') {
+    cmd = `rm -rf ${file}* ${depends}*`;
+  } else {
+    cmd = `rm -rf ${fileToDelete}`;
+  }
+
+  exec(cmd, (err, stdout, stderr) => {
     if (err) {
       console.log(err);
       responseStructure.msg = "Cannot delete this file!";

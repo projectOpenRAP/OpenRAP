@@ -60,7 +60,9 @@ class FileUnitComponent extends Component {
   handleDelete() {
     let consent = window.confirm("Cannot be reverted once it is deleted. Are you sure you want to delete this file?");
     if (consent) {
-      this.props.deleteFile(this.props.filemgmt.currentDir, this.props.name, this.props.auth.user.username, (err, res) => {
+      const fileToDelete = this.props.ext === '.ecar' ? (this.props.id + this.props.ext) : this.props.name;
+
+      this.props.deleteFile(this.props.filemgmt.currentDir, fileToDelete, this.props.auth.user.username, (err, res) => {
         if (err) {
           alert(res);
         } else {
