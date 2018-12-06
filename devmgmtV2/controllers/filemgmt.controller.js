@@ -141,7 +141,7 @@ let classify = (dir, file) => {
           .then(ecarName => {
             const id = name.substring(0, name.lastIndexOf('_'));
 
-            response.name = ecarName;
+            response.name = ecarName + ext;
             response.ext = ext;
             response.id = id;
 
@@ -240,10 +240,11 @@ let deleteFileFromDisk = (req, res) => {
   const dir = path.dirname(fileToDelete);
 
   const file = path.resolve(dir, name);
-  const depends = path.resolve(dir, '..', 'json_dir', name);
+  const json_dir = path.resolve(dir, '..', 'json_dir', name);
+  const xcontent = path.resolve(dir, '..', 'xcontent', name);
 
   if (ext === '.ecar') {
-    cmd = `rm -rf ${file}* ${depends}*`;
+    cmd = `rm -rf ${file}* ${json_dir}* ${xcontent}*`;
   } else {
     cmd = `rm -rf ${fileToDelete}`;
   }
