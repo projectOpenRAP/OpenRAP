@@ -121,6 +121,23 @@ let getEcarNameForId = id => {
   return defer.promise;
 }
 
+const isEcarDir = (dir) => {
+	// make following configurable
+	let ecarDirList = [
+		'/home/admin/sunbird/ecar_files',
+		'/home/admin/ekStep/ecar_files'
+	];
+	
+	dir = path.resolve(dir);
+	ecarDirList = ecarDirList.map(dir => path.resolve(dir));
+	
+	if (ecarDirList.indexOf(dir) !== -1 ) {
+		return true;
+	}
+
+	return false;
+}
+
 let classify = (dir, file) => {
   let defer = q.defer();
 
@@ -136,7 +153,7 @@ let classify = (dir, file) => {
 
       let response = { 'name': file, 'type': 'file', 'ext': 'other', 'size': stats.size };
 
-      if (ext === '.ecar') {
+      if (ext === '.ecar' && isEcarDir(dir)) {
         getEcarNameForId(file)
           .then(ecarName => {
             const id = name.substring(0, name.lastIndexOf('_'));
