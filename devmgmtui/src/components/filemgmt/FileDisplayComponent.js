@@ -116,7 +116,7 @@ class FileDisplayComponent extends Component {
     });
     let files = this.props.filemgmt.files.map((item, index) => {
         return (
-          item.type === 'file' ? <List.Item key={index}><FileUnitComponent name={item.name} size={item.size} /></List.Item> : null
+          item.type === 'file' ? <List.Item key={index}><FileUnitComponent name={item.name} size={item.size} ext={item.ext} id={item.id}/></List.Item> : null
         )
     });
     return (
