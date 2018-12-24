@@ -110,7 +110,7 @@ let registerDikshaApp = () => {
   }
 }'
 */
-let registerSunbirdDevice = (token) => {
+let registerDikshaDevice = (token) => {
 	let defer = q.defer();
 	const pattern = 'YYYY-MM-DD HH:mm:ss:SSSZZ';
 	const timestamp = getTimestamp(pattern);
