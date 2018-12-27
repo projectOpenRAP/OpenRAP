@@ -224,7 +224,7 @@ let extractDependencyIdList = (manifest, parentId) => {
 
 let getDependencies = (req, res) => {
 	const { parent } = req.params;
-	const src = `${config.FS_ROOT}sunbird/${parent}`; // TODO: Make configurable
+	const src = `${config.FS_ROOT}diksha/${parent}`; // TODO: Make configurable
 	const dest = `/tmp/${parent}`;
 
 	let responseData = {
