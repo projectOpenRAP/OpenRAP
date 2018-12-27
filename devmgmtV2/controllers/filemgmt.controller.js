@@ -142,7 +142,7 @@ const isEcarDir = dir => {
 // make following configurable
 const getEcarDb = dir => {
   let db;
-  const contentFolder = path.basename(dir.replace(path.basename(dir), ''));
+  const contentFolder = path.basename(path.dirname(dir));
 
   switch (contentFolder) {
     case 'ekStep':
