@@ -169,13 +169,17 @@ let checkFileCreationTime = (plugin) => {
         if (err) {
             defer.resolve(fileToBeMoved);
         } else {
-            data = JSON.parse(data);
-            let timeNow = (new Date()).getTime()
-            let timeDiff = timeNow - data.time;
-            if (timeDiff < 15 * 60 * 1000) {
-                defer.resolve(fileToBeMoved);
+            if (data) {
+                data = JSON.parse(data);
+                let timeNow = (new Date()).getTime()
+                let timeDiff = timeNow - data.time;
+                if (timeDiff < 15 * 60 * 1000) {
+                    defer.resolve(fileToBeMoved);
+                } else {
+                    fileToBeMoved.toBeMoved = true;
+                    defer.resolve(fileToBeMoved);
+                }
             } else {
-                fileToBeMoved.toBeMoved = true;
                 defer.resolve(fileToBeMoved);
             }
         }

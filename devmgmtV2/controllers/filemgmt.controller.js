@@ -103,11 +103,11 @@ let getUSB = (req, res) => {
 
 }
 
-let getEcarNameForId = id => {
+let getEcarNameForId = (id, db) => {
   let defer = q.defer();
 
   searchsdk.getDocument({
-    indexName: 'sb.db',
+    indexName: db,
     documentID: id
   }).then(results => {
     const metaData = JSON.parse(results.body);
@@ -121,11 +121,12 @@ let getEcarNameForId = id => {
   return defer.promise;
 }
 
-const isEcarDir = (dir) => {
-	// make following configurable
+// make following configurable
+const isEcarDir = dir => {
 	let ecarDirList = [
 		'/home/admin/sunbird/ecar_files',
-		'/home/admin/ekStep/ecar_files'
+    '/home/admin/ekStep/ecar_files',
+    '/home/admin/diksha/ecar_files'
 	];
 	
 	dir = path.resolve(dir);
@@ -136,6 +137,32 @@ const isEcarDir = (dir) => {
 	}
 
 	return false;
+}
+
+// make following configurable
+const getEcarDb = dir => {
+  let db;
+  const contentFolder = path.basename(path.dirname(dir));
+
+  switch (contentFolder) {
+    case 'ekStep':
+      db = 'es.db';
+      break;
+
+    case 'sunbird':
+      db = 'sb.db';
+      break;
+
+    case 'diksha':
+      db = 'dk.db';
+      break;
+
+    default:
+      db = null;
+      break;
+  }
+
+  return db;
 }
 
 let classify = (dir, file) => {
@@ -154,7 +181,9 @@ let classify = (dir, file) => {
       let response = { 'name': file, 'type': 'file', 'ext': 'other', 'size': stats.size };
 
       if (ext === '.ecar' && isEcarDir(dir)) {
-        getEcarNameForId(file)
+        const db = getEcarDb(dir);
+
+        getEcarNameForId(file, db)
           .then(ecarName => {
             const id = name.substring(0, name.lastIndexOf('_'));
 

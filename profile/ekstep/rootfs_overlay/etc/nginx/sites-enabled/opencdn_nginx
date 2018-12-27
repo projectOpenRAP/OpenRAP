@@ -28,17 +28,17 @@ server {
 
     location @ekstep {
 		# On encountering a 404 here, it will
-		# resort to @sunbird, and then fallback
+		# resort to @diksha, and then fallback
 		# to displaying 404.
 
         root /home/admin/ekstep/;
         proxy_intercept_errors on;
         recursive_error_pages on;
-        error_page 404 = @sunbird;
+        error_page 404 = @diksha;
     }
 
-	location @sunbird {
-        root /home/admin/sunbird/;
+	location @diksha {
+        root /home/admin/diksha/;
     }
 
 	#
