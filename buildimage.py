@@ -150,7 +150,7 @@ def syncthing_init():
     if os.path.isdir(syncthing_dir):
         log.info("Pulling from syncthing:master...")
 
-        cmd = "cd " + syncthing_dir + " && git pull origin master"
+        cmd = "cd " + syncthing_dir + " && git pull"
         run_cmd(cmd)
     else:
         log.info("Cloning syncthing:master...")
