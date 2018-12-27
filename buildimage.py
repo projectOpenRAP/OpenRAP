@@ -141,11 +141,22 @@ def golang_init():
         cmd = "go get github.com/mohae/deepcopy"
         run_cmd(cmd)
 
-        cmd = "git clone https://github.com/syncthing/syncthing " + syncthing_dir
-        run_cmd(cmd)
 
     return
 
+def syncthing_init():
+
+    # Check if syncthig is already cloned and pull latest if present else clone
+    if os.path.isdir(syncthing_dir):
+        log.info("Pulling from syncthing:master...")
+
+        cmd = "cd " + syncthing_dir + " && git pull"
+        run_cmd(cmd)
+    else:
+        log.info("Cloning syncthing:master...")
+
+        cmd = "git clone https://github.com/syncthing/syncthing " + syncthing_dir
+        run_cmd(cmd)
 
 class Platform(object):
     '''This is a class of PlatformBoard
@@ -252,6 +263,8 @@ class Device(object):
         '''Ensure all directory structure and files are present'''
 
         golang_init()
+
+        syncthing_init()
 
         # Create a 'opencdn' directory inside build where all the files will be copied
         try:
