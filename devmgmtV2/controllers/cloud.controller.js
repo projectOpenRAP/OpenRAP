@@ -112,8 +112,8 @@ let getRequestOptions = (method, uri, body, headers, json = true) => ({
 	json
 });
 
-// Search sunbird cloud with the query string, limit of results to be returned, and offset of results
-let searchSunbirdCloud = ({ query, limit, offset, filters, fields }) => {
+// Search diksha cloud with the query string, limit of results to be returned, and offset of results
+let searchDikshaCloud = ({ query, limit, offset, filters, fields }) => {
 	const state = getState();
 	const body = getSearchBody(query, +limit, +offset, filters, fields);
 	const headers = getSearchHeaders();
@@ -173,7 +173,7 @@ let searchContent = (req, res) => {
 	let count = 0;
 	let content = [];
 
-	searchSunbirdCloud(req.query)
+	searchDikshaCloud(req.query)
 		.then(({ body }) => {
 			if (!(body.params.status === 'successful')) {
 				throw new Error(body.params.err);
@@ -250,7 +250,7 @@ let getDependencies = (req, res) => {
 					fields: ['downloadUrl', 'pkgVersion', 'size', 'name']
 				};
 	
-				return searchSunbirdCloud(reqQuery);
+				return searchDikshaCloud(reqQuery);
 			} else {
 				return null;
 			}
