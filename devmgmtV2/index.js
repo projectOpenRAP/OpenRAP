@@ -11,7 +11,7 @@ let app = express();
 let { exec } = require('child_process');
 let { repeatedlyCheckForInternet, repeatedlyCheckUsers } = require('./telemetry_cron.js');
 let { initiateTelemetrySync } = require('./telemetry_sync');
-let { generateOriginalJWTs } = require('./helpers/cloud.helper.js');
+let { generateOriginalJWTs, shutdownCron } = require('./helpers/cloud.helper.js');
 
 const fs = require('fs');
 const request = require('request');
@@ -40,6 +40,8 @@ require('./routes/captive.routes.js')(app);
 require('./routes/config.routes.js')(app);
 require('./routes/cloud.routes.js')(app);
 
+let searchJwtCron = null;
+
 app.listen(8080, err => {
     if (err)
         console.log(err);
@@ -49,6 +51,15 @@ app.listen(8080, err => {
         cron.schedule("*/15 * * * * *", () => {
             repeatedlyCheckForInternet();
             repeatedlyCheckUsers();
+        });
+
+        searchJwtCron = cron.schedule("* * * * *", () => {
+          generateOriginalJWTs().then(value => {
+            console.log("Successfully obtained JWT for search");
+            shutdownCron(searchJwtCron);
+          }).catch(err => {
+            console.log("Error in obtaining JWT for search: ", err);
+          });
         });
 
         console.log("server running on port 8080");

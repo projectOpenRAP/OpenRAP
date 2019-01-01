@@ -181,6 +181,11 @@ let generateOriginalJWTs = () => {
 	return defer.promise;
 }
 
+let shutdownCron = (cronjob) => {
+	cronjob.destroy();
+}
+
 module.exports = {
-	generateOriginalJWTs
+	generateOriginalJWTs,
+	shutdownCron
 }
