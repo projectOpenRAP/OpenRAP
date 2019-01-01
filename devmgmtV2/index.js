@@ -79,10 +79,5 @@ app.listen(8080, err => {
             console.log(stdout);
           }
         });
-        generateOriginalJWTs().then(value => {
-          console.log("Successfully registered to cloud");
-        }).catch(e => {
-          console.log("Error: ", e.err);
-        });
     }
 });
