@@ -126,7 +126,8 @@ const isEcarDir = dir => {
 	let ecarDirList = [
 		'/home/admin/sunbird/ecar_files',
     '/home/admin/ekStep/ecar_files',
-    '/home/admin/diksha/ecar_files'
+    '/home/admin/diksha/ecar_files',
+    '/home/admin/forwater/ecar_files'
 	];
 	
 	dir = path.resolve(dir);
@@ -155,6 +156,10 @@ const getEcarDb = dir => {
 
     case 'diksha':
       db = 'dk.db';
+      break;
+
+    case 'forwater':
+      db = 'fw.db';
       break;
 
     default:
