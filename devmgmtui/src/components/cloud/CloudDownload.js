@@ -175,7 +175,7 @@ class CloudDownload extends Component {
 			if(err) {
 				console.log(err);
 				
-				alert('Trouble fetching content from Diksha server.');
+				alert('Trouble fetching content from Forwater server.');
 			}
 		});
 	}
