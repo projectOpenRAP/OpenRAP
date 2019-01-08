@@ -112,7 +112,7 @@ let getRequestOptions = (method, uri, body, headers, json = true) => ({
 	json
 });
 
-// Search diksha cloud with the query string, limit of results to be returned, and offset of results
+// Search forwater cloud with the query string, limit of results to be returned, and offset of results
 let searchDikshaCloud = ({ query, limit, offset, filters, fields }) => {
 	const state = getState();
 	const body = getSearchBody(query, +limit, +offset, filters, fields);
@@ -224,7 +224,7 @@ let extractDependencyIdList = (manifest, parentId) => {
 
 let getDependencies = (req, res) => {
 	const { parent } = req.params;
-	const src = `${config.FS_ROOT}diksha/${parent}`; // TODO: Make configurable
+	const src = `${config.FS_ROOT}forwater/${parent}`; // TODO: Make configurable
 	const dest = `/tmp/${parent}`;
 
 	let responseData = {

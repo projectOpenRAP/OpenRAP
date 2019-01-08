@@ -28,17 +28,17 @@ server {
 
     location @ekstep {
 		# On encountering a 404 here, it will
-		# resort to @diksha, and then fallback
+		# resort to @forwater, and then fallback
 		# to displaying 404.
 
         root /home/admin/ekstep/;
         proxy_intercept_errors on;
         recursive_error_pages on;
-        error_page 404 = @diksha;
+        error_page 404 = @forwater;
     }
 
-	location @diksha {
-        root /home/admin/diksha/;
+	location @forwater {
+        root /home/admin/forwater/;
     }
 
 	#
