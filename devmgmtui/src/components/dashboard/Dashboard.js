@@ -7,6 +7,7 @@ import { Segment, Grid } from 'semantic-ui-react';
 
 import SideNav from '../common/Sidebar';
 import ChartSegment from './ChartSegment';
+import SysInfo from './SysInfo';
 
 let timer;
 
@@ -25,7 +26,7 @@ class Dashboard extends Component {
     }
 
     renderCharts() {
-        const systemInfo = () => { return <ChartSegment /> }
+        const systemInfo = () => { return <SysInfo /> }
         const memoryUsage = () => { return <ChartSegment id='mem'/> }
         const spaceUsage = () => { return <ChartSegment id='space'/> }
         const cpuUsage = () => { return <ChartSegment id='cpu'/> }
