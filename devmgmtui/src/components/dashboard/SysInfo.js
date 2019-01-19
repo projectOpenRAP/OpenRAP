@@ -64,7 +64,7 @@ class SysInfo extends Component {
             <ProgressBar numberOfUsers={this.props.dashboard.usersConnected.numberOfUsers} />
             :
             false;
-        let internetStatus = this.props.dashboard && this.props.dashboard.internetStatus && this.props.dashboard.internetStatus.data 
+        let internetStatus = this.props.dashboard && this.props.dashboard.internetStatus && typeof this.props.dashboard.internetStatus.data !== 'undefined'
             ?
             (
                 this.props.dashboard.internetStatus.data
