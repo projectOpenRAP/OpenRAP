@@ -9,15 +9,28 @@ const exec = require('child_process').exec;
 
 const { config } = require('../config');
 let { selectFields } = require('dbsdk');
+var ping = require("ping")
 
 let getInternetStatus = (req, res) => {
-    dns.lookup('google.com', (err) => {
-        if (err) {
-            res.send({data : false});
-        } else {
-            res.send({data : true});
+    let responseData = {
+        retrieveSuccessful : true,
+        data  : false,
+        msg : 'Successfully retrieved internet Status.'
+    }
+
+    const cmd = path.join(__dirname, '../../CDN/netconnect_status.sh');
+
+    exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
+
+    	if(err) {
+            responseData.retrieveSuccessful = false;
+    		responseData.msg = err;
+    	}  else {
+            responseData.data = stdout.trim();
         }
-    })
+
+        res.status(200).json(responseData);
+    });
 }
 
 let getLastRefresh = (req, res) => {
