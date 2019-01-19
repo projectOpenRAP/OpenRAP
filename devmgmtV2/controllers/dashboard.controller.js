@@ -9,7 +9,6 @@ const exec = require('child_process').exec;
 
 const { config } = require('../config');
 let { selectFields } = require('dbsdk');
-var ping = require("ping")
 
 let getInternetStatus = (req, res) => {
     let responseData = {
