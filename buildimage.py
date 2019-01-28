@@ -155,7 +155,7 @@ def syncthing_init():
     else:
         log.info("Cloning syncthing:master...")
 
-        cmd = "git clone https://github.com/syncthing/syncthing " + syncthing_dir
+        cmd = "git clone -b v1.0.0 https://github.com/syncthing/syncthing " + syncthing_dir
         run_cmd(cmd)
 
 class Platform(object):
