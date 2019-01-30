@@ -178,7 +178,7 @@ let searchContent = (req, res) => {
 	let content = [];
 
 	generateOriginalJWTs()
-		.then(searchDikshaCloud(req.query))
+		.then(() => searchDikshaCloud(req.query))
 		.then(({ body }) => {
 			if (!(body.params.status === 'successful')) {
 				throw new Error(body.params.err);
