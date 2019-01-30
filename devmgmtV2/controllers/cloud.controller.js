@@ -12,6 +12,10 @@ let {
 	config
 } = require('../config');
 
+let {
+	generateOriginalJWTs
+} = require('../helpers/cloud.helper.js');
+
 let getState = () => {
 	let {
 		userToken,
@@ -173,7 +177,8 @@ let searchContent = (req, res) => {
 	let count = 0;
 	let content = [];
 
-	searchDikshaCloud(req.query)
+	generateOriginalJWTs()
+		.then(searchDikshaCloud(req.query))
 		.then(({ body }) => {
 			if (!(body.params.status === 'successful')) {
 				throw new Error(body.params.err);
