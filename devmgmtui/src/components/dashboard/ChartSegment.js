@@ -1,44 +1,11 @@
 import React, { Component } from 'react';
 
 import { connect } from 'react-redux';
-import * as actions from '../../actions/dashboard';
 
-import { Segment, Grid, Header, Message, Progress } from 'semantic-ui-react';
+import { Segment, Header, Message } from 'semantic-ui-react';
 
 import PieChart from 'react-svg-piechart';
 import './dashboard.css';
-
-const ProgressBar = ({ numberOfUsers }) => {
-
-    const handleProgressColor = () => {
-        if(numberOfUsers <= 15) {
-            return 'green';
-        } else if (numberOfUsers > 15 && numberOfUsers <= 25) {
-            return 'orange';
-        } else {
-            return 'red';
-        }
-    }
-
-    const handleProgress = () => {
-        return (
-            (numberOfUsers/25)*100
-        );
-    }
-
-    return (
-        <div style={{marginTop: '1%'}}>
-            <Progress
-                percent={handleProgress()}
-                color={handleProgressColor()}
-                style={{marginBottom: '0'}}
-                className="progress-bar-content"
-            >
-                {numberOfUsers}/25
-            </Progress>
-        </div>
-    )
-}
 
 class ChartSegment extends Component {
 
@@ -46,11 +13,6 @@ class ChartSegment extends Component {
         let memoryData = this.props.dashboard.memoryData;
         let spaceData = this.props.dashboard.spaceData;
         let cpuData = this.props.dashboard.cpuData;
-        let version = this.props.dashboard.version;
-        let usersConnected = this.props.dashboard.usersConnected;
-        let internetStatus = this.props.dashboard.internetStatus;
-        let lastRefreshTime = this.props.dashboard.lastRefreshTime;
-        let deviceID = this.props.dashboard.deviceID;
 
         let data = [];
         let header = {};
@@ -125,101 +87,8 @@ class ChartSegment extends Component {
 
             break;
 
-            // Segment showing system version and uptime returned directly
             default: {
-                const secondsToDDHHMMSS = (totalSeconds) => {
-                    let days    = Math.floor(totalSeconds / (3600 * 24));
-                    let hours   = Math.floor((totalSeconds - days * 3600 * 24) / 3600);
-                    let minutes = Math.floor((totalSeconds - days * 3600 * 24 - hours * 3600) / 60);
-
-                    let result =  (days < 10 ? "0" + days : days);
-                        result += ":" + (hours < 10 ? "0" + hours : hours);
-                        result += ":" + (minutes < 10 ? "0" + minutes : minutes);
-
-                    return result;
-                }
-
-                let ssid                    = this.props.ssid.currentSSID || this.props.dashboard.currentSSID;
-                let sysVersion              = version.data.toString();
-                let sysUpTimeInDDHHMMSS     = secondsToDDHHMMSS(memoryData.sysUpTime);
-                let numberOfUsersConnected  = usersConnected.numberOfUsers;
-
-                return (
-                    <Segment color='teal'>
-                        <Header color='teal'>
-                            System Information
-                        </Header>
-
-                        <Grid centered columns='equal'>
-                            <Grid.Row centered>
-                                <Grid.Column>
-                                    <Message
-                                        icon='id badge'
-                                        header='Device ID'
-                                        content={deviceID}
-                                    />
-                                </Grid.Column>
-
-                                <Grid.Column>
-                                    <Message
-                                        icon='time'
-                                        header='System Uptime'
-                                        content={sysUpTimeInDDHHMMSS}
-                                    />
-                                </Grid.Column>
-
-                                <Grid.Column>
-                                    <Message
-                                        icon='tag'
-                                        header='System Version'
-                                        content={sysVersion}
-                                    />
-                                </Grid.Column>
-                            </Grid.Row>
-                            <Grid.Row centered>
-                                <Grid.Column>
-                                    <Message
-                                        icon='wifi'
-                                        header='SSID'
-                                        content={ssid}
-                                    />
-                                </Grid.Column>
-
-                                <Grid.Column>
-                                    <Message compact
-                                        style={{width: '100%'}}
-                                        icon='signal'
-                                        header='Internet Connectivity'
-                                        content={internetStatus.data ? 'Connected' : 'Not connected'}
-                                    />
-                                </Grid.Column>
-
-                                <Grid.Column>
-                                    <Message
-                                        icon='refresh'
-                                        header='Last Content Refresh'
-                                        content={lastRefreshTime.data || 'Not refreshed yet'}
-                                    />
-                                </Grid.Column>
-                            </Grid.Row>
-                            <Grid.Row centered>
-                                <Grid.Column>
-                                    <Message
-                                        icon='users'
-                                        header='Number of Users connected'
-                                        content={
-                                            <ProgressBar
-                                                numberOfUsers={numberOfUsersConnected}
-                                            />
-                                        }
-                                    />
-                                </Grid.Column>
-                                <Grid.Column/>
-                                <Grid.Column/>
-                            </Grid.Row>
-                        </Grid>
-                    </Segment>
-                )
+                return null;
             }
         }
 
@@ -265,9 +134,6 @@ class ChartSegment extends Component {
                     dashboard.memoryData
                     && dashboard.spaceData
                     && dashboard.cpuData
-                    && dashboard.version
-                    && dashboard.usersConnected
-                    && dashboard.internetStatus
                     ? this.renderData()
                     : this.renderLoader()
                 }
@@ -276,8 +142,8 @@ class ChartSegment extends Component {
     }
 }
 
-function mapStateToProps({ dashboard, ssid }) {
-    return { dashboard, ssid }
+function mapStateToProps({ dashboard }) {
+    return { dashboard }
 }
 
-export default connect(mapStateToProps, actions)(ChartSegment);
+export default connect(mapStateToProps, null)(ChartSegment);
