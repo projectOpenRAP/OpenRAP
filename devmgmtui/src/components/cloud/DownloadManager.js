@@ -9,24 +9,31 @@ export default class DownloadManager {
 		this.connected = false;
 		this.dir = dir;
 		this.aria2 = aria2;
+
+		this.aria2.on('close', () => {
+			this.connected = false;	
+		});
+
+		this.aria2.on('open', () => {
+			this.connected = true;
+		});
 	}
 
 	async connect() {
-		if(!this.connected) {
+		if (!this.connected) {
 			try {
-				const connectStatus = await this.aria2.open();
-				this.connected = true;
-				
-				console.log('Connection established.');
+				await this.aria2.open();
+				console.log('Connected to aria2.');
 			} catch(err) {
-				console.log('Not able to connect.');
+				console.log('Error occured while connecting to aria2.');
+				console.log({ err });
 			}
 		} else {
 			console.log('Already connected.');
 		}
 	}
 
-	async downloadData(uri, ecarName) {
+	async downloadData(uri, ecarName, retries = 3) {
 		if (this.connected) {
 			try {
 				// Add option to overwriting existing files
@@ -41,9 +48,13 @@ export default class DownloadManager {
 				console.log('Error occurred while queuing download.', err);
 				return -1;
 			}
-		} else {
-			console.log('Connection not established. Please connect first.');
+		} else if (retries == 0) {
+			console.log('Couldn\'t connect to aria2.');
 			return -1;
+		} else {
+			console.log('Connection not established. Re-establishing connection...');
+			await this.connect();
+			return this.downloadData(uri, ecarName, --retries);
 		}
 	}
 
