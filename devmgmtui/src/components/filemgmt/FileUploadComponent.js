@@ -115,11 +115,11 @@ class FileUploadComponent extends Component {
         <Segment>
         <span>
         <Button animated color='blue' onClick={this.transferToUSB.bind(this)} disabled = {!this.state.usbConnected || this.state.isUploadingToUsb} loading={this.state.isUploadingToUsb}>
-          <Button.Content visible>Transfer Folder to USB</Button.Content>
+          <Button.Content visible>Transfer Contents to USB</Button.Content>
           <Button.Content hidden><Icon name='usb' /><Icon name='up arrow'/></Button.Content>
         </Button>
         <Button animated color='blue' onClick={this.transferFromUSB.bind(this)} disabled = {!this.state.usbConnected || this.state.isDownloadingFromUsb} loading={this.state.isDownloadingFromUsb}>
-          <Button.Content visible>Transfer Here From USB</Button.Content>
+          <Button.Content visible>Transfer Contents From USB</Button.Content>
           <Button.Content hidden><Icon name='usb' /><Icon name='down arrow'/></Button.Content>
         </Button>
         </span>
