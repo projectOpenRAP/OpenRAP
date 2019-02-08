@@ -45,7 +45,6 @@ class App extends Component {
                     <Route exact path={"/upgrade"} component={verifyAuth(Upgrade)} />
                     <Route exact path={"/filemgmt"} component={verifyAuth(FileMgmt)} />
                     <Route exact path={"/dashboard"} component={verifyAuth(Dashboard)} />
-                    <Route exact path={"/upgrade"} component={verifyAuth(Upgrade)} />
                     <Route exact path={"/captive"} component={verifyAuth(Captive)} />
                     <Route exact path={"/cloud"} component={verifyAuth(CloudDownload)} />
                 </div>

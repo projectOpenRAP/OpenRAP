@@ -55,7 +55,10 @@ class UpgradeDisplayComponent extends Component {
       alert('Please select a file to upload');
       return;
     }
-    this.setState({fileUploadedStatus:"ACTIVE"});
+    else{
+      alert("After upgrade the device will be rebooted. Would you like to proceed?");
+      this.setState({fileUploadedStatus:"ACTIVE"});
+    }
   }
 
 
