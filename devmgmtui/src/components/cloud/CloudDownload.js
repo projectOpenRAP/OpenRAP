@@ -176,6 +176,7 @@ class CloudDownload extends Component {
 				console.log(err);
 				
 				alert('Trouble fetching content from Diksha server.');
+				this.props.clearCurrentContent();
 			}
 		});
 	}
@@ -320,8 +321,6 @@ class CloudDownload extends Component {
 
 	componentDidMount() {
 		document.title = 'Cloud Download';
-		
-		this.handleSearchClick();
 		this.downloadManager.connect();
 	}
 	
