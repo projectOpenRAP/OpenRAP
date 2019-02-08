@@ -52,7 +52,7 @@ class UpgradeDisplayComponent extends Component {
 
   submitFilesForUpload() {
     if (this.state.fileToAdd == null) {
-      alert('Select a file to upload first');
+      alert('Please select a file to upload');
       return;
     }
     this.setState({fileUploadedStatus:"ACTIVE"});
@@ -95,7 +95,7 @@ class UpgradeDisplayComponent extends Component {
         <span style={{float : 'right'}}>
 
           <Button animated color={this.state.fileUploadedStatus === 'ERROR' ? 'red': 'green'} onClick = {this.submitFilesForUpload.bind(this)}>
-            <Button.Content visible>Begin upload!</Button.Content>
+            <Button.Content visible>Start upgrade!</Button.Content>
             <Button.Content hidden><Icon name='checkmark'/></Button.Content>
           </Button>
         </span>
