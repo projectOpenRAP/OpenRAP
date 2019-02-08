@@ -80,7 +80,7 @@ function renderNoDownloads() {
 	return (
 		<div style={styles.noDownloads}>
 			<Icon name='download' size='huge' />
-			<h2>No downloads in progress.</h2>
+			<h2>No downloads in progress</h2>
 		</div>
 	);
 }
