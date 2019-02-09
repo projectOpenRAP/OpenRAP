@@ -53,11 +53,10 @@ class CreateUser extends Component {
 	            				break;
 	            		case 2:alert("Please Enter Password");
 	            				break;
-	            		default:alert("Unknown error");
+	            		default:alert(msg);
                     }
                 }
                 else{
-                    alert("Success");
                     this.props.history.push("/users");
                 }
 
@@ -70,6 +69,7 @@ class CreateUser extends Component {
         let isError = false;
         let a=0;
         
+        //Note the negation symbol "!" which is used below 
         if(!(/^[A-za-z0-9]*$/.test (this.state.user) && this.state.user.length>=1)){
             isError = true;
             a=1;

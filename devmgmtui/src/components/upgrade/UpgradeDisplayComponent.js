@@ -31,7 +31,15 @@ class UpgradeDisplayComponent extends Component {
   }
 
   handleFileInputChange(selectedFile) {
-    this.setState({fileName : selectedFile[0].name, fileToAdd : selectedFile[0]});
+    let re = /\.tgz/ 
+		if(!(re.test(selectedFile[0].name))){
+      alert("Select a correct file to Upgrade the device");
+		}
+		else {
+      this.setState({fileName : selectedFile[0].name, fileToAdd : selectedFile[0]});
+      console.log(selectedFile[0].name.length);//currently selected file's length
+    };
+    
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -56,7 +64,7 @@ class UpgradeDisplayComponent extends Component {
       return;
     }
     else{
-      alert("After upgrade the device will be rebooted. Would you like to proceed?");
+      alert("After upgrade the device will be rebooted.");
       this.setState({fileUploadedStatus:"ACTIVE"});
     }
   }
