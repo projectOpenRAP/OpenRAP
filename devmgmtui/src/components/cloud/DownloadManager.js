@@ -12,7 +12,7 @@ export default class DownloadManager {
 
 		this.aria2.on('close', () => {
 			console.log('Disconnected from the download manager.');
-			this.connected = false;	
+			this.connected = false;
 			this.connect();
 		});
 
@@ -23,16 +23,15 @@ export default class DownloadManager {
 	}
 
 	async connect() {
-		if (!this.connected) {
+		if (this.connected) {
+			console.log('Already connected.');
+		} else {
 			try {
 				await this.aria2.open();
-				console.log('Connected to aria2.');
 			} catch(err) {
-				console.log('Error occured while connecting to aria2.');
+				console.log('Error occured while connecting to the download manager.');
 				console.log({ err });
 			}
-		} else {
-			console.log('Already connected.');
 		}
 	}
 
@@ -52,10 +51,9 @@ export default class DownloadManager {
 				return -1;
 			}
 		} else if (retries == 0) {
-			console.log('Couldn\'t connect to aria2.');
+			console.log('Couldn\'t connect to the download manager.');
 			return -1;
 		} else {
-			console.log('Connection not established. Re-establishing connection...');
 			await this.connect();
 			return this.downloadData(uri, ecarName, --retries);
 		}
