@@ -11,10 +11,13 @@ export default class DownloadManager {
 		this.aria2 = aria2;
 
 		this.aria2.on('close', () => {
+			console.log('Disconnected from the download manager.');
 			this.connected = false;	
+			this.connect();
 		});
 
 		this.aria2.on('open', () => {
+			console.log('Connected to the download manager.');
 			this.connected = true;
 		});
 	}
