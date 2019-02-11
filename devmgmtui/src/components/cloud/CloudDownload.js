@@ -175,7 +175,7 @@ class CloudDownload extends Component {
 			if(err) {
 				console.log(err);
 				
-				alert('Unable to connect to Diksha server. Check your internet connection and retry.');
+				alert('Unable to connect to Cloud Media server. Check your internet connection and retry.');
 				this.props.clearCurrentContent();
 			}
 		});
