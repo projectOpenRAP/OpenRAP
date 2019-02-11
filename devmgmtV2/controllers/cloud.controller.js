@@ -196,6 +196,18 @@ let searchContent = (req, res) => {
 	let count = 0;
 	let content = [];
 
+	/*
+		This snippet does the following,
+
+		1. Check the Internet connectivity, if connected go to step 2, else throw an error and go to step 7.
+		2. Check the validity status of the current token, if valid return the current token and go to step 4, else go to step 3.
+		3. Generate and return a new auth token and go to the next step.
+		4. Set the token received (will remain unchanged if the current token is valid), perform search and go to the next step.
+		5. If the search was successful set token's validity status to true and go to step 8, else go to step 6.
+		6. Set token's validity status to false, throw an error and go to step 7.
+		7. Print the error message and return a 200 response with error message.
+		8. Parse the search hits and return a 200 response with the parsed search hits.
+	*/
 	getInternetStatus()
 		.then(connected => {
 			if (connected) {
