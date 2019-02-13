@@ -70,7 +70,7 @@ let getInternetStatus = () => {
     	if(err) {
             defer.resolve(false);
     	}  else {
-            defer.resolve(!!stdout.trim());
+            defer.resolve(true);
         }
 	});
 	
