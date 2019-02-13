@@ -279,7 +279,7 @@ let deleteFileFromDisk = (req, res) => {
   }
   let cmd;
 
-  fileToDelete = "\"" + fileToDelete + "\"";
+  fileToDelete = fileToDelete.replace(/\W/g,"\\$&");
 
   const ext = path.extname(fileToDelete);
   const name = path.basename(fileToDelete).replace(ext, '');

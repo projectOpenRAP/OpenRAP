@@ -105,8 +105,8 @@ export const deleteFolder = (prefix, folderName, actor, cb) =>  (dispatch) => {
   });
 }
 
-export const deleteFile = (prefix, folderName, actor, cb) =>  (dispatch) => {
-  let fullPath = encodeURIComponent(prefix + folderName);
+export const deleteFile = (prefix, fileName, actor, cb) =>  (dispatch) => {
+  let fullPath = encodeURIComponent(prefix + fileName);
   axios.delete(`${BASE_URL}/file/delete`, {params : {path : fullPath, timestamp : getTimestamp(), actor}}).then((response) => {
     if (response.data.success) {
       cb(null, "success");
