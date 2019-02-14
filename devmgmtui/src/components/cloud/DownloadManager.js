@@ -81,4 +81,19 @@ export default class DownloadManager {
 		const details = await this.aria2.call('tellStatus', guid);
 		return details;
 	}
+
+	async getActiveDownloads() {
+		const details = await this.aria2.call('tellActive');
+		return details;
+	}
+
+	async getWaitingDownloads(offset, num) {
+		const details = await this.aria2.call('tellWaiting', offset, num);
+		return details;
+	}
+
+	async getGlobalStat() {
+		const details = await this.aria2.call('getGlobalStat');
+		return details;
+	}
 }
