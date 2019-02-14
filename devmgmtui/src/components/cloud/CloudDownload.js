@@ -31,7 +31,8 @@ class CloudDownload extends Component {
 		super(props);
 
 		this.state = {
-			input: ''
+			input: '',
+			downloadPath: '/home/admin/diksha/'
 		};
 
 		this.handleSearch = this.handleSearch.bind(this);
@@ -45,19 +46,19 @@ class CloudDownload extends Component {
 		this.removeDownload = this.removeDownload.bind(this);
 		this.handleFailedDownload = this.handleFailedDownload.bind(this);
 		this.handleLoadContentClick = this.handleLoadContentClick.bind(this);
-		
-		this.downloadManager = new DownloadManager('/home/admin/diksha'); // TODO: Make download path configurable
+
+		this.downloadManager = new DownloadManager(this.state.downloadPath); // TODO: Make download path configurable
 		this.downloadManager.onDownloadComplete(this.removeDownload);
 		this.downloadManager.onDownloadError(this.handleFailedDownload);
 	}
 
 	formatBytes(bytes = 0, decimals) {
-		if(bytes === 0) return '0 Bytes';
+		if (bytes === 0) return '0 Bytes';
 		const k = 1024,
 			dm = decimals || 2,
 			sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
 			i = Math.floor(Math.log(bytes) / Math.log(k));
-	
+
 		return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 	}
 
@@ -74,7 +75,7 @@ class CloudDownload extends Component {
 				if (res.data.success) {
 					// alert(`Fetched dependencies for "${parent}".`);
 					const dependencies = res.data.data;
-					
+
 					dependencies.forEach(item => {
 						const {
 							downloadUrl,
@@ -97,10 +98,12 @@ class CloudDownload extends Component {
 			});
 	}
 
-	addNewDownload(guid, name, id, ver, size, uri, isRoot) {
+	addNewDownload({ guid, name, id, ver, size, uri, isRoot, status }) {
 		let {
 			downloads
 		} = this.props.cloud;
+
+		status = status || 'ongoing';
 
 		downloads.push({
 			guid,
@@ -110,7 +113,7 @@ class CloudDownload extends Component {
 			id,
 			ver,
 			isRoot,
-			status: 'ongoing'
+			status
 		});
 
 		this.props.updateDownloadQueue(downloads, () => console.log('Queued: ', guid));
@@ -122,7 +125,7 @@ class CloudDownload extends Component {
 		} = this.props.cloud;
 
 		downloads = downloads.map(item => {
-			if(item.guid === oldGuid) {
+			if (item.guid === oldGuid) {
 				item.guid = newGuid;
 				item.status = 'ongoing';
 			}
@@ -133,14 +136,13 @@ class CloudDownload extends Component {
 		this.props.updateDownloadQueue(downloads, () => console.log(`Updated ${oldGuid} to ${newGuid}`));
 	}
 
-	// TODO: Add a getter for tellActive under DownloadManager and clear any dangling downloads inside removeDownload().
 	removeDownload(guid) {
 		let {
 			downloads
 		} = this.props.cloud;
 
 		downloads = downloads.map(item => {
-			if(item.guid === guid) {
+			if (item.guid === guid) {
 				item.status = 'done';
 
 				if (item.isRoot) {
@@ -160,7 +162,7 @@ class CloudDownload extends Component {
 		} = this.props.cloud;
 
 		downloads = downloads.map(item => {
-			if(item.guid === guid) {
+			if (item.guid === guid) {
 				item.status = 'failed';
 			}
 
@@ -169,24 +171,24 @@ class CloudDownload extends Component {
 
 		this.props.updateDownloadQueue(downloads, () => console.log('Failed: ', guid));
 	}
-	
+
 	handleSearch(queryString, limit, offset) {
 		this.props.searchContent(queryString, limit, offset, (err) => {
-			if(err) {
+			if (err) {
 				console.log(err);
-				
+
 				alert('Trouble fetching content from Diksha server.');
 				this.props.clearCurrentContent();
 			}
 		});
 	}
-	
+
 	handleSearchClick() {
 		this.props.clearCurrentContent(err => {
-			if(err) {
+			if (err) {
 				console.log('Error occurred while clearing content. Error: ');
 				console.log(err);
-				
+
 				alert('Some mess-up happened while searching for content. Try again.');
 			} else {
 				this.handleSearch(this.state.input, this.props.cloud.limit, 1);
@@ -195,7 +197,7 @@ class CloudDownload extends Component {
 	}
 
 	handleSearchKeyUp(event) {
-		if(event.keyCode === 13) {
+		if (event.keyCode === 13) {
 			event.preventDefault();
 			this.handleSearchClick();
 		}
@@ -232,24 +234,25 @@ class CloudDownload extends Component {
 		let status;
 
 		downloads.forEach(item => {
-			if(item.uri === uri) {
+			if (item.id === id) {
 				oldGuid = item.guid;
 				alreadyQueued = true;
 				status = item.status;
 			}
 		});
 
-		if(!alreadyQueued) {
+		if (!alreadyQueued) {
 			newGuid = await this.downloadManager.downloadData(uri, this.getEcarName(id, ver));
-			
-			if(newGuid !== -1) {
-				this.addNewDownload(newGuid, name, id, ver, size, uri, isRoot);
+
+			if (newGuid !== -1) {
+				this.addNewDownload({ guid: newGuid, name, id, ver, size, uri, isRoot });
 			} else {
 				alert('Not able to download', name);
 			}
 		} else {
-			switch(status) {
+			switch (status) {
 				case 'ongoing':
+				case 'waiting':
 					alert(`"${name}" is being downladed.`);
 					break;
 				case 'done':
@@ -258,7 +261,7 @@ class CloudDownload extends Component {
 				case 'failed':
 					newGuid = await this.downloadManager.downloadData(uri, this.getEcarName(id, ver));
 
-					if(newGuid !== -1) {
+					if (newGuid !== -1) {
 						this.updateDownloadGuid(oldGuid, newGuid);
 					} else {
 						alert(`Not able to download "${name}".`);
@@ -269,7 +272,7 @@ class CloudDownload extends Component {
 	}
 
 	handleLoadContentClick() {
-		if(window.confirm('Some services might be interrupted for a moment. Do you still wish to proceed?')) {
+		if (window.confirm('Some services might be interrupted for a moment. Do you still wish to proceed?')) {
 			this.props.loadContent(err => {
 				if (err) {
 					console.log('Error occured while applying changes.');
@@ -319,11 +322,78 @@ class CloudDownload extends Component {
 		);
 	}
 
+	async updateDownloadList() {
+		const globalStat = await this.downloadManager.getGlobalStat();
+
+		let consolidatedDownloadsList = [];
+		let downloadedFiles = [];
+
+		let [activeDownloads, waitingDownloads] = await Promise.all([
+			this.downloadManager.getActiveDownloads(),
+			this.downloadManager.getWaitingDownloads(0, parseInt(globalStat.numWaiting))
+		]);
+
+		const parseDownloadList = downloads => {
+			downloads.map(download => {
+			const {
+				gid,
+				files,
+				totalLength
+			} = download;
+
+			const file = files[0];
+			const path = file.path;
+
+			const name = path.substring(path.lastIndexOf('/')+1).replace(/.ecar/, '');;
+			const id = name.substring(0, name.lastIndexOf('_'));
+			const ver = name.substring(name.lastIndexOf('_'), name.lastIndexOf('.'));
+			const size = this.formatBytes(totalLength);
+			const uri = file.uris[0].uri;
+
+			return ({ guid: gid, name, id, ver, size, uri, isRoot: false, status: 'ongoing' });
+		});
+		}
+
+		activeDownloads = parseDownloadList(activeDownloads);
+		waitingDownloads = parseDownloadList(waitingDownloads);
+
+		axios.get(`${BASE_URL}/file/open`, { params: { path: this.state.downloadPath } })
+			.then(response => {
+				downloadedFiles = response.data.children;
+
+				downloadedFiles = downloadedFiles
+					.filter(item => item.type === 'file')
+					.map(item => {
+						let {
+							name,
+							size
+						} = item;
+
+						name = name.replace(/.ecar/, '');
+						const id = name.substring(0, name.lastIndexOf('_'));
+						const ver = name.substring(name.lastIndexOf('_'), name.lastIndexOf('.'));
+						size = this.formatBytes(size);
+
+						return ({ name, size, id, ver, isRoot: false, status: 'done' });
+					});
+					
+					downloadedFiles.forEach(item => this.addNewDownload(item));
+			})
+			.catch(error => {
+				console.log("Error fetching downloaded files.");
+				console.log(error);
+			});
+
+		consolidatedDownloadsList = consolidatedDownloadsList.concat(activeDownloads, waitingDownloads);
+		consolidatedDownloadsList.forEach(download => this.addNewDownload(download));
+	}
+
 	componentDidMount() {
 		document.title = 'Cloud Download';
 		this.downloadManager.connect();
+		this.updateDownloadList();
 	}
-	
+
 	render() {
 		return (
 			<div style={styles.parentDiv}>
