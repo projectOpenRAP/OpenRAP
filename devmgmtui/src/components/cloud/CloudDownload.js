@@ -177,7 +177,7 @@ class CloudDownload extends Component {
 			if (err) {
 				console.log(err);
 
-				alert('Trouble fetching content from Diksha server.');
+				alert('Unable to connect to Cloud Media server. Check your internet connection and retry.');
 				this.props.clearCurrentContent();
 			}
 		});
@@ -327,42 +327,47 @@ class CloudDownload extends Component {
 
 		let consolidatedDownloadsList = [];
 		let downloadedFiles = [];
-
 		let [activeDownloads, waitingDownloads] = await Promise.all([
 			this.downloadManager.getActiveDownloads(),
 			this.downloadManager.getWaitingDownloads(0, parseInt(globalStat.numWaiting))
 		]);
 
-		const parseDownloadList = downloads => {
-			downloads.map(download => {
-			const {
-				gid,
-				files,
-				totalLength
-			} = download;
+		const parseDownloadList = (downloads, status) => {
+			return downloads.map(download => {
+				const {
+					gid,
+					files,
+					totalLength
+				} = download;
 
-			const file = files[0];
-			const path = file.path;
+				const file = files[0];
+				const path = file.path;
 
-			const name = path.substring(path.lastIndexOf('/')+1).replace(/.ecar/, '');;
-			const id = name.substring(0, name.lastIndexOf('_'));
-			const ver = name.substring(name.lastIndexOf('_'), name.lastIndexOf('.'));
-			const size = this.formatBytes(totalLength);
-			const uri = file.uris[0].uri;
+				const name = path.substring(path.lastIndexOf('/') + 1).replace(/.ecar/, '');;
+				const id = name.substring(0, name.lastIndexOf('_'));
+				const ver = name.substring(name.lastIndexOf('_'), name.lastIndexOf('.'));
+				const size = this.formatBytes(totalLength);
+				const uri = file.uris[0].uri;
 
-			return ({ guid: gid, name, id, ver, size, uri, isRoot: false, status: 'ongoing' });
-		});
-		}
+				return ({ guid: gid, name, id, ver, size, uri, isRoot: false, status });
+			});
+		};
 
-		activeDownloads = parseDownloadList(activeDownloads);
-		waitingDownloads = parseDownloadList(waitingDownloads);
+		const getUniqueDownloadList = (downloads, key) => {
+			let seen = {};
+			return downloads.filter(item => {
+				const k = item[key];
+				return seen.hasOwnProperty(k) ? false : (seen[k] = true);
+			});
+		};
+
+		activeDownloads = parseDownloadList(activeDownloads, 'ongoing');
+		waitingDownloads = parseDownloadList(waitingDownloads, 'waiting');
 
 		axios.get(`${BASE_URL}/file/open`, { params: { path: this.state.downloadPath } })
 			.then(response => {
-				downloadedFiles = response.data.children;
-
-				downloadedFiles = downloadedFiles
-					.filter(item => item.type === 'file')
+				downloadedFiles = response.data.children
+					.filter(item => item.type === 'file' && item.name.endsWith('.ecar'))
 					.map(item => {
 						let {
 							name,
@@ -376,16 +381,14 @@ class CloudDownload extends Component {
 
 						return ({ name, size, id, ver, isRoot: false, status: 'done' });
 					});
-					
-					downloadedFiles.forEach(item => this.addNewDownload(item));
+
+				consolidatedDownloadsList = [].concat(activeDownloads, waitingDownloads, downloadedFiles);
+				getUniqueDownloadList(consolidatedDownloadsList, 'id').forEach(download => this.addNewDownload(download));
 			})
 			.catch(error => {
 				console.log("Error fetching downloaded files.");
 				console.log(error);
 			});
-
-		consolidatedDownloadsList = consolidatedDownloadsList.concat(activeDownloads, waitingDownloads);
-		consolidatedDownloadsList.forEach(download => this.addNewDownload(download));
 	}
 
 	componentDidMount() {
