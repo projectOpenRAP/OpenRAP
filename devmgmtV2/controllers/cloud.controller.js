@@ -3,6 +3,8 @@
 let request = require('request');
 let q = require('q');
 let moment = require('moment');
+const exec = require('child_process').exec;
+const path = require('path');
 let {
 	extractZip,
 	readFile
@@ -16,7 +18,7 @@ let {
 	generateOriginalJWTs
 } = require('../helpers/cloud.helper.js');
 
-let getState = () => {
+let state = (() => {
 	let {
 		userToken,
 		authToken,
@@ -24,6 +26,8 @@ let getState = () => {
 		searchUrlSuffix,
 		filter
 	} = config.cloudAPI;
+
+	let isAuthTokenValid = false;
 
 	let { keysToUse } = filter;
 
@@ -38,6 +42,11 @@ let getState = () => {
 			return authToken;
 		},
 
+		isAuthTokenValid(status) {
+			isAuthTokenValid = typeof status !== 'undefined' ? status : isAuthTokenValid;
+			return isAuthTokenValid;
+		},
+
 		searchUrl(suffix) {
 			searchUrlSuffix = suffix || searchUrlSuffix;
 			return `${baseUrl}${searchUrlSuffix}`;
@@ -48,9 +57,25 @@ let getState = () => {
 			return keysToUse;
 		}
 	};
-};
+})();
 
 let getTimestamp = (pattern) => moment().format(pattern);
+
+let getInternetStatus = () => {
+	let defer = q.defer();
+
+    const cmd = path.join(__dirname, '../../CDN/netconnect_status.sh');
+
+    exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
+    	if(err) {
+            defer.resolve(false);
+    	}  else {
+            defer.resolve(true);
+        }
+	});
+	
+	return defer.promise;
+}
 
 let requestWithPromise = (options) => {
 	let defer = q.defer();
@@ -69,8 +94,6 @@ let requestWithPromise = (options) => {
 let getSearchHeaders = () => {
 	const pattern = 'YYYY-MM-DD HH:mm:ss:SSSZZ';
 	const timestamp = getTimestamp(pattern);
-
-	const state = getState();
 
 	return {
 		'Accept': 'application/json',
@@ -118,7 +141,6 @@ let getRequestOptions = (method, uri, body, headers, json = true) => ({
 
 // Search diksha cloud with the query string, limit of results to be returned, and offset of results
 let searchDikshaCloud = ({ query, limit, offset, filters, fields }) => {
-	const state = getState();
 	const body = getSearchBody(query, +limit, +offset, filters, fields);
 	const headers = getSearchHeaders();
 	const uri = state.searchUrl();
@@ -151,7 +173,6 @@ let replaceUrlWithImageData = (obj) => {
 };
 
 let filterObjectKeysAndAddImageData = (obj = {}, keysToUse) => {
-	const state = getState();
 	let filteredObj = {};
 
 	keysToUse = keysToUse || state.keysToUse();
@@ -172,22 +193,51 @@ let searchContent = (req, res) => {
 		hits: null
 	};
 
-	const state = getState();
-
 	let count = 0;
 	let content = [];
 
-	generateOriginalJWTs()
-		.then(() => searchDikshaCloud(req.query))
-		.then(({ body }) => {
-			if (!(body.params.status === 'successful')) {
-				throw new Error(body.params.err);
+	/*
+		This snippet does the following,
+
+		1. Check the Internet connectivity, if connected go to step 2, else throw an error and go to step 7.
+		2. Check the validity status of the current token, if valid return the current token and go to step 4, else go to step 3.
+		3. Generate and return a new auth token and go to the next step.
+		4. Set the token received (will remain unchanged if the current token is valid), perform search and go to the next step.
+		5. If the search was successful set token's validity status to true and go to step 8, else go to step 6.
+		6. Set token's validity status to false, throw an error and go to step 7.
+		7. Print the error message and return a 200 response with error message.
+		8. Parse the search hits and return a 200 response with the parsed search hits.
+	*/
+	getInternetStatus()
+		.then(connected => {
+			if (connected) {
+				if (state.isAuthTokenValid()) {
+					console.log("Cloud auth token already exists.");
+					return { token: state.authToken() };
+				} else {
+					console.log("Generating cloud auth token...");
+					return generateOriginalJWTs();
+				}
+			} else {
+				throw new Error("No Internet connectivity.");
 			}
+		})
+		.then(({ token }) => {
+			state.authToken(token);
+			return searchDikshaCloud(req.query);
+		})
+		.then(({ body }) => {
+			if (body && body.params && body.params.status === "successful") {
+				state.isAuthTokenValid(true);
 
-			count = body.result.count;
+				count = body.result.count;
 
-			const contentPromises = manipulateKeysInObjectList(body.result.content, filterObjectKeysAndAddImageData);
-			return q.allSettled(contentPromises);
+				const contentPromises = manipulateKeysInObjectList(body.result.content, filterObjectKeysAndAddImageData);
+				return q.allSettled(contentPromises);
+			} else {
+				state.isAuthTokenValid(false);
+				throw new Error(body.message || body.params.err);
+			}
 		})
 		.then(data => {
 			content = data.map(item => item.value);

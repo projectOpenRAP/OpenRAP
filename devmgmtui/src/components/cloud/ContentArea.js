@@ -148,7 +148,7 @@ function renderTable(content, handleDownload) {
 }
 
 function renderNoResultsFound(query) {
-	const placeholderText = !query ? "Nothing to show here" : `No results found for "${query}"`;
+	const placeholderText = query ? `No results found for "${query}"` : "Nothing to show here";
 
 	return (
 		<div style={styles.noResults}>
