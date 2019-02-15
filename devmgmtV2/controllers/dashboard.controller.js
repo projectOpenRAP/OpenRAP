@@ -34,8 +34,8 @@ let getInternetStatus = (req, res) => {
 
 let getLastRefresh = (req, res) => {
     let meta = path.join(config.FS_ROOT, '.meta');
-    fs.readFile(meta, 'utf-8', (err,data)=>{
-        res.send({data});
+    fs.readFile(meta, 'utf-8', (err, data = "Not refreshed yet") => {
+        res.send({ data });
     })
 }
 
