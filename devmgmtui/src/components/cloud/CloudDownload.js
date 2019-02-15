@@ -343,7 +343,7 @@ class CloudDownload extends Component {
 				const file = files[0];
 				const path = file.path;
 
-				const name = path.substring(path.lastIndexOf('/') + 1).replace(/.ecar/, '');;
+				const name = path.substring(path.lastIndexOf('/') + 1).replace(/.ecar/, '');
 				const id = name.substring(0, name.lastIndexOf('_'));
 				const ver = name.substring(name.lastIndexOf('_'), name.lastIndexOf('.'));
 				const size = this.formatBytes(totalLength);
