@@ -70,6 +70,10 @@ systemctl restart aria2
 
 reboot_device
 
+# These instructions have been moved after the reboot
+# because this script gets called from within the devmgmt
+# service and once devmgmt got restarted, the script came
+# to a halt and further instructions were never executed
 systemctl enable devmgmt
 systemctl restart devmgmt
 
