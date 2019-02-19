@@ -6,6 +6,11 @@ export default function(ComposedComponent) {
         componentWillMount() {
             if (!this.props.verify.authenticated) {
                 this.props.history.push('/');
+            } else {
+                const { pathname } = this.props.location;
+                if (pathname === "/") {
+                    this.props.history.push("/dashboard");
+                }
             }
         }
 
