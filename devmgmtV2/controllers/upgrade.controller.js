@@ -13,17 +13,15 @@ let writeUpdateFile = (req, res) => {
       console.log(err);
       res.status(500).json({success : false});
     } else {
-      exec('/opt/opencdn/CDN/upgrade.sh ' + updateFileArgument, (err, stdout, stderr) => {
-        if (err){
-          console.log(err);
-        } else if (stdout){
-          console.log(stdout)
+      exec('/opt/opencdn/CDN/upgrade.sh ' + updateFileArgument, (error, stdout, stderr) => {
+        if (error) {
+          res.status(200).json({success : false});
         } else {
-          console.log('Script error : ' + stderr);
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+        res.status(200).json({success : true});
         }
       })
-
-      res.status(200).json({success : true});
     }
   })
 }

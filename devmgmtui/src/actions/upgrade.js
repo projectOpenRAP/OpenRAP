@@ -22,11 +22,10 @@ export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
     if(response.data.success) {
       cb(null, "success");
     } else {
-      cb("Error", "Could not save file!");
+      cb("Error", "Could not ugrade with this file!");
     }
   })
   .catch(e => {
-    console.log(e);
     cb("Error", "Server error")
   })
 }
