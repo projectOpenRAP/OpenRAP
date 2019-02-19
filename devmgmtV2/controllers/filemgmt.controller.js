@@ -279,20 +279,23 @@ let deleteFileFromDisk = (req, res) => {
   }
   let cmd;
 
-  fileToDelete = fileToDelete.replace(/\W/g,"\\$&");
-
   const ext = path.extname(fileToDelete);
   const name = path.basename(fileToDelete).replace(ext, '');
   const dir = path.dirname(fileToDelete);
-
   const file = path.resolve(dir, name);
   const json_dir = path.resolve(dir, '..', 'json_dir', name);
   const xcontent = path.resolve(dir, '..', 'xcontent', name);
-
+  
   if (ext === '.ecar') {
     cmd = `rm -rf ${file}* ${json_dir}* ${xcontent}*`;
   } else {
-    cmd = `rm -rf ${fileToDelete}`;
+    if(!(dir.startsWith('/home/admin/diksha'))){
+      fileToDelete = fileToDelete.replace(/\W/g,"\\$&");
+      cmd = `rm -rf ${fileToDelete}`;
+    }else {
+      responseStructure.msg = "Cannot Delete this file!";
+      return res.status(200).json(responseStructure);
+    }
   }
 
   exec(cmd, (err, stdout, stderr) => {

@@ -111,7 +111,7 @@ export const deleteFile = (prefix, fileName, actor, cb) =>  (dispatch) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
-      cb("Error", "Cannot delete!");
+      cb("Error", "Cannot Delete this file!");
     }
   }, reject => {
     console.log(reject);
