@@ -42,8 +42,8 @@ class FolderUnitComponent extends Component {
   }
 
   shortenString(string) {
-    if (string.length > 30) {
-      return (string.slice(0, 8) + '...' + string.slice(-6))
+    if (string.length > 45) {
+      return (string.slice(0, 16) + '...' + string.slice(-6))
     }
     return string;
   }

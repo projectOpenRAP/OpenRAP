@@ -111,7 +111,7 @@ let getEcarNameForId = (id, db) => {
     documentID: id
   }).then(results => {
     const metaData = JSON.parse(results.body);
-    const ecarName = metaData.fields["archive.items.name"][0];
+    const ecarName = metaData.fields["archive.items.name"];
 
     defer.resolve(ecarName);
   }).catch(err => {
