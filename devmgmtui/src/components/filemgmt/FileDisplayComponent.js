@@ -71,9 +71,19 @@ class FileDisplayComponent extends Component {
   selectAll() {
     let currentDirFiles = this.props.filemgmt.files;
     if (!this.state.allSelected) {
+      if(this.props.filemgmt.currentDir === "/home/admin/diksha/ecar_files/") {
+        this.props.updateSelectedFiles(currentDirFiles.map((item, index) => (item.id + item.ext)));
+      }
+      else {
       this.props.updateSelectedFiles(currentDirFiles.map((item, index) => item.name));
+      }     
     } else if(!this.props.filemgmt.selectedFiles.length) {
-      this.props.updateSelectedFiles(currentDirFiles.map((item, index) => item.name));
+      if (this.props.filemgmt.currentDir === "/home/admin/diksha/ecar_files/") {
+        this.props.updateSelectedFiles(currentDirFiles.map((item, index) => (item.id + item.ext)));
+      }
+      else {
+      this.props.updateSelectedFiles(currentDirFiles.map((item, index) => item.name)); 
+      }   
     } else {
       this.props.updateSelectedFiles([]);
     }
