@@ -12,6 +12,9 @@ const styles = {
 	downloadCard: {
 		width: '100%'
 	},
+	downloadCardSubheading: {
+		color: 'grey'
+	},
 	downloadCardList: {
 		paddingBottom: '32px'
 	},
@@ -37,6 +40,7 @@ function DownloadCard(props) {
 	switch(status) {
 		case 'ongoing': cardStatusIndicator = <Loader active />; break;
 		case 'done': cardStatusIndicator = <Icon name='check circle' size='big' color='green' />; break;
+		case 'waiting': cardStatusIndicator = <Icon name='pause circle' size='big' color='yellow' />; break;
 		case 'failed': cardStatusIndicator = <Icon name='warning circle' size='big' color='red' />; break;
 	}
 
@@ -44,10 +48,10 @@ function DownloadCard(props) {
 		<Segment compact style={styles.downloadCard}>
 			<Grid columns={2}>
 				<Grid.Column width={13} stretched>
-					<Header as='h2' floated='left'>
+					<Header as='h2' floated='left' size='medium'>
 						<Header.Content>
-							{name}
-							<Header.Subheader>Size {size}</Header.Subheader>
+								{name}
+							<Header.Subheader style={styles.downloadCardSubheading}>Size: {size}</Header.Subheader>
 						</Header.Content>
 					</Header>
 				</Grid.Column>
@@ -80,7 +84,7 @@ function renderNoDownloads() {
 	return (
 		<div style={styles.noDownloads}>
 			<Icon name='download' size='huge' />
-			<h2>No downloads in progress.</h2>
+			<h2>No downloads in progress</h2>
 		</div>
 	);
 }

@@ -36,7 +36,7 @@ class App extends Component {
       <div className="App">
             <BrowserRouter >
                 <div>
-                    <Route exact path={"/"} component={Login} />
+                    <Route exact path={"/"} component={verifyAuth(Login)} />
                     <Route exact path={"/users/edit/:username/:permissions"} component={verifyAuth(EditUser)} />
                     <Route exact path={"/create/user"} component={verifyAuth(CreateUser)} />
                     <Route exact path={"/users"} component={verifyAuth(UserList)} />

@@ -3,6 +3,8 @@
 let request = require('request');
 let q = require('q');
 let moment = require('moment');
+const exec = require('child_process').exec;
+const path = require('path');
 let {
 	extractZip,
 	readFile
@@ -12,7 +14,7 @@ let {
 	config
 } = require('../config');
 
-let getState = () => {
+let state = (() => {
 	let {
 		userToken,
 		authToken,
@@ -44,9 +46,25 @@ let getState = () => {
 			return keysToUse;
 		}
 	};
-};
+})();
 
 let getTimestamp = (pattern) => moment().format(pattern);
+
+let getInternetStatus = () => {
+	let defer = q.defer();
+
+    const cmd = path.join(__dirname, '../../CDN/netconnect_status.sh');
+
+    exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
+    	if(err) {
+            defer.resolve(false);
+    	}  else {
+            defer.resolve(true);
+        }
+	});
+	
+	return defer.promise;
+}
 
 let requestWithPromise = (options) => {
 	let defer = q.defer();
@@ -65,8 +83,6 @@ let requestWithPromise = (options) => {
 let getSearchHeaders = () => {
 	const pattern = 'YYYY-MM-DD HH:mm:ss:SSSZZ';
 	const timestamp = getTimestamp(pattern);
-
-	const state = getState();
 
 	return {
 		'Accept': 'application/json',
@@ -114,7 +130,6 @@ let getRequestOptions = (method, uri, body, headers, json = true) => ({
 
 // Search forwater cloud with the query string, limit of results to be returned, and offset of results
 let searchForwaterCloud = ({ query, limit, offset, filters, fields }) => {
-	const state = getState();
 	const body = getSearchBody(query, +limit, +offset, filters, fields);
 	const headers = getSearchHeaders();
 	const uri = state.searchUrl();
@@ -147,7 +162,6 @@ let replaceUrlWithImageData = (obj) => {
 };
 
 let filterObjectKeysAndAddImageData = (obj = {}, keysToUse) => {
-	const state = getState();
 	let filteredObj = {};
 
 	keysToUse = keysToUse || state.keysToUse();
@@ -168,21 +182,26 @@ let searchContent = (req, res) => {
 		hits: null
 	};
 
-	const state = getState();
-
 	let count = 0;
 	let content = [];
 
-	searchForwaterCloud(req.query)
-		.then(({ body }) => {
-			if (!(body.params.status === 'successful')) {
-				throw new Error(body.params.err);
+	getInternetStatus()
+		.then(connected => {
+			if (connected) {
+				return searchForwaterCloud(req.query);
+			} else {
+				throw new Error("No Internet connectivity.");
 			}
+		})
+		.then(({ body }) => {
+			if (body && body.params && body.params.status === "successful") {
+				count = body.result.count;
 
-			count = body.result.count;
-
-			const contentPromises = manipulateKeysInObjectList(body.result.content, filterObjectKeysAndAddImageData);
-			return q.allSettled(contentPromises);
+				const contentPromises = manipulateKeysInObjectList(body.result.content, filterObjectKeysAndAddImageData);
+				return q.allSettled(contentPromises);
+			} else {
+				throw new Error(body.message || body.params.err);
+			}
 		})
 		.then(data => {
 			content = data.map(item => item.value);

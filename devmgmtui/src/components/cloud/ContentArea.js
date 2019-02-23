@@ -148,10 +148,12 @@ function renderTable(content, handleDownload) {
 }
 
 function renderNoResultsFound(query) {
+	const placeholderText = query ? `No results found for "${query}"` : "Nothing to show here";
+
 	return (
 		<div style={styles.noResults}>
 			<Icon name='search' size='massive'/>
-			<h2>No results found for "{query}"</h2>
+			<h2>{placeholderText}</h2>
 		</div>
 	);
 }

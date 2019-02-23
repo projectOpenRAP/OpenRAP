@@ -12,7 +12,7 @@ for i in $files_saved
 do
 	 cp $i /tmp
 done
-	
+
 }
 
 restore_files()
@@ -62,9 +62,6 @@ systemctl restart searchserver
 systemctl enable appserver
 systemctl restart appserver
 
-systemctl enable devmgmt
-systemctl restart devmgmt
-
 systemctl enable syncthing
 systemctl restart syncthing
 
@@ -73,8 +70,14 @@ systemctl restart aria2
 
 reboot_device
 
-exit 0
+# These instructions have been moved after the reboot
+# because this script gets called from within the devmgmt
+# service and once devmgmt got restarted, the script came
+# to a halt and further instructions were never executed
+systemctl enable devmgmt
+systemctl restart devmgmt
 
+exit 0
 }
 
 pre_install()
@@ -90,7 +93,7 @@ if [ "$1" == "-post" ]
 	then
 	post_install
 fi
-	
+
 if [ "$1" == "-pre" ]
 		then
 		pre_install

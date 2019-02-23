@@ -53,15 +53,6 @@ app.listen(8080, err => {
             repeatedlyCheckUsers();
         });
 
-        // searchJwtCron = cron.schedule("* * * * *", () => {
-        //   generateOriginalJWTs().then(value => {
-        //     console.log("Successfully obtained JWT for search");
-        //     shutdownCron(searchJwtCron);
-        //   }).catch(err => {
-        //     console.log("Error in obtaining JWT for search: ", err);
-        //   });
-        // });
-
         console.log("server running on port 8080");
         exec('mysql -u root -proot < /opt/opencdn/devmgmtV2/init.sql', (err, stdout, stderr) => {
           if (err) {
