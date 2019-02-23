@@ -59,8 +59,9 @@ class FolderUnitComponent extends Component {
         if (err) {
           alert(res);
         } else {
-          alert("Folder deletion success");
-          this.props.readFolder(this.props.filemgmt.currentDir);
+          this.props.readFolder(this.props.filemgmt.currentDir, () =>{
+            alert("Folder deletion success");
+          });
         }
       });
     } else {

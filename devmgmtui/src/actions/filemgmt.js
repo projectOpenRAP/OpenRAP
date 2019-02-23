@@ -27,7 +27,8 @@ export const applyChanges = (cb) => (dispatch) => {
         });
 }
 
-export const readFolder = (folderPath, update=true) => (dispatch) => {
+export const readFolder = (folderPath, cb) => (dispatch) => {
+  let update = true;
   let encodedPath = encodeURIComponent(folderPath)
   axios.get(`${BASE_URL}/file/open`, {params : {path : encodedPath}})
     .then((response) => {
@@ -37,9 +38,11 @@ export const readFolder = (folderPath, update=true) => (dispatch) => {
       dispatch({type : 'READ_DIR', payload : response.data.children});
       dispatch({type : 'OPEN_DIR', payload : folderPath});
       localStorage.setItem('directoryData',folderPath);
+      cb && cb();
   })
     .catch(e => {
       console.log(e);
+      cb && cb();
       alert ('No permissions to read folder');
     })
 }
