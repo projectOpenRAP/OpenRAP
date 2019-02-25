@@ -44,11 +44,44 @@ class CreateUser extends Component {
         this.props.createUser(this.state.user, this.state.password, this.props.auth.user.username, (err,msg)=>{
             if(err){
                 alert(msg);
-            }else{
-                alert("Success");
-                this.props.history.push("/users");
             }
+            else{
+                const error=this.validate();
+	            if(error){
+	            	switch(error){
+	            		case 1:alert("Name should contain only alphabets and should not be blank");
+	            				break;
+	            		case 2:alert("Please Enter Password");
+	            				break;
+	            		default:alert(msg);
+                    }
+                }
+                else{
+                    this.props.history.push("/users");
+                }
+
+            }
+            
         });
+    }
+    
+    validate = () => {
+        let isError = false;
+        let a=0;
+        
+        //Note the negation symbol "!" which is used below 
+        if(!(/^[A-za-z0-9]*$/.test (this.state.user) && this.state.user.length>=1)){
+            isError = true;
+            a=1;
+        }
+        else{
+            if(!(this.state.password.length>=1)){
+                isError = true;
+                a=2;
+            }
+        }
+
+        return a;
     }
 
     handleKeyPress = (e) =>
