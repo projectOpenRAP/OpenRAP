@@ -78,15 +78,19 @@ let extractZip = (source, destination) => {
     return extractWithUnzipStream(source, destination);
 }
 let extractWithUnzipStream = (src, dest) => {
-	let defer = q.defer();
-
-	fs.createReadStream(src)
+        let defer = q.defer();
+        fs.createReadStream(src)
 		.pipe(unzip.Extract({ path: dest }))
 		.on('close', (err) => {
-			if (err) defer.reject(err);
-			else defer.resolve('Done!!!');
-        });
-
+			if (err) {
+			    defer.reject(err);
+			}	
+			else {
+                defer.resolve('Done!!!');
+			}	
+        	}).on('error', (err) => {
+			    defer.reject(err);
+		});	
 	return defer.promise;
 }
 let extractTar = (source, destination) => {
