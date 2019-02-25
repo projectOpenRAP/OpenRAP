@@ -24,7 +24,7 @@ class FileUnitComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected : (this.props.filemgmt.selectedFiles.indexOf(props.name) >= 0)
+      selected : (this.props.filemgmt.selectedFiles.indexOf(props.name) >= 0 || this.props.filemgmt.selectedFiles.indexOf(props.id + props.ext) >= 0)
     }
     this.toggleSelected = this.toggleSelected.bind(this);
   }
@@ -37,14 +37,19 @@ class FileUnitComponent extends Component {
   }*/
 
   componentWillReceiveProps(newProps, newState) {
-    this.setState({selected : (newProps.filemgmt.selectedFiles.indexOf(this.props.name) >= 0)})
+    this.setState({selected : (newProps.filemgmt.selectedFiles.indexOf(this.props.name) >= 0 || newProps.filemgmt.selectedFiles.indexOf(this.props.id + this.props.ext) >= 0)})
   }
   toggleSelected() {
     let currentlySelectedFiles = this.props.filemgmt.selectedFiles;
     if (this.state.selected) {
       currentlySelectedFiles.splice(currentlySelectedFiles.indexOf(this.props.name), 1);
     } else {
+      if(this.props.filemgmt.currentDir === "/home/admin/diksha/ecar_files/") {
+      currentlySelectedFiles.push(this.props.id + this.props.ext);
+      }
+      else {
       currentlySelectedFiles.push(this.props.name);
+      }
     }
     this.setState({selected : !this.state.selected});
     this.props.updateSelectedFiles(currentlySelectedFiles);
