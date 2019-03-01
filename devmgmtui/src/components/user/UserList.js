@@ -3,89 +3,34 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import SideNav from '../common/Sidebar'
 import * as actions from '../../actions/user'
-import { Segment, Container, List, Button, Icon, Header, Modal } from 'semantic-ui-react'
+import { Segment, Container, List, Button, Icon, Header } from 'semantic-ui-react'
 const styles = {
     container: {
         marginTop: '4%'
     },
 }
 class UserList extends Component {
-
-    constructor() {
-        super();
-        this.state = {
-            deleteModal: false
-        };
-        this.username = '';
-    }
-
+    
     componentWillMount() {
         this.props.getAllUser();
         document.title = "User List";
     }
 
-    handleDelete() {
-        this.props.deleteUser(this.username, this.props.auth.user.username, (err,msg) => {
-            if(!err){
-                alert("Deletion Success");
-                this.props.getAllUser();
-                this.setState({
-                    deleteModal: false
-                });
-            }else{
-                alert(msg);
-            }
-        })
+    handleDelete(key) {
+        let consent = window.confirm("Cannot be reverted once you delete the user. Are you sure?")
+        if(consent){
+            this.props.deleteUser(key, this.props.auth.user.username, (err,msg) => {
+                if(!err){
+                    this.props.getAllUser();
+                }else{
+                    alert(msg);
+                }
+            })
+        } else {
+            this.props.getAllUser();
+        }
     }
-
-    setUserName(username) {
-        this.username = username;
-    }
-
-    openDeleteModal() {
-        this.setState({
-            deleteModal: true
-        });
-    }
-
-    closeDeleteModal() {
-        this.setState({
-            deleteModal: false
-        });
-    }
-
-    renderDeleteModal() {
-        return (
-            <Modal
-                open={this.state.deleteModal}
-                onClose={() => this.closeDeleteModal()}
-                style={{ height: 'auto' }}
-                closeIcon
-            >
-                <Header content='Delete User' />
-                <Modal.Content>
-                    <p>
-                        Are you sure?
-                    </p>
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button
-                        color='red'
-                        onClick={() => this.closeDeleteModal()}
-                    >
-                        <Icon name='remove' /> No
-                    </Button>
-                    <Button 
-                        color='green'
-                        onClick={() => this.handleDelete()}
-                    >
-                        <Icon name='checkmark' /> Yes
-                    </Button>
-                </Modal.Actions>
-            </Modal>
-        )
-    }
-
+    
     renderUserList() {
         return this.props.user.list.userList.map((item, index) => {
             return (
@@ -97,7 +42,7 @@ class UserList extends Component {
                 // </div>
                 ( item.username !== 'root' ? <List.Item key={index}>
                 { this.props.auth.user.permissions.search(/DELETE_USERS|ALL/) >= 0 ? <List.Content floated='right'>
-                    <Button animated color='red' onClick={() => {this.openDeleteModal(); this.setUserName(item.username)}} >
+                    <Button animated color='red' onClick={() => this.handleDelete(item.username)} >
                         <Button.Content visible> Delete</Button.Content>
                         <Button.Content hidden>
                             <Icon name='trash' />
@@ -127,7 +72,6 @@ class UserList extends Component {
                 <Container style={styles.container}>
                     <Header as='h1'>User Management</Header>
                     <Segment raised >
-                        {this.renderDeleteModal()}
                         <div>
                             <List animated divided verticalAlign='middle' size={'big'}>
                                 {this.props.user.list && this.renderUserList()}

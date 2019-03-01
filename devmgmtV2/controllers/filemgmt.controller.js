@@ -116,11 +116,7 @@ let getEcarNameForId = (id, db) => {
     defer.resolve(ecarName);
   }).catch(err => {
     // defer.reject(err);
-    defer.resolve({
-      name:'',
-      ext,
-      id: file
-    })
+    defer.resolve(name = '');
   });
   return defer.promise;
 }
