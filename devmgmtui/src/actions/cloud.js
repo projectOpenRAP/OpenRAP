@@ -2,15 +2,18 @@ import axios from 'axios';
 import { BASE_URL } from '../config/config';
 
 export const clearCurrentContent = (cb) => (dispatch) => {
+	const defaultSearchState = {
+		content: [],
+		count: 0,
+		limit: 33,
+		offset: 1,
+		queryString: '',
+		searching: false
+	};
+
 	dispatch({
 		type: 'CLEAR_CONTENT',
-		payload: {
-			content: [],
-			count: 0,
-			queryString: '',
-			offset: 1,
-			searching: false
-		}
+		payload: defaultSearchState
 	});
 
 	cb(null);
@@ -24,16 +27,18 @@ export const searchContent = (queryString = '', limit, offset, cb) => (dispatch)
 
 	axios.get(`${BASE_URL}/cloud/search?query=${queryString}&limit=${limit}&offset=${offset}`)
 		.then(({ data }) => {
-			if(data.success) {
+			if (data.success) {
+				const newSearchState = {
+					content: data.hits.content,
+					count: data.hits.count,
+					queryString,
+					offset,
+					searching: false
+				}
+
 				dispatch({
 					type: 'SEARCHED_CONTENT',
-					payload: {
-						content: data.hits.content,
-						count: data.hits.count,
-						queryString,
-						offset,
-						searching: false
-					}
+					payload: newSearchState
 				});
 
 				cb(null);
@@ -53,12 +58,13 @@ const sortByStatus = (downloads, statusMap) => {
 export const updateDownloadQueue = (downloads, cb) => (dispatch) => {
 	const statusMap = {
 		'ongoing': 1,
-		'failed': 2,
-		'done': 3
+		'waiting': 2,
+		'failed': 3,
+		'done': 4
 	};
 
 	downloads = sortByStatus(downloads, statusMap);
-	
+
 	dispatch({
 		type: 'UPDATE_DOWNLOAD_QUEUE',
 		payload: downloads
@@ -70,7 +76,7 @@ export const updateDownloadQueue = (downloads, cb) => (dispatch) => {
 export const loadContent = (cb) => (dispatch) => {
 	axios.put(`${BASE_URL}/file/apply`)
 		.then(response => {
-			if(response.data.success) {
+			if (response.data.success) {
 				cb(null);
 			} else {
 				throw new Error(response.data.message);
