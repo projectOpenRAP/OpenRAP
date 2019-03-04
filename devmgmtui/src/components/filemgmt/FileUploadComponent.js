@@ -17,12 +17,16 @@ class FileUploadComponent extends Component {
     }
   }
 
-  handleFileInputChange(fileList)  {
-    let files = this.props.filemgmt.uploadableFiles;
-    for (let i = 0; i < fileList.length; i++) {
-      files.push(fileList[i]);
+  handleFileInputChange(fileList, type)  {
+    if(type == "folderinput" && fileList.length <= 0) {
+      alert("No files to upload! Make sure the folder being uploaded contains at least one file.\n\nNOTE: You can create an empty folder by using the 'Create New Folder' option on the left panel.");
+    } else {
+      let files = this.props.filemgmt.uploadableFiles;
+      for (let i = 0; i < fileList.length; i++) {
+        files.push(fileList[i]);
+      }
+      this.props.updateUploadableFiles(files);
     }
-    this.props.updateUploadableFiles(files);
 
     // Allow selecting same file(s) more than once for upload
     document.getElementById('fileinput').value = null;
@@ -137,7 +141,7 @@ class FileUploadComponent extends Component {
             </Button.Content>
           </Button>
           <input type='file' id='fileinput' style = {{display : 'None'}}
-          onChange={(e) => this.handleFileInputChange(e.target.files)} multiple/>
+          onChange={(e) => this.handleFileInputChange(e.target.files, "fileinput")} multiple/>
         </span>
         <span>
           <Button animated='vertical' color='blue' onClick = {() => {
@@ -151,7 +155,7 @@ class FileUploadComponent extends Component {
             </Button.Content>
           </Button>
           <input type='file' id='folderinput' style = {{display : 'None'}}
-          onChange={(e) => this.handleFileInputChange(e.target.files)} multiple='' webkitdirectory='' mozdirectory='' directory=''/>
+          onChange={(e) => this.handleFileInputChange(e.target.files, "folderinput")} multiple='' webkitdirectory='' mozdirectory='' directory=''/>
         </span>
         <span style={{ float : 'right' }}>
             <Button animated='vertical' color='green' onClick = {this.handleApplyChanges.bind(this)}>
