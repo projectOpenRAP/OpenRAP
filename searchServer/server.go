@@ -30,22 +30,22 @@ import (
 var createIndexHandlerGlobal *(bleveHttp.CreateIndexHandler)
 
 func createAndInitIndexHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("calling createAndInitIndexHandler")
 	pathVariable := mux.Vars(r)
 	indexName := pathVariable["indexName"]
-	log.Printf(indexName)
-	createIndexHandlerGlobal.ServeHTTP(w, r)
+    jsonDir := r.URL.Query().Get("jsonDir")
+    createIndexHandlerGlobal.ServeHTTP(w, r)
 	index := bleveHttp.IndexByName(indexName)
 	if index == nil {
 		log.Printf("no such index '%s'", indexName)
 		return
 	}
-	log.Printf("checkpoint 1 : %s",r.URL.Path)
-	jsonDir := r.URL.Query().Get("jsonDir")
-	log.Printf(jsonDir)
-	dirEntries, err := ioutil.ReadDir(jsonDir)
+	if jsonDir == nil {
+        log.Printf("no such directory")
+        return
+    }
+    dirEntries, err := ioutil.ReadDir(jsonDir)
 	if err != nil {
-		log.Printf("cannot open directory")
+		log.Printf("cannot open directory : %s\n", jsonDir)
 		return
 	}
 	count := 0
@@ -77,7 +77,8 @@ func createAndInitIndexHandler(w http.ResponseWriter, r *http.Request) {
 		if batchCount >= batchSize {
 			err = index.Batch(batch)
 			if err != nil {
-				return
+				log.Printf("error while adding batch to index")
+                return
 			}
 			batch = index.NewBatch()
 			batchCount = 0
@@ -95,8 +96,8 @@ func createAndInitIndexHandler(w http.ResponseWriter, r *http.Request) {
 	if batchCount > 0 {
 		err = index.Batch(batch)
 		if err != nil {
-			log.Printf("error while flushing")
-			log.Fatal(err)
+			log.Printf("error while adding last batch to index")
+            return
 		}
 	}
 	indexDuration := time.Since(startTime)
