@@ -38,7 +38,7 @@ func createAndInitIndexHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("no such index '%s'", indexName)
 		return
 	}
-	if jsonDir == nil {
+	if jsonDir == "" {
 		log.Printf("no metadata directory for initial index creation")
 		return
 	}
