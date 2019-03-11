@@ -14,9 +14,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+	"time"
+    "encoding/json"
 	"github.com/gorilla/mux"
-
 	"github.com/blevesearch/bleve"
 	bleveMappingUI "github.com/blevesearch/bleve-mapping-ui"
 	bleveHttp "github.com/blevesearch/bleve/http"
@@ -26,6 +26,85 @@ import (
 
 	//"github.com/projectOpenRAP/OpenRAP/searchServer/edu"
 )
+
+var createIndexHandlerGlobal *(bleveHttp.CreateIndexHandler)
+
+func createAndInitIndexHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("calling createAndInitIndexHandler")
+	pathVariable := mux.Vars(r)
+	indexName := pathVariable["indexName"]
+	log.Printf(indexName)
+	createIndexHandlerGlobal.ServeHTTP(w, r)
+	index := bleveHttp.IndexByName(indexName)
+	if index == nil {
+		log.Printf("no such index '%s'", indexName)
+		return
+	}
+	log.Printf("checkpoint 1 : %s",r.URL.Path)
+	jsonDir := r.URL.Query().Get("jsonDir")
+	log.Printf(jsonDir)
+	dirEntries, err := ioutil.ReadDir(jsonDir)
+	if err != nil {
+		log.Printf("cannot open directory")
+		return
+	}
+	count := 0
+	startTime := time.Now()
+	batch := index.NewBatch()
+	batchCount := 0
+	batchSize := 50
+	for _, dirEntry := range dirEntries {
+		filename := dirEntry.Name()
+		logger.Trace.Printf("Bulk addition to Index: %s\n", filename)
+		// read the bytes
+		jsonBytes, err := ioutil.ReadFile(jsonDir + "/" + filename)
+		if err != nil {
+			log.Printf("error while reading file")
+			continue
+		}
+
+		// parse bytes as json
+		var jsonDoc interface{}
+		err = json.Unmarshal(jsonBytes, &jsonDoc)
+		if err != nil {
+			log.Printf("error while unmarshal file: %s\n", filename)
+			continue
+		}
+
+
+		batch.Index(filename, jsonDoc)
+		batchCount++
+		if batchCount >= batchSize {
+			err = index.Batch(batch)
+			if err != nil {
+				return
+			}
+			batch = index.NewBatch()
+			batchCount = 0
+		}
+		count++
+		if count%1000 == 0 {
+			indexDuration := time.Since(startTime)
+			indexDurationSeconds := float64(indexDuration) / float64(time.Second)
+			timePerDoc := float64(indexDuration) / float64(count)
+			logger.Trace.Printf("Indexed %d documents, in %.2fs (average %.2fms/doc)",
+			count, indexDurationSeconds, timePerDoc/float64(time.Millisecond))
+		}
+
+	}
+	if batchCount > 0 {
+		err = index.Batch(batch)
+		if err != nil {
+			log.Printf("error while flushing")
+			log.Fatal(err)
+		}
+	}
+	indexDuration := time.Since(startTime)
+	indexDurationSeconds := float64(indexDuration) / float64(time.Second)
+	timePerDoc := float64(indexDuration) / float64(count)
+	logger.Info.Printf("Indexed %d documents, in %.2fs (average %.2fms/doc)", count, indexDurationSeconds, timePerDoc/float64(time.Millisecond))
+	return
+}
 
 func loadIndexAndServe(indexDir, bindAddr string) {
 
@@ -70,7 +149,9 @@ func loadIndexAndServe(indexDir, bindAddr string) {
 
 	createIndexHandler := bleveHttp.NewCreateIndexHandler(indexDir)
 	createIndexHandler.IndexNameLookup = indexNameLookup
-	router.Handle("/api/search/v2/index/{indexName}", createIndexHandler).Methods("PUT")
+	createIndexHandlerGlobal = createIndexHandler
+	//router.Handle("/api/search/v2/index/{indexName}", createIndexHandler).Methods("PUT")
+    router.HandleFunc("/api/search/v2/index/{indexName}", createAndInitIndexHandler).Methods("PUT") 
 
 	getIndexHandler := bleveHttp.NewGetIndexHandler()
 	getIndexHandler.IndexNameLookup = indexNameLookup
