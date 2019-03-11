@@ -10,20 +10,19 @@
 package main
 
 import (
+	"encoding/json"
+	"github.com/blevesearch/bleve"
+	bleveMappingUI "github.com/blevesearch/bleve-mapping-ui"
+	bleveHttp "github.com/blevesearch/bleve/http"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"time"
-    "encoding/json"
-	"github.com/gorilla/mux"
-	"github.com/blevesearch/bleve"
-	bleveMappingUI "github.com/blevesearch/bleve-mapping-ui"
-	bleveHttp "github.com/blevesearch/bleve/http"
 
 	// import general purpose configuration
 	_ "github.com/blevesearch/bleve/config"
-
 	//"github.com/projectOpenRAP/OpenRAP/searchServer/edu"
 )
 
@@ -32,18 +31,18 @@ var createIndexHandlerGlobal *(bleveHttp.CreateIndexHandler)
 func createAndInitIndexHandler(w http.ResponseWriter, r *http.Request) {
 	pathVariable := mux.Vars(r)
 	indexName := pathVariable["indexName"]
-    jsonDir := r.URL.Query().Get("jsonDir")
-    createIndexHandlerGlobal.ServeHTTP(w, r)
+	jsonDir := r.URL.Query().Get("jsonDir")
+	createIndexHandlerGlobal.ServeHTTP(w, r)
 	index := bleveHttp.IndexByName(indexName)
 	if index == nil {
 		log.Printf("no such index '%s'", indexName)
 		return
 	}
 	if jsonDir == nil {
-        log.Printf("no such directory")
-        return
-    }
-    dirEntries, err := ioutil.ReadDir(jsonDir)
+		log.Printf("no metadata directory for initial index creation")
+		return
+	}
+	dirEntries, err := ioutil.ReadDir(jsonDir)
 	if err != nil {
 		log.Printf("cannot open directory : %s\n", jsonDir)
 		return
@@ -71,14 +70,13 @@ func createAndInitIndexHandler(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-
 		batch.Index(filename, jsonDoc)
 		batchCount++
 		if batchCount >= batchSize {
 			err = index.Batch(batch)
 			if err != nil {
 				log.Printf("error while adding batch to index")
-                return
+				return
 			}
 			batch = index.NewBatch()
 			batchCount = 0
@@ -89,7 +87,7 @@ func createAndInitIndexHandler(w http.ResponseWriter, r *http.Request) {
 			indexDurationSeconds := float64(indexDuration) / float64(time.Second)
 			timePerDoc := float64(indexDuration) / float64(count)
 			logger.Trace.Printf("Indexed %d documents, in %.2fs (average %.2fms/doc)",
-			count, indexDurationSeconds, timePerDoc/float64(time.Millisecond))
+				count, indexDurationSeconds, timePerDoc/float64(time.Millisecond))
 		}
 
 	}
@@ -97,7 +95,7 @@ func createAndInitIndexHandler(w http.ResponseWriter, r *http.Request) {
 		err = index.Batch(batch)
 		if err != nil {
 			log.Printf("error while adding last batch to index")
-            return
+			return
 		}
 	}
 	indexDuration := time.Since(startTime)
@@ -152,7 +150,7 @@ func loadIndexAndServe(indexDir, bindAddr string) {
 	createIndexHandler.IndexNameLookup = indexNameLookup
 	createIndexHandlerGlobal = createIndexHandler
 	//router.Handle("/api/search/v2/index/{indexName}", createIndexHandler).Methods("PUT")
-    router.HandleFunc("/api/search/v2/index/{indexName}", createAndInitIndexHandler).Methods("PUT") 
+	router.HandleFunc("/api/search/v2/index/{indexName}", createAndInitIndexHandler).Methods("PUT")
 
 	getIndexHandler := bleveHttp.NewGetIndexHandler()
 	getIndexHandler.IndexNameLookup = indexNameLookup
