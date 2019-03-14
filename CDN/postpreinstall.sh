@@ -57,16 +57,12 @@ install_aria2
 remove_aria2_deb
 
 systemctl enable searchserver
-systemctl restart searchserver
 
 systemctl enable appserver
-systemctl restart appserver
 
 systemctl enable syncthing
-systemctl restart syncthing
 
 systemctl enable aria2
-systemctl restart aria2
 
 reboot_device
 
