@@ -20,6 +20,7 @@ let writeUpdateFile = (req, res) => {
         console.log(`stdout: ${stdout}`);
         console.log(`stderr: ${stderr}`);
         res.status(200).json({success : true});
+        exec('/opt/opencdn/CDN/reboot.sh');
         }
       })
     }
