@@ -5,7 +5,7 @@ let { exec } = require('child_process');
 const path = require('path');
 const searchsdk = require('../../searchsdk');
 
-const { config } = require('../config');
+const config = require('../config');
 
 let checkIfDeviceIsUSB = (string) => {
   let defer = q.defer();

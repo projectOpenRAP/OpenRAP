@@ -1,6 +1,6 @@
 'use strict'
 
-const { config } = require('../config');
+const config = require('../config');
 
 const getConfig = (req, res) => {
     res.status(200).json(config);

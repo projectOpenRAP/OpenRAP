@@ -11,7 +11,7 @@ const {
 	zipContents
 } = require('../telemetrysdk');
 
-const { config } = require('./config');
+const config = require('./config');
 
 const plugin = 'devmgmt';
 const telemetryPath = '/home/admin/telemetry';

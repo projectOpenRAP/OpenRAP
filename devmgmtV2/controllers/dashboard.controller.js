@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require('path');
 const exec = require('child_process').exec;
 
-const { config } = require('../config');
+const config = require('../config');
 let { selectFields } = require('dbsdk');
 
 let getInternetStatus = (req, res) => {

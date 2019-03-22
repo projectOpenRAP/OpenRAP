@@ -4,9 +4,7 @@ const request = require('request');
 let moment = require('moment');
 const uuid4 = require('uuid/v4');
 
-let {
-	config
-} = require('../config');
+let config = require('../config');
 
 let getTimestamp = (pattern) => moment().format(pattern);
 

@@ -10,25 +10,22 @@ let {
 	readFile
 } = require('../../filesdk');
 
-let {
-	config
-} = require('../config');
+let config = require('../config');
 
 let {
 	generateOriginalJWTs
 } = require('../helpers/cloud.helper.js');
 
 let state = (() => {
-	let {
-		userToken,
-		authToken,
-		baseUrl,
-		searchUrlSuffix,
+	const {
+		search_api,
 		filter
-	} = config.cloudAPI;
+	} = config.cloud;
 
+	let userToken = search_api.user_token;
+	let authToken = search_api.auth_token;
+	let searchUrl = search_api.url;
 	let isAuthTokenValid = false;
-
 	let { keysToUse } = filter;
 
 	return {
@@ -47,9 +44,9 @@ let state = (() => {
 			return isAuthTokenValid;
 		},
 
-		searchUrl(suffix) {
-			searchUrlSuffix = suffix || searchUrlSuffix;
-			return `${baseUrl}${searchUrlSuffix}`;
+		searchUrl(url) {
+			searchUrl = url || searchUrl;
+			return searchUrl;
 		},
 
 		keysToUse(keys) {
