@@ -25,12 +25,6 @@ restore_files()
 	done
 }
 
-reboot_device()
-{
-	echo "Rebooting device"
-	reboot now
-}
-
 install_aria2()
 {
 	echo "Installing aria2"
@@ -67,15 +61,6 @@ systemctl enable syncthing
 
 systemctl enable aria2
 
-reboot_device
-
-# These instructions have been moved after the reboot
-# because this script gets called from within the devmgmt
-# service and once devmgmt got restarted, the script came
-# to a halt and further instructions were never executed
-systemctl enable devmgmt
-systemctl restart devmgmt
-
 exit 0
 }
 
@@ -99,5 +84,3 @@ if [ "$1" == "-pre" ]
 fi
 
 echo "$0 <-post | -pre>"
-
-
