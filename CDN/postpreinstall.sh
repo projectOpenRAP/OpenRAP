@@ -61,6 +61,9 @@ systemctl enable syncthing
 
 systemctl enable aria2
 
+#Purge ntp and to set correct date
+apt purge ntp
+
 exit 0
 }
 
