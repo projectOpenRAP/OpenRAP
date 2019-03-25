@@ -79,6 +79,7 @@ class SysInfo extends Component {
             :
             false;
         let deviceID = this.props.dashboard.deviceID;
+        let syncthingID = this.props.dashboard.syncthingID;
 
         const secondsToDDHHMMSS = (totalSeconds) => {
             let days    = Math.floor(totalSeconds / (3600 * 24));
@@ -133,7 +134,11 @@ class SysInfo extends Component {
                         <Grid.Column>
                             {this.renderMessage('users', 'Number of Users connected', usersConnected)}
                         </Grid.Column>
-                        <Grid.Column/>
+
+                        <Grid.Column>
+                            {this.renderMessage('id badge', 'Syncthing ID', syncthingID)}
+                        </Grid.Column>
+                        
                         <Grid.Column/>
                     </Grid.Row>
                 </Grid>

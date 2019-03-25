@@ -74,4 +74,12 @@ export const fetchSystemData = () => (dispatch) => {
         .catch((e) => {
             console.log(e);
         })
+
+    axios.get(`${BASE_URL}/dashboard/system/syncthingID`)
+        .then((response) => {
+            dispatch({type: 'SYNCTHING_ID_FETCH', payload: response.data.syncthingID})
+        })
+        .catch((e) => {
+            console.log(e);
+        })
 }
