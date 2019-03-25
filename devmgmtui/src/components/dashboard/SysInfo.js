@@ -138,7 +138,7 @@ class SysInfo extends Component {
                         <Grid.Column>
                             {this.renderMessage('id badge', 'Syncthing ID', syncthingID)}
                         </Grid.Column>
-                        
+
                         <Grid.Column/>
                     </Grid.Row>
                 </Grid>
