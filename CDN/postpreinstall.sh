@@ -67,6 +67,18 @@ systemctl enable syncthing
 
 systemctl enable aria2
 
+#Optimize the system
+rm -rf /var/log/daemon.log
+ln -s /dev/null /var/log/daemon.log
+
+rm -rf /var/log/dnsmasq.log
+ln -s /dev/null /var/log/dnsmasq.log
+
+rm -rf /var/log/syslog
+ln -s /dev/null /var/log/syslog
+
+update-rc.d dphys-swapfile remove
+
 reboot_device
 
 # These instructions have been moved after the reboot
