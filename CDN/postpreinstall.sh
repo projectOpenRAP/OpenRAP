@@ -62,7 +62,19 @@ systemctl enable syncthing
 systemctl enable aria2
 
 #Purge ntp and to set correct date
-apt purge ntp
+echo "Y" | apt purge ntp
+
+#Optimize the system
+rm -rf /var/log/daemon.log
+ln -s /dev/null /var/log/daemon.log
+
+rm -rf /var/log/dnsmasq.log
+ln -s /dev/null /var/log/dnsmasq.log
+
+rm -rf /var/log/syslog
+ln -s /dev/null /var/log/syslog
+
+update-rc.d dphys-swapfile remove
 
 exit 0
 }
