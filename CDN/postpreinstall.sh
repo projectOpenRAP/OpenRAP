@@ -52,6 +52,9 @@ restore_files
 mkdir -p /opt/searchEngine/bleveDbDir/
 mkdir -p /home/admin/GoK/
 
+#Set System time-zone
+sudo timedatectl set-timezone Asia/Kolkata
+
 # Install aria2 and clean up the deb files used
 install_aria2
 remove_aria2_deb
