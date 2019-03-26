@@ -18,6 +18,8 @@ export default function (state={}, action) {
             return {...state, version: action.payload};
         case 'DEVICEID_FETCH':
             return {...state, deviceID: action.payload};
+        case 'SYNCTHING_ID_FETCH':
+            return {...state, syncthingID: action.payload};
         default:
             return state;
     }
