@@ -184,7 +184,7 @@ def do_build_plugin(plugin_name="ekstep", variant="diksha", prod=False):
         cmd = "rm -rf {} && git clone --depth 1 -b build-img-script {} {}".format(plugin_repo_dir, repo_url, plugin_repo_dir)
         run_cmd(cmd)
 
-        cmd = "{}/init.sh {} {} {} {} {}".format('/home/genghiskh/GitProjects/EkStep/ekstep', plugin_name, variant, repo_name, base_dir, build_type)
+        cmd = "{}/init.sh {} {} {} {} {}".format(plugin_dir, plugin_name, variant, repo_name, base_dir, build_type)
         run_cmd(cmd)
 
     else:
