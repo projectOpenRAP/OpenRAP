@@ -289,7 +289,7 @@ let deleteFileFromDisk = (req, res) => {
   if (ext === '.ecar') {
     cmd = `rm -rf ${file}* ${json_dir}* ${xcontent}*`;
   } else {
-    if(!(dir.startsWith('/home/admin/diksha'))){
+    if((dir.startsWith('/home/admin')) && (!(dir.startsWith('/home/admin/diksha')))){
       fileToDelete = fileToDelete.replace(/\W/g,"\\$&");
       cmd = `rm -rf ${fileToDelete}`;
     }else {
