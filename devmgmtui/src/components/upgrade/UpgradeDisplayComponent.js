@@ -53,6 +53,7 @@ class UpgradeDisplayComponent extends Component {
         } else {
           alert('Successfully Upgraded!.Rebooting Now...');
           this.setState({fileUploadedStatus:"DONE"});
+          window.location.reload(true);
         }
       });
     }
