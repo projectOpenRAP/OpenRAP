@@ -289,6 +289,7 @@ let deleteFileFromDisk = (req, res) => {
   if (ext === '.ecar') {
     cmd = `rm -rf ${file}* ${json_dir}* ${xcontent}*`;
   } else {
+    // deletion of files outside the "/home/admin" dir and inside the "/home/admin/diksha" dir has been restricted.
     if((dir.startsWith('/home/admin')) && (!(dir.startsWith('/home/admin/diksha')))){
       fileToDelete = fileToDelete.replace(/\W/g,"\\$&");
       cmd = `rm -rf ${fileToDelete}`;
