@@ -35,7 +35,7 @@ export default class DownloadManager {
 		}
 	}
 
-	async downloadData(uri, ecarName, retries = 3) {
+	async downloadData(uri, ecarName, retries = 1) {
 		if (this.connected) {
 			try {
 				// Add option to overwriting existing files

@@ -41,12 +41,14 @@ class CloudDownload extends Component {
 		this.handleInputChange = this.handleInputChange.bind(this);
 		this.handleLoadMoreClick = this.handleLoadMoreClick.bind(this);
 		this.handleDownload = this.handleDownload.bind(this);
-		this.addNewDownload = this.addNewDownload.bind(this);
-		this.updateDownloadGuid = this.updateDownloadGuid.bind(this);
+		this.addRootToDownload = this.addRootToDownload.bind(this);
+		this.addChildToDownload = this.addChildToDownload.bind(this);
+		this.updateRootGuid = this.updateRootGuid.bind(this);
+		this.updateChildrenGuid = this.updateChildrenGuid.bind(this);
 		this.removeDownload = this.removeDownload.bind(this);
 		this.handleFailedDownload = this.handleFailedDownload.bind(this);
 		this.handleLoadContentClick = this.handleLoadContentClick.bind(this);
-
+    
 		this.downloadManager = new DownloadManager(this.state.downloadPath); // TODO: Make download path configurable
 		this.downloadManager.onDownloadComplete(this.removeDownload);
 		this.downloadManager.onDownloadError(this.handleFailedDownload);
@@ -66,16 +68,26 @@ class CloudDownload extends Component {
 		return `${id}_${ver.toFixed(1)}.ecar`
 	}
 
-	fetchAndDownloadDependencies(id, rootName, ver) {
+	fetchAndDownloadDependencies(id, rootName, ver, callback) {
+		let {
+			downloads
+		} = this.props.cloud;
+    let rootGuid; 
 		const parent = this.getEcarName(id, ver);
 		const url = `${BASE_URL}/cloud/dependencies/${encodeURIComponent(parent)}`;
-
+		
+		downloads.forEach(item =>{
+			if(item.id === id){
+				rootGuid = item.guid;
+			}
+		});
+		
 		axios.get(url)
 			.then(res => {
 				if (res.data.success) {
 					// alert(`Fetched dependencies for "${parent}".`);
 					const dependencies = res.data.data;
-
+					
 					dependencies.forEach(item => {
 						const {
 							downloadUrl,
@@ -86,19 +98,21 @@ class CloudDownload extends Component {
 							name
 						} = item;
 
-						this.handleDownload(`${name} (Root: ${rootName})`, this.formatBytes(size, 1), downloadUrl, contentType, identifier, pkgVersion, false);
+						this.handleDownload(`${name} (Root: ${rootName})`, this.formatBytes(size, 1), downloadUrl, contentType, identifier, pkgVersion, false, rootGuid);
 					});
 				} else {
 					throw res.data.err;
 				}
+				callback(null, true);
 			})
 			.catch(err => {
 				alert(`Couldn\'t fetch the dependencies for "${parent}".`);
 				console.log(err);
+				callback(err, false);
 			});
 	}
 
-	addNewDownload({ guid, name, id, ver, size, uri, isRoot, status }) {
+	addRootToDownload({ guid, name, id, ver, size, uri, type, isRoot, status }) {
 		let {
 			downloads
 		} = this.props.cloud;
@@ -112,61 +126,137 @@ class CloudDownload extends Component {
 			uri,
 			id,
 			ver,
+			type,
 			isRoot,
-			status
+			status,
+			children : []
 		});
 
 		this.props.updateDownloadQueue(downloads, () => console.log('Queued: ', guid));
 	}
-
-	updateDownloadGuid(oldGuid, newGuid) {
+	
+	addChildToDownload({ guid, name, id, ver, size, uri, isRoot, type, status },rootGuid) {
 		let {
 			downloads
 		} = this.props.cloud;
 
-		downloads = downloads.map(item => {
+		status = status || 'ongoing';
+		
+		downloads.forEach(item => {
+			if (item.guid === rootGuid) {
+				item.children.push({
+					guid,
+					name,
+					size,
+					uri,
+					id,
+					ver,
+					type,
+					isRoot,
+					status
+				});
+			}
+		});
+		
+		console.log('Queued: ', guid);
+   }	
+	updateRootGuid(oldGuid, newGuid) {
+		let {
+			downloads
+		} = this.props.cloud;
+
+		downloads.some(item => {
 			if (item.guid === oldGuid) {
 				item.guid = newGuid;
 				item.status = 'ongoing';
 			}
 
-			return item;
+	
+			item.children.some(child => {
+				if (child.guid === oldGuid ) {
+					child.guid = newGuid;
+					child.status = 'ongoing';
+				}
+			});	
 		});
 
 		this.props.updateDownloadQueue(downloads, () => console.log(`Updated ${oldGuid} to ${newGuid}`));
 	}
 
-	removeDownload(guid) {
+	updateChildrenGuid(oldGuid, newGuid) {
 		let {
 			downloads
 		} = this.props.cloud;
 
-		downloads = downloads.map(item => {
-			if (item.guid === guid) {
-				item.status = 'done';
-
-				if (item.isRoot) {
-					this.fetchAndDownloadDependencies(item.id, item.name, item.ver);
+		downloads.some(item => {
+			item.children.some(child => {
+				if (child.guid === oldGuid ) {
+					child.guid = newGuid;
+					child.status = 'ongoing';
 				}
-			}
-
-			return item;
+			});	
 		});
 
-		this.props.updateDownloadQueue(downloads, () => console.log('Done: ', guid));
+		console.log(`Updated ${oldGuid} to ${newGuid}`);
+	}
+	
+  isDone(child) {
+		return child.status === 'done';
+	}
+
+  removeDownload(guid) {
+		let {
+			downloads
+		} = this.props.cloud;
+		
+		downloads.some( item => {
+			    
+				if(item.guid === guid && item.isRoot) {
+						this.fetchAndDownloadDependencies(item.id, item.name, item.ver, (error, success) => {
+							if(error) {
+								item.status = 'done';
+								this.props.updateDownloadQueue(downloads, () => console.log('Done: ', guid));
+							}
+						    if(item.children.length === 0 &&  item.type === 'Resource'){
+								item.status = 'done';
+								this.props.updateDownloadQueue(downloads, () => console.log('Done: ', guid));
+							}
+						});		
+				}
+				
+				item.children.some(child => {
+					if(child.guid === guid) {
+						child.status = 'done';
+						console.log('Done: ', guid);	
+					}
+				});
+				
+				if(item.children.length !==0 && item.children.every(this.isDone)) {
+					item.status = 'done';
+					this.props.updateDownloadQueue(downloads, () => console.log('Done: ', item.guid));
+				}
+
+		});	
+		
 	}
 
 	handleFailedDownload(guid) {
 		let {
 			downloads
 		} = this.props.cloud;
-
-		downloads = downloads.map(item => {
+        
+		downloads.some(item => {
 			if (item.guid === guid) {
 				item.status = 'failed';
 			}
-
-			return item;
+			
+      item.children.some(child => {
+				if(child.guid === guid ) {
+					child.status = 'failed';
+					item.status = 'failed'
+				}
+			});
+		
 		});
 
 		this.props.updateDownloadQueue(downloads, () => console.log('Failed: ', guid));
@@ -222,30 +312,39 @@ class CloudDownload extends Component {
 		this.handleSearch(queryString, limit, newOffset);
 	}
 
-	async handleDownload(name, size, uri, type, id, ver, isRoot) {
+	async handleDownload(name, size, uri, type, id, ver, isRoot, rootGuid) {
 		let {
 			downloads
 		} = this.props.cloud;
 
 		let oldGuid = null;
 		let newGuid = null;
-
 		let alreadyQueued = false;
 		let status;
-
-		downloads.forEach(item => {
+        
+		downloads.some(item => {
 			if (item.id === id) {
 				oldGuid = item.guid;
 				alreadyQueued = true;
 				status = item.status;
 			}
+			
+			item.children.some(child => {
+				if(child.id === id) {
+					oldGuid = child.guid;
+					alreadyQueued = true;
+					status = child.status;
+				}
+			});
+		
 		});
 
 		if (!alreadyQueued) {
 			newGuid = await this.downloadManager.downloadData(uri, this.getEcarName(id, ver));
-
-			if (newGuid !== -1) {
-				this.addNewDownload({ guid: newGuid, name, id, ver, size, uri, isRoot });
+			if (newGuid !== -1 && isRoot) {
+				this.addRootToDownload({ guid: newGuid, name, id, ver, size, uri, type, isRoot});
+			} else if(newGuid !== -1 && !isRoot){
+				this.addChildToDownload({ guid: newGuid, name, id, ver, size, uri, type, isRoot }, rootGuid);
 			} else {
 				alert('Not able to download', name);
 			}
@@ -253,16 +352,18 @@ class CloudDownload extends Component {
 			switch (status) {
 				case 'ongoing':
 				case 'waiting':
-					alert(`"${name}" is being downladed.`);
+					alert(`"${name}" is being downloaded.`);
 					break;
 				case 'done':
-					alert(`"${name}" has been downlaoded.`);
+					alert(`"${name}" has been downloaded.`);
 					break;
 				case 'failed':
 					newGuid = await this.downloadManager.downloadData(uri, this.getEcarName(id, ver));
 
-					if (newGuid !== -1) {
-						this.updateDownloadGuid(oldGuid, newGuid);
+					if (newGuid !== -1 && isRoot) {
+						this.updateRootGuid(oldGuid, newGuid);
+					} else if(newGuid !== -1 && !isRoot) {
+						this.updateChildrenGuid(oldGuid, newGuid);
 					} else {
 						alert(`Not able to download "${name}".`);
 					}
@@ -270,7 +371,7 @@ class CloudDownload extends Component {
 			}
 		}
 	}
-
+    
 	handleLoadContentClick() {
 		if (window.confirm('Some services might be interrupted for a moment. Do you still wish to proceed?')) {
 			this.props.loadContent(err => {
@@ -349,7 +450,7 @@ class CloudDownload extends Component {
 				const size = this.formatBytes(totalLength);
 				const uri = file.uris[0].uri;
 
-				return ({ guid: gid, name, id, ver, size, uri, isRoot: false, status });
+				return ({ guid: gid, name, id, ver, size, uri, isRoot: true, status });
 			});
 		};
 
@@ -381,9 +482,11 @@ class CloudDownload extends Component {
 
 						return ({ name, size, id, ver, isRoot: false, status: 'done' });
 					});
-
+				console.log(downloadedFiles);	
+				console.log(activeDownloads);
+				console.log(waitingDownloads);
 				consolidatedDownloadsList = [].concat(activeDownloads, waitingDownloads, downloadedFiles);
-				getUniqueDownloadList(consolidatedDownloadsList, 'id').forEach(download => this.addNewDownload(download));
+				getUniqueDownloadList(consolidatedDownloadsList, 'id').forEach(download => this.addRootToDownload(download));
 			})
 			.catch(error => {
 				console.log("Error fetching downloaded files.");
