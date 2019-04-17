@@ -66,11 +66,13 @@ function DownloadCard(props) {
 
 function renderDownloadCards(downloads) {
 	const downloadCards = downloads.map((item, index) => {
-		return (
-			<List.Item key={index}>
-				<DownloadCard name={item.name} size={item.size} status={item.status} />
-			</List.Item>
-		);
+		if(item.isRoot) {
+			return (
+				<List.Item key={index}>
+					<DownloadCard name={item.name} size={item.size} status={item.status} />
+				</List.Item>
+			);
+	    }
 	});
 
 	return (
