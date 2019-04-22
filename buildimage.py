@@ -188,10 +188,10 @@ def do_build_plugin(plugin_name="ekstep", variant="diksha", prod=False):
         plugin_name in supported_plugins
         ):
 
-        cmd = "rm -rf {} && git clone --depth 1 -b build-img-script {} {}".format(plugin_repo_dir, repo_url, plugin_repo_dir)
+        cmd = "rm -rf {} && git clone --depth 1 {} {}".format(plugin_repo_dir, repo_url, plugin_repo_dir)
         run_cmd(cmd)
 
-        cmd = "{}/init.sh {} {} {} {} {}".format(plugin_dir, plugin_name, variant, repo_name, base_dir, build_type)
+        cmd = "{}/initialize_plugin.sh {} {} {} {} {}".format(plugin_dir, plugin_name, variant, repo_name, base_dir, build_type)
         run_cmd(cmd)
 
     else:
