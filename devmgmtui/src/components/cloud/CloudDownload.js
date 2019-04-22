@@ -32,7 +32,7 @@ class CloudDownload extends Component {
 
 		this.state = {
 			input: '',
-			downloadPath: '/home/admin/diksha/'
+			downloadPath: props.config.config.root_dir
 		};
 
 		this.handleSearch = this.handleSearch.bind(this);
@@ -407,8 +407,8 @@ class CloudDownload extends Component {
 
 }
 
-function mapStateToProps({ cloud }) {
-	return { cloud };
+function mapStateToProps({ cloud, config }) {
+	return { cloud, config };
 }
 
 export default connect(mapStateToProps, actions)(CloudDownload);

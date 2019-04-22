@@ -2,7 +2,7 @@ const defaultState = {
 	content: [],
 	count: 0,
 	limit: 33,
-	offset: 1,
+	offset: 0,
 	queryString: '',
 	searching: false,
 	downloads: []
