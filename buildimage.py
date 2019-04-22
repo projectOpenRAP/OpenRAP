@@ -15,6 +15,13 @@ supported_plugins = [
     "ekstep",
     "gok"
 ]
+supported_variants = {
+    "ekstep": [
+        "diksha",
+        "forwater"
+    ],
+    "gok": []
+}
 
 build_logfile = "buildimage.log"
 
@@ -324,6 +331,12 @@ class Device(object):
         cmd = "rm -rf  " + self.build_output_dir
         run_cmd(cmd)
 
+    def do_superclean(self):
+        # Delete the build directory itself
+
+        cmd = "rm -rf  " + build_dir
+        run_cmd(cmd)
+
     def do_build(self, plugin, variant, prod):
 
         do_build_plugin(plugin, variant, prod)
@@ -505,10 +518,11 @@ if __name__ == '__main__':
     argparser.add_argument("--board", choices=boardlist, default="rpi", help="Select board type for image (default = \"rpi\")")
     argparser.add_argument("--platform", choices=platformlist, default="raspbian", help="Select platforn type for image (default = \"raspbian\")")
     argparser.add_argument("--profile", choices=profilelist, default="ekstep", help="Select profile (default = \"ekstep\")")
-    argparser.add_argument("--clean", dest="clean",  action='store_true', help="Select type of image to clean (default = \"openrap\")")
-    argparser.add_argument("--plugin", default='', help="Select the plugin that needs to be bundled with this build (default = \"esktep\")")
-    argparser.add_argument("--variant", default='', help="Select the variant of the plugin, if any (default = \"diksha\")")
-    argparser.add_argument("--prod", default='', help="Set to True if this is a production build (default = \"False\")")
+    argparser.add_argument("--clean", dest="clean",  action="store_true", help="Select type of image to clean (default = \"openrap\")")
+    argparser.add_argument("--superclean", dest="superclean",  action="store_true", help="Remove the build directory completely")
+    argparser.add_argument("-p","--plugin", choices=supported_plugins, default="ekstep", help="Select the plugin that needs to be bundled with this build (default = \"esktep\")")
+    argparser.add_argument("-v","--variant", choices=supported_variants["ekstep"], default="diksha", help="Select the variant of ekstep plugin, if any (default = \"diksha\")")
+    argparser.add_argument("-P","--prod", dest="prod", action="store_true", help="Set this option if you want to create a production build")
     args = argparser.parse_args()
 
     (board, platform, profile, clean) = (args.board, args.platform, args.profile, args.clean)
@@ -516,13 +530,16 @@ if __name__ == '__main__':
 
     plugin = args.plugin
     variant = args.variant
-    prod = args.prod == 'True'
+    prod = args.prod
 
     if board == "minipc":
         GOARCH='386'
 
     d = Profile(profile, device, platform, board)
-    if args.clean:
+    
+    if args.superclean:
+        d.do_superclean()
+    elif args.clean:
         d.do_clean()
     else:
         d.do_prepare()
