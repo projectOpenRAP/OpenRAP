@@ -143,7 +143,7 @@ let classify = (dir, file) => {
       if (ext === '.ecar' && isEcarDir(dir)) {
         const db = getEcarDb();
 
-        getEcarNameForId(file, db)
+        getEcarNameForId(file+'.json', db) //Name of the file will be present inside the ".json" file(meta data)
           .then(ecarName => {
             const id = name.substring(0, name.lastIndexOf('_'));
 
