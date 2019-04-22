@@ -10,25 +10,22 @@ let {
 	readFile
 } = require('../../filesdk');
 
-let {
-	config
-} = require('../config');
+let config = require('../config');
 
 let {
 	generateOriginalJWTs
 } = require('../helpers/cloud.helper.js');
 
 let state = (() => {
-	let {
-		userToken,
-		authToken,
-		baseUrl,
-		searchUrlSuffix,
+	const {
+		search_api,
 		filter
-	} = config.cloudAPI;
+	} = config.cloud;
 
+	let userToken = search_api.user_token;
+	let authToken = search_api.auth_token;
+	let searchUrl = search_api.url;
 	let isAuthTokenValid = false;
-
 	let { keysToUse } = filter;
 
 	return {
@@ -47,9 +44,9 @@ let state = (() => {
 			return isAuthTokenValid;
 		},
 
-		searchUrl(suffix) {
-			searchUrlSuffix = suffix || searchUrlSuffix;
-			return `${baseUrl}${searchUrlSuffix}`;
+		searchUrl(url) {
+			searchUrl = url || searchUrl;
+			return searchUrl;
 		},
 
 		keysToUse(keys) {
@@ -139,8 +136,7 @@ let getRequestOptions = (method, uri, body, headers, json = true) => ({
 	json
 });
 
-// Search diksha cloud with the query string, limit of results to be returned, and offset of results
-let searchDikshaCloud = ({ query, limit, offset, filters, fields }) => {
+let searchEkStepCloud = ({ query, limit, offset, filters, fields }) => {
 	const body = getSearchBody(query, +limit, +offset, filters, fields);
 	const headers = getSearchHeaders();
 	const uri = state.searchUrl();
@@ -224,7 +220,7 @@ let searchContent = (req, res) => {
 		})
 		.then(({ token }) => {
 			state.authToken(token);
-			return searchDikshaCloud(req.query);
+			return searchEkStepCloud(req.query);
 		})
 		.then(({ body }) => {
 			if (body && body.params && body.params.status === "successful") {
@@ -279,7 +275,7 @@ let extractDependencyIdList = (manifest, parentId) => {
 
 let getDependencies = (req, res) => {
 	const { parent } = req.params;
-	const src = `${config.FS_ROOT}diksha/${parent}`; // TODO: Make configurable
+	const src = config.root_dir;
 	const dest = `/tmp/${parent}`;
 
 	let responseData = {
@@ -305,7 +301,7 @@ let getDependencies = (req, res) => {
 					fields: ['downloadUrl', 'pkgVersion', 'size', 'name']
 				};
 	
-				return searchDikshaCloud(reqQuery);
+				return searchEkStepCloud(reqQuery);
 			} else {
 				return null;
 			}

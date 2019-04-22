@@ -5,7 +5,7 @@ let { exec } = require('child_process');
 const path = require('path');
 const searchsdk = require('../../searchsdk');
 
-const { config } = require('../config');
+const config = require('../config');
 
 let checkIfDeviceIsUSB = (string) => {
   let defer = q.defer();
@@ -121,49 +121,9 @@ let getEcarNameForId = (id, db) => {
   return defer.promise;
 }
 
-// make following configurable
-const isEcarDir = dir => {
-	let ecarDirList = [
-		'/home/admin/sunbird/ecar_files',
-    '/home/admin/ekStep/ecar_files',
-    '/home/admin/diksha/ecar_files'
-	];
-	
-	dir = path.resolve(dir);
-	ecarDirList = ecarDirList.map(dir => path.resolve(dir));
-	
-	if (ecarDirList.indexOf(dir) !== -1 ) {
-		return true;
-	}
+const isEcarDir = dir => path.resolve(dir) === path.resolve(config.ecar_dir);
 
-	return false;
-}
-
-// make following configurable
-const getEcarDb = dir => {
-  let db;
-  const contentFolder = path.basename(path.dirname(dir));
-
-  switch (contentFolder) {
-    case 'ekStep':
-      db = 'es.db';
-      break;
-
-    case 'sunbird':
-      db = 'sb.db';
-      break;
-
-    case 'diksha':
-      db = 'dk.db';
-      break;
-
-    default:
-      db = null;
-      break;
-  }
-
-  return db;
-}
+const getEcarDb = () => config.bleve_search.db_name;
 
 let classify = (dir, file) => {
   let defer = q.defer();
@@ -181,7 +141,7 @@ let classify = (dir, file) => {
       let response = { 'name': file, 'type': 'file', 'ext': 'other', 'size': stats.size };
 
       if (ext === '.ecar' && isEcarDir(dir)) {
-        const db = getEcarDb(dir);
+        const db = getEcarDb();
 
         getEcarNameForId(file+'.json', db) //Name of the file will be present inside the ".json" file(meta data)
           .then(ecarName => {
@@ -289,8 +249,7 @@ let deleteFileFromDisk = (req, res) => {
   if (ext === '.ecar') {
     cmd = `rm -rf ${file}* ${json_dir}* ${xcontent}*`;
   } else {
-    // deletion of files outside the "/home/admin" dir and inside the "/home/admin/diksha" dir has been restricted.
-    if((dir.startsWith('/home/admin')) && (!(dir.startsWith('/home/admin/diksha')))){
+    if(!(dir.startsWith(config.root_dir))){
       fileToDelete = fileToDelete.replace(/\W/g,"\\$&");
       cmd = `rm -rf ${fileToDelete}`;
     }else {
