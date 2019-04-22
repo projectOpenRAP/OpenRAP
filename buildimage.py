@@ -11,6 +11,17 @@ build_dir = base_dir + 'build/'
 rootfs_dir = base_dir + 'rootfs_overlay'
 cdn_dir    = base_dir + 'CDN'
 ver_file   = cdn_dir + 'version.txt'
+supported_plugins = [
+    "ekstep",
+    "gok"
+]
+supported_variants = {
+    "ekstep": [
+        "diksha",
+        "forwater"
+    ],
+    "gok": []
+}
 
 build_logfile = "buildimage.log"
 
@@ -87,6 +98,7 @@ def golang_init():
     # Set the GOPATH, GOBIN env
     os.environ['GOPATH'] = gopath
     os.environ['GOBIN'] = gopath + "bin"
+    os.environ['GOCACHE'] = gopath + ".cache/go-build"
     os.environ['PATH'] = os.environ['GOBIN'] + ":" + os.environ['PATH']
 
     # Check if go compiler is installed
@@ -148,15 +160,42 @@ def syncthing_init():
 
     # Check if syncthig is already cloned and pull latest if present else clone
     if os.path.isdir(syncthing_dir):
-        log.info("Pulling from syncthing:master...")
+        log.info("Pulling from syncthing repository...")
 
         cmd = "cd " + syncthing_dir + " && git pull"
         run_cmd(cmd)
     else:
-        log.info("Cloning syncthing:master...")
+        log.info("Cloning syncthing repository...")
 
-        cmd = "git clone -b v1.0.0 https://github.com/syncthing/syncthing " + syncthing_dir
+        cmd = "git clone --depth 1 -b v1.0.0  https://github.com/syncthing/syncthing " + syncthing_dir
         run_cmd(cmd)
+
+    cmd = "go get -u {}/...".format(syncthing_dir)
+    run_cmd(cmd)
+
+def do_build_plugin(plugin_name="ekstep", variant="diksha", prod=False):
+    repo_url = "https://github.com/projectOpenRAP/EkStep.git"
+    repo_name = "tmp"
+
+    plugins_root_dir = "{}/appServer/plugins".format(base_dir)
+    plugin_repo_dir = "{}/{}".format(plugins_root_dir, repo_name)
+    plugin_dir = "{}/{}".format(plugin_repo_dir, plugin_name)
+
+    build_type = "prod" if prod else "staging"
+
+    if (
+        plugin_name is not None and \
+        plugin_name in supported_plugins
+        ):
+
+        cmd = "rm -rf {} && git clone --depth 1 {} {}".format(plugin_repo_dir, repo_url, plugin_repo_dir)
+        run_cmd(cmd)
+
+        cmd = "{}/initialize_plugin.sh {} {} {} {} {}".format(plugin_dir, plugin_name, variant, repo_name, base_dir, build_type)
+        run_cmd(cmd)
+
+    else:
+        log.info("Choose at least one of the plugins in the list: " + list_of_plugins)
 
 class Platform(object):
     '''This is a class of PlatformBoard
@@ -292,7 +331,15 @@ class Device(object):
         cmd = "rm -rf  " + self.build_output_dir
         run_cmd(cmd)
 
-    def do_build(self):
+    def do_superclean(self):
+        # Delete the build directory itself
+
+        cmd = "rm -rf  " + build_dir
+        run_cmd(cmd)
+
+    def do_build(self, plugin, variant, prod):
+
+        do_build_plugin(plugin, variant, prod)
 
         # copy CDN dir
         cmd = "cp -r " + cdn_dir + " " + self.imgdir
@@ -401,10 +448,10 @@ class Profile(Device):
     def do_config(self):
         super().do_config()
 
-    def do_build(self):
+    def do_build(self, plugin, variant, prod):
         print("calling do_build: board[%s] platform[%s] device[%s] profile[%s]\n" %
             (self.boardtype, self.platformtype, self.devicetype, self.profiletype))
-        super().do_build()
+        super().do_build(plugin, variant, prod)
 
         # Copy rootfs_overlay first
         cmd = "cp -rf profile/" + self.profiletype + "/rootfs_overlay" + " " + self.imgdir
@@ -471,22 +518,33 @@ if __name__ == '__main__':
     argparser.add_argument("--board", choices=boardlist, default="rpi", help="Select board type for image (default = \"rpi\")")
     argparser.add_argument("--platform", choices=platformlist, default="raspbian", help="Select platforn type for image (default = \"raspbian\")")
     argparser.add_argument("--profile", choices=profilelist, default="ekstep", help="Select profile (default = \"ekstep\")")
-    argparser.add_argument("--clean", dest="clean",  action='store_true', help="Select type of image to clean (default = \"openrap\")")
+    argparser.add_argument("--clean", dest="clean",  action="store_true", help="Select type of image to clean (default = \"openrap\")")
+    argparser.add_argument("--superclean", dest="superclean",  action="store_true", help="Remove the build directory completely")
+    argparser.add_argument("-p","--plugin", choices=supported_plugins, default="ekstep", help="Select the plugin that needs to be bundled with this build (default = \"esktep\")")
+    argparser.add_argument("-v","--variant", choices=supported_variants["ekstep"], default="diksha", help="Select the variant of ekstep plugin, if any (default = \"diksha\")")
+    argparser.add_argument("-P","--prod", dest="prod", action="store_true", help="Set this option if you want to create a production build")
     args = argparser.parse_args()
 
     (board, platform, profile, clean) = (args.board, args.platform, args.profile, args.clean)
     device="openrap"
 
+    plugin = args.plugin
+    variant = args.variant
+    prod = args.prod
+
     if board == "minipc":
         GOARCH='386'
 
     d = Profile(profile, device, platform, board)
-    if args.clean:
+    
+    if args.superclean:
+        d.do_superclean()
+    elif args.clean:
         d.do_clean()
     else:
         d.do_prepare()
         d.do_config()
-        d.do_build()
+        d.do_build(plugin, variant, prod)
         d.do_pkg()
 
     sys.exit(0)
