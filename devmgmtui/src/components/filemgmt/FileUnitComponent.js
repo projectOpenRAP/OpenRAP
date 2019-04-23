@@ -44,7 +44,7 @@ class FileUnitComponent extends Component {
     if (this.state.selected) {
       currentlySelectedFiles.splice(currentlySelectedFiles.indexOf(this.props.name), 1);
     } else {
-      if(this.props.filemgmt.currentDir === this.props.config.config.ecar_dir) {
+      if(this.props.filemgmt.currentDir === "/home/admin/diksha/ecar_files/") {
       currentlySelectedFiles.push(this.props.id + this.props.ext);
       }
       else {
@@ -111,8 +111,8 @@ class FileUnitComponent extends Component {
     )
   }
 }
-function mapStateToProps({ filemgmt, auth, config }) {
-  return { filemgmt, auth, config }
+function mapStateToProps({ filemgmt, auth }) {
+  return { filemgmt, auth }
 }
 
 export default connect(mapStateToProps, actions)(FileUnitComponent);
