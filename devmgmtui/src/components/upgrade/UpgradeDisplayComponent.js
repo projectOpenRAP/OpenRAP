@@ -51,8 +51,9 @@ class UpgradeDisplayComponent extends Component {
         } else if (uploading) {
           this.setState({uploadProgress : res});
         } else {
-          alert('Successfully uploaded file!');
+          alert('Successfully Upgraded!.Rebooting Now...');
           this.setState({fileUploadedStatus:"DONE"});
+          window.location.reload(true);
         }
       });
     }
@@ -64,8 +65,10 @@ class UpgradeDisplayComponent extends Component {
       return;
     }
     else{
-      alert("After upgrade the device will be rebooted.");
-      this.setState({fileUploadedStatus:"ACTIVE"});
+      let consent = window.confirm("After upgrade the device will be rebooted.");
+      if (consent){
+	  	  this.setState({fileUploadedStatus:"ACTIVE"});
+		  }
     }
   }
 

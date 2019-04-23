@@ -20,6 +20,10 @@ let writeUpdateFile = (req, res) => {
         console.log(`stdout: ${stdout}`);
         console.log(`stderr: ${stderr}`);
         res.status(200).json({success : true});
+        setTimeout(() => {
+          exec('/sbin/reboot');
+        }, 10000);
+        
         }
       })
     }

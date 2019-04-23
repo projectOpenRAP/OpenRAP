@@ -141,6 +141,7 @@ let getRequestOptions = (method, uri, body, headers, json = true) => ({
 
 // Search diksha cloud with the query string, limit of results to be returned, and offset of results
 let searchDikshaCloud = ({ query, limit, offset, filters, fields }) => {
+	offset = offset - 1;
 	const body = getSearchBody(query, +limit, +offset, filters, fields);
 	const headers = getSearchHeaders();
 	const uri = state.searchUrl();

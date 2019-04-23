@@ -46,16 +46,18 @@ let init = () => {
 }
 
 //Create a new index [PUT] Creates a new Index
-let createIndex = (params) => {
+let createAndInitIndex = (params) => {
     let defer = q.defer();
     let indexName = params.indexName;
+    let jsonDir = params.jsonDir;
+    let url = `${SEARCH_SERVER}/${INDEX_BASE_URL}/${indexName}?jsonDir=${jsonDir}`;
     let options = {
-        url : `${SEARCH_SERVER}/${INDEX_BASE_URL}/${indexName}`,
+        url : url,
         method : 'PUT'
     }
     request(options, (err, res, body) => {
         if (err) {
-            return defer.reject({err, at : "Create Index"});
+            return defer.reject({err, at : "Create Index and start indexing"});
         } else {
             let statusCode = res.statusCode.toString();
             if (statusCode.search(/^[2]\d\d$/) === -1) {
@@ -222,10 +224,12 @@ let search = (params) => {
     let defer = q.defer();
     let indexName = params.indexName;
     let searchString = params.searchString;
+    let limit = params.limit;
+    let offset = params.offset;
     let options = {
         url : `${SEARCH_SERVER}/${INDEX_BASE_URL}/${indexName}/_search`,
         method : 'POST',
-        body : JSON.stringify({"query" : {"query" : searchString}})
+        body : JSON.stringify({"query" : {"query" : searchString}, "size" : limit, "from" : offset})
     }
     request(options, (err, res, body) => {
         if (err) {
@@ -337,7 +341,7 @@ runManualTests();
 
 module.exports = {
     init,
-    createIndex,
+    createAndInitIndex,
     addDocument,
     deleteIndex,
     deleteDocument,

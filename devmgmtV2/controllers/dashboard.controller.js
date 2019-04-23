@@ -103,7 +103,7 @@ let getDeviceID = (req,res) => {
     let responseData = {
         retrieveSuccessful : true,
         deviceID : undefined,
-        msg : 'Successfully retrieved Mac address'
+        msg : 'Successfully retrieved device ID'
     }
 
     selectFields({dbName : 'device_mgmt', tableName : 'device', columns : ["dev_id"]})
@@ -117,6 +117,29 @@ let getDeviceID = (req,res) => {
         });
 }
 
+let getSyncthingID = (req, res) => {
+    let responseData = {
+        retrieveSuccessful: true,
+        syncthingID: undefined,
+        msg: 'Successfully retrieved syncthing ID'
+    }
+
+    const cmd = 'sudo /opt/opencdn/CDN/syncthing -device-id';
+
+    exec(cmd, { shell: '/bin/bash' }, (err, stdout, stderr) => {
+        if (err) {
+            console.log("Error occurred while fetching syncthing ID\n", JSON.stringify({ err, stderr }, null, 4));
+
+            responseData.retrieveSuccessful = false;
+            responseData.msg = err;
+        } else {
+            responseData.syncthingID = stdout.trim();
+        }
+
+        res.status(200).json(responseData);
+    });
+}
+
 module.exports = {
     getInternetStatus,
     getLastRefresh,
@@ -125,5 +148,6 @@ module.exports = {
     getSystemSpace,
     getSystemCpu,
     getSystemVersion,
-    getDeviceID
+    getDeviceID,
+    getSyncthingID
 }

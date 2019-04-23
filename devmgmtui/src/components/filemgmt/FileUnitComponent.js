@@ -57,7 +57,7 @@ class FileUnitComponent extends Component {
 
   shortenString(string) {
     if (string.length > 45) {
-      return (string.slice(0, 24) + '...' + string.slice(-15))
+      return (string.slice(0, 20) + '...' + string.slice(-22))
     }
     return string;
   }

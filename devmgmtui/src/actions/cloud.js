@@ -6,7 +6,7 @@ export const clearCurrentContent = (cb) => (dispatch) => {
 		content: [],
 		count: 0,
 		limit: 33,
-		offset: 1,
+		offset: 0,
 		queryString: '',
 		searching: false
 	};

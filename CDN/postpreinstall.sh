@@ -25,12 +25,6 @@ restore_files()
 	done
 }
 
-reboot_device()
-{
-	echo "Rebooting device"
-	reboot now
-}
-
 install_aria2()
 {
 	echo "Installing aria2"
@@ -52,30 +46,35 @@ restore_files
 mkdir -p /opt/searchEngine/bleveDbDir/
 mkdir -p /home/admin/GoK/
 
+#Set System time-zone
+sudo timedatectl set-timezone Asia/Kolkata
+
 # Install aria2 and clean up the deb files used
 install_aria2
 remove_aria2_deb
 
 systemctl enable searchserver
-systemctl restart searchserver
 
 systemctl enable appserver
-systemctl restart appserver
 
 systemctl enable syncthing
-systemctl restart syncthing
 
 systemctl enable aria2
-systemctl restart aria2
 
-reboot_device
+#There were two NTP clients on the system, ntp and systemd-timesyncd.Both were trying to set the date and were conflicting.The ntp is purged to resolve the conflict.
+echo "Y" | apt purge ntp
 
-# These instructions have been moved after the reboot
-# because this script gets called from within the devmgmt
-# service and once devmgmt got restarted, the script came
-# to a halt and further instructions were never executed
-systemctl enable devmgmt
-systemctl restart devmgmt
+#Optimize the system
+rm -rf /var/log/daemon.log
+ln -s /dev/null /var/log/daemon.log
+
+rm -rf /var/log/dnsmasq.log
+ln -s /dev/null /var/log/dnsmasq.log
+
+rm -rf /var/log/syslog
+ln -s /dev/null /var/log/syslog
+
+update-rc.d dphys-swapfile remove
 
 exit 0
 }
@@ -100,5 +99,3 @@ if [ "$1" == "-pre" ]
 fi
 
 echo "$0 <-post | -pre>"
-
-
