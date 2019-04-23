@@ -183,7 +183,7 @@ let classify = (dir, file) => {
       if (ext === '.ecar' && isEcarDir(dir)) {
         const db = getEcarDb(dir);
 
-        getEcarNameForId(file, db)
+        getEcarNameForId(file+'.json', db) //Name of the file will be present inside the ".json" file(meta data)
           .then(ecarName => {
             const id = name.substring(0, name.lastIndexOf('_'));
 
@@ -289,7 +289,8 @@ let deleteFileFromDisk = (req, res) => {
   if (ext === '.ecar') {
     cmd = `rm -rf ${file}* ${json_dir}* ${xcontent}*`;
   } else {
-    if(!(dir.startsWith('/home/admin/diksha'))){
+    // deletion of files outside the "/home/admin" dir and inside the "/home/admin/diksha" dir has been restricted.
+    if((dir.startsWith('/home/admin')) && (!(dir.startsWith('/home/admin/diksha')))){
       fileToDelete = fileToDelete.replace(/\W/g,"\\$&");
       cmd = `rm -rf ${fileToDelete}`;
     }else {

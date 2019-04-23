@@ -224,10 +224,12 @@ let search = (params) => {
     let defer = q.defer();
     let indexName = params.indexName;
     let searchString = params.searchString;
+    let limit = params.limit;
+    let offset = params.offset;
     let options = {
         url : `${SEARCH_SERVER}/${INDEX_BASE_URL}/${indexName}/_search`,
         method : 'POST',
-        body : JSON.stringify({"query" : {"query" : searchString}, "size" : 1000})
+        body : JSON.stringify({"query" : {"query" : searchString}, "size" : limit, "from" : offset})
     }
     request(options, (err, res, body) => {
         if (err) {
