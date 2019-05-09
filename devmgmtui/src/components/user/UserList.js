@@ -10,22 +10,27 @@ const styles = {
     },
 }
 class UserList extends Component {
-
+    
     componentWillMount() {
         this.props.getAllUser();
         document.title = "User List";
     }
 
     handleDelete(key) {
-        this.props.deleteUser(key, this.props.auth.user.username, (err,msg) => {
-            if(!err){
-                alert("Deletion Success");
-                this.props.getAllUser();
-            }else{
-                alert(msg);
-            }
-        })
+        let consent = window.confirm("Cannot be reverted once you delete the user. Are you sure?")
+        if(consent){
+            this.props.deleteUser(key, this.props.auth.user.username, (err,msg) => {
+                if(!err){
+                    this.props.getAllUser();
+                }else{
+                    alert(msg);
+                }
+            })
+        } else {
+            this.props.getAllUser();
+        }
     }
+    
     renderUserList() {
         return this.props.user.list.userList.map((item, index) => {
             return (

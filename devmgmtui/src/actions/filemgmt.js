@@ -27,7 +27,8 @@ export const applyChanges = (cb) => (dispatch) => {
         });
 }
 
-export const readFolder = (folderPath, update=true) => (dispatch) => {
+export const readFolder = (folderPath, cb) => (dispatch) => {
+  let update = true;
   let encodedPath = encodeURIComponent(folderPath)
   axios.get(`${BASE_URL}/file/open`, {params : {path : encodedPath}})
     .then((response) => {
@@ -37,9 +38,11 @@ export const readFolder = (folderPath, update=true) => (dispatch) => {
       dispatch({type : 'READ_DIR', payload : response.data.children});
       dispatch({type : 'OPEN_DIR', payload : folderPath});
       localStorage.setItem('directoryData',folderPath);
+      cb && cb();
   })
     .catch(e => {
       console.log(e);
+      cb && cb();
       alert ('No permissions to read folder');
     })
 }
@@ -105,13 +108,13 @@ export const deleteFolder = (prefix, folderName, actor, cb) =>  (dispatch) => {
   });
 }
 
-export const deleteFile = (prefix, folderName, actor, cb) =>  (dispatch) => {
-  let fullPath = encodeURIComponent(prefix + folderName);
+export const deleteFile = (prefix, fileName, actor, cb) =>  (dispatch) => {
+  let fullPath = encodeURIComponent(prefix + fileName);
   axios.delete(`${BASE_URL}/file/delete`, {params : {path : fullPath, timestamp : getTimestamp(), actor}}).then((response) => {
     if (response.data.success) {
       cb(null, "success");
     }else{
-      cb("Error", "Cannot delete!");
+      cb("Error", "Cannot Delete this file!");
     }
   }, reject => {
     console.log(reject);

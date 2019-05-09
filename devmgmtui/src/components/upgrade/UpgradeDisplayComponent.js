@@ -31,7 +31,15 @@ class UpgradeDisplayComponent extends Component {
   }
 
   handleFileInputChange(selectedFile) {
-    this.setState({fileName : selectedFile[0].name, fileToAdd : selectedFile[0]});
+    let re = /\.tgz/ 
+		if(!(re.test(selectedFile[0].name))){
+      alert("Select a correct file to Upgrade the device");
+		}
+		else {
+      this.setState({fileName : selectedFile[0].name, fileToAdd : selectedFile[0]});
+      console.log(selectedFile[0].name.length);//currently selected file's length
+    };
+    
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -43,8 +51,9 @@ class UpgradeDisplayComponent extends Component {
         } else if (uploading) {
           this.setState({uploadProgress : res});
         } else {
-          alert('Successfully uploaded file!');
+          alert('Successfully Upgraded!.Rebooting Now...');
           this.setState({fileUploadedStatus:"DONE"});
+          window.location.reload(true);
         }
       });
     }
@@ -52,10 +61,15 @@ class UpgradeDisplayComponent extends Component {
 
   submitFilesForUpload() {
     if (this.state.fileToAdd == null) {
-      alert('Select a file to upload first');
+      alert('Please select a file to upload');
       return;
     }
-    this.setState({fileUploadedStatus:"ACTIVE"});
+    else{
+      let consent = window.confirm("After upgrade the device will be rebooted.");
+      if (consent){
+	  	  this.setState({fileUploadedStatus:"ACTIVE"});
+		  }
+    }
   }
 
 
@@ -95,7 +109,7 @@ class UpgradeDisplayComponent extends Component {
         <span style={{float : 'right'}}>
 
           <Button animated color={this.state.fileUploadedStatus === 'ERROR' ? 'red': 'green'} onClick = {this.submitFilesForUpload.bind(this)}>
-            <Button.Content visible>Begin upload!</Button.Content>
+            <Button.Content visible>Start upgrade!</Button.Content>
             <Button.Content hidden><Icon name='checkmark'/></Button.Content>
           </Button>
         </span>

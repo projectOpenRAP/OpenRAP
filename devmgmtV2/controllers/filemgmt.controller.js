@@ -111,13 +111,13 @@ let getEcarNameForId = (id, db) => {
     documentID: id
   }).then(results => {
     const metaData = JSON.parse(results.body);
-    const ecarName = metaData.fields["archive.items.name"][0];
+    const ecarName = metaData.fields["archive.items.name"];
 
     defer.resolve(ecarName);
   }).catch(err => {
-    defer.reject(err);
+    // defer.reject(err);
+    defer.resolve(name = '');
   });
-
   return defer.promise;
 }
 
@@ -188,7 +188,7 @@ let classify = (dir, file) => {
       if (ext === '.ecar' && isEcarDir(dir)) {
         const db = getEcarDb(dir);
 
-        getEcarNameForId(file, db)
+        getEcarNameForId(file+'.json', db) //Name of the file will be present inside the ".json" file(meta data)
           .then(ecarName => {
             const id = name.substring(0, name.lastIndexOf('_'));
 
@@ -284,20 +284,24 @@ let deleteFileFromDisk = (req, res) => {
   }
   let cmd;
 
-  fileToDelete = fileToDelete.replace(/'/g, "\'\\''");
-
   const ext = path.extname(fileToDelete);
   const name = path.basename(fileToDelete).replace(ext, '');
   const dir = path.dirname(fileToDelete);
-
   const file = path.resolve(dir, name);
   const json_dir = path.resolve(dir, '..', 'json_dir', name);
   const xcontent = path.resolve(dir, '..', 'xcontent', name);
-
+  
   if (ext === '.ecar') {
     cmd = `rm -rf ${file}* ${json_dir}* ${xcontent}*`;
   } else {
-    cmd = `rm -rf ${fileToDelete}`;
+    // deletion of files outside the "/home/admin" dir and inside the "/home/admin/forwater" dir has been restricted.
+    if((dir.startsWith('/home/admin')) && (!(dir.startsWith('/home/admin/forwater')))){
+      fileToDelete = fileToDelete.replace(/\W/g,"\\$&");
+      cmd = `rm -rf ${fileToDelete}`;
+    }else {
+      responseStructure.msg = "Cannot Delete this file!";
+      return res.status(200).json(responseStructure);
+    }
   }
 
   exec(cmd, (err, stdout, stderr) => {

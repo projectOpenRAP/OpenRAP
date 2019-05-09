@@ -49,10 +49,10 @@ class SideNav extends Component {
                           <Icon name='wifi' />
                           Modify SSID
                         </Menu.Item> : null }
-                        { this.props.auth.user.permissions.search(/CHANGE_CAPTIVE_PORTAL|ALL/) >= 0 ? <Menu.Item name='captive_mod' active={this.state.currentLocation === '/captive'} as={Link} to={'/captive'}>
+                        {/* { this.props.auth.user.permissions.search(/CHANGE_CAPTIVE_PORTAL|ALL/) >= 0 ? <Menu.Item name='captive_mod' active={this.state.currentLocation === '/captive'} as={Link} to={'/captive'}>
                           <Icon name='eye' />
                           Modify Captive Portal
-                        </Menu.Item> : null }
+                        </Menu.Item> : null } */}
                         
                         { this.props.auth.user.permissions.search(/ALL/) >= 0 ? <Menu.Item name='cloud_download' active={this.state.currentLocation === '/cloud'} as={Link} to={'/cloud'}>
                           <Icon name='cloud download' />

@@ -42,8 +42,8 @@ class FolderUnitComponent extends Component {
   }
 
   shortenString(string) {
-    if (string.length > 30) {
-      return (string.slice(0, 8) + '...' + string.slice(-6))
+    if (string.length > 45) {
+      return (string.slice(0, 20) + '...' + string.slice(-22))
     }
     return string;
   }
@@ -59,8 +59,9 @@ class FolderUnitComponent extends Component {
         if (err) {
           alert(res);
         } else {
-          alert("Folder deletion success");
-          this.props.readFolder(this.props.filemgmt.currentDir);
+          this.props.readFolder(this.props.filemgmt.currentDir, () =>{
+            alert("Folder deletion success");
+          });
         }
       });
     } else {

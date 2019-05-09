@@ -56,8 +56,8 @@ class FileUnitComponent extends Component {
   }
 
   shortenString(string) {
-    if (string.length > 30) {
-      return (string.slice(0, 12) + '...' + string.slice(-15))
+    if (string.length > 45) {
+      return (string.slice(0, 20) + '...' + string.slice(-22))
     }
     return string;
   }
@@ -71,8 +71,9 @@ class FileUnitComponent extends Component {
         if (err) {
           alert(res);
         } else {
-          alert("File deletion success");
-          this.props.readFolder(this.props.filemgmt.currentDir);
+          this.props.readFolder(this.props.filemgmt.currentDir, () => {
+            alert("File deletion success");
+          });
         }
       });
     } else {
