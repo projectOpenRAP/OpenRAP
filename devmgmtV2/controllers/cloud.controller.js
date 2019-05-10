@@ -276,7 +276,7 @@ let extractDependencyIdList = (manifest, parentId) => {
 
 let getDependencies = (req, res) => {
 	const { parent } = req.params;
-	const src = config.root_dir;
+	const src = `${config.root_dir}/${parent}`;
 	const dest = `/tmp/${parent}`;
 
 	let responseData = {
