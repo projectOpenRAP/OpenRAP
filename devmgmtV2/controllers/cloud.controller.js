@@ -25,7 +25,7 @@ let state = (() => {
 	let userToken = search_api.user_token;
 	let authToken = search_api.auth_token;
 	let searchUrl = search_api.url;
-	let isAuthTokenValid = false;
+	let isAuthTokenValid = true; // should always be TRUE 
 	let { keysToUse } = filter;
 
 	return {
