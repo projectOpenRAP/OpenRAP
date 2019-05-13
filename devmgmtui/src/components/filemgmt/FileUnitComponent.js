@@ -44,7 +44,7 @@ class FileUnitComponent extends Component {
     if (this.state.selected) {
       currentlySelectedFiles.splice(currentlySelectedFiles.indexOf(this.props.name), 1);
     } else {
-      if(this.props.filemgmt.currentDir === "/home/admin/diksha/ecar_files/") {
+      if(this.props.filemgmt.currentDir === "/home/admin/forwater/ecar_files/") {
       currentlySelectedFiles.push(this.props.id + this.props.ext);
       }
       else {
