@@ -454,8 +454,8 @@ class Profile(Device):
         super().do_build(plugin, variant, prod)
 
         # Copy rootfs_overlay first
-        cmd = "cp -rf profile/" + self.profiletype + "/rootfs_overlay" + " " + self.imgdir
-        run_cmd(cmd)
+        #cmd = "cp -rf profile/" + self.profiletype + "/rootfs_overlay" + " " + self.imgdir
+        #run_cmd(cmd)
 
         # Update /etc/hostname file
         filename = self.imgdir + "rootfs_overlay/etc/hostname"
