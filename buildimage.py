@@ -457,10 +457,6 @@ class Profile(Device):
         #cmd = "cp -rf profile/" + self.profiletype + "/rootfs_overlay" + " " + self.imgdir
         #run_cmd(cmd)
 
-        #Rename variant.apk as app.apk
-        cmd = "cp rootfs_overlay/var/www/html/public/" + variant + ".apk" + " " + "rootfs_overlay/var/www/html/public/app.apk"
-        run_cmd(cmd)
-
         # Copy rootfs_overlay 
         cmd = "cp -rf rootfs_overlay" + " " + self.imgdir
         run_cmd(cmd)
