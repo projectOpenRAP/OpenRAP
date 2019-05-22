@@ -9,11 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.212.1",
+    "aws-sdk": "^2.457.0",
     "child_process": "^1.0.2",
     "node-zip": "^1.1.1",
     "q": "^1.5.1",
-    "request": "^2.85.0",
+    "request": "^2.88.0",
     "util": "^0.10.3"
   }
 }
