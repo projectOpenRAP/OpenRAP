@@ -32,6 +32,7 @@ class EditUser extends Component {
                 perm7 : false,
                 perm8 : false,
                 perm9 : false,
+                perm10 : false,
             },
             permissionsAsStrings: {
                 perm0 : "VIEW_DASHBOARD",
@@ -39,11 +40,12 @@ class EditUser extends Component {
                 perm2 : "DELETE_USERS",
                 perm3 : "EDIT_USERS",
                 perm4 : "ADD_USERS",
-                perm5 : "VIEW_FILES",
-                perm6 : "UPLOAD_FILES",
-                perm7 : "DELETE_FILES",
-                perm8 : "MODIFY_SSID",
-                perm9 : "UPGRADE_DEVICE"
+                perm5 : "CHANGE_PASSWORD",
+                perm6 : "VIEW_FILES",
+                perm7 : "UPLOAD_FILES",
+                perm8 : "DELETE_FILES",
+                perm9 : "MODIFY_SSID",
+                perm10 : "UPGRADE_DEVICE"
             },
             disabledFlag : {
                 perm0 : false,
@@ -56,6 +58,7 @@ class EditUser extends Component {
                 perm7 : false,
                 perm8 : false,
                 perm9 : false,
+                perm10 : false,
             },
             isAllEnabled : true
         }
@@ -77,11 +80,11 @@ class EditUser extends Component {
           this.setState({permissions});
         }
         let disabledFlag = { ...this.state.disabledFlag };
-        if (this.state.permissions['perm2'] || this.state.permissions['perm3'] || this.state.permissions['perm4']) {
+        if (this.state.permissions['perm2'] || this.state.permissions['perm3'] || this.state.permissions['perm4'] || this.state.permissions['perm5']) {
             disabledFlag.perm1 = true;
         }
-        if (this.state.permissions['perm6'] || this.state.permissions['perm7']) {
-            disabledFlag.perm5 = true;
+        if (this.state.permissions['perm7'] || this.state.permissions['perm8']) {
+            disabledFlag.perm6 = true;
         }
         this.setState({
             disabledFlag
@@ -108,22 +111,22 @@ class EditUser extends Component {
 
         permissions[permLabel] = !permissions[permLabel]
 
-        if(permissions[permLabel] && ["DELETE_USERS", "EDIT_USERS", "ADD_USERS"].indexOf(permissionsAsStrings[permLabel]) !== -1) {
+        if(permissions[permLabel] && ["DELETE_USERS", "EDIT_USERS", "ADD_USERS", "CHANGE_PASSWORD"].indexOf(permissionsAsStrings[permLabel]) !== -1) {
             permissions['perm1'] = true;
             disabledFlag['perm1'] = true;
         }
 
-        if(!permissions['perm2'] && !permissions['perm3'] && !permissions['perm4']) {
+        if(!permissions['perm2'] && !permissions['perm3'] && !permissions['perm4'] && !permissions['perm5']) {
             disabledFlag['perm1'] = false;
         }
 
         if(permissions[permLabel] && ["UPLOAD_FILES", "DELETE_FILES"].indexOf(permissionsAsStrings[permLabel]) !== -1) {
-            permissions['perm5'] = true;
-            disabledFlag['perm5'] = true;
+            permissions['perm6'] = true;
+            disabledFlag['perm6'] = true;
         }
 
-        if(!permissions['perm6'] && !permissions['perm7']) {
-            disabledFlag['perm5'] = false;
+        if(!permissions['perm7'] && !permissions['perm8']) {
+            disabledFlag['perm6'] = false;
         }
 
         this.setState({ permissions }, this.setAllEnabled);
@@ -142,7 +145,7 @@ class EditUser extends Component {
         permissions[i] = true;
       }
       disabledFlag.perm1 = true;
-      disabledFlag.perm5 = true;
+      disabledFlag.perm6 = true;
       this.setState({ permissions, disabledFlag }, this.setAllEnabled);
     }
 

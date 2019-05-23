@@ -57,6 +57,14 @@ class UserList extends Component {
                         </Button.Content>
                     </Button>
                 </List.Content> : null}
+                { this.props.auth.user.permissions.search(/CHANGE_PASSWORD|ALL/) >= 0 ? <List.Content floated='right'>
+                    <Button animated color='orange' as={Link} to={'/update/password/' + item.username} >
+                        <Button.Content visible>Change Password</Button.Content>
+                        <Button.Content hidden>
+                            <Icon name='edit' />
+                        </Button.Content>
+                    </Button>
+                </List.Content> : null}
                 <List.Content>
                     <List.Header>{item.username}</List.Header>
                 </List.Content>

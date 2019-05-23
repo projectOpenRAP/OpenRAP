@@ -77,3 +77,24 @@ export const logout = () => (dispatch) => {
     localStorage.removeItem('authData');
     dispatch({ type: 'DISABLE_AUTH' });
 }
+
+export const changePassword = (user, password, cb) => () => {
+    let data = {
+        "username" : user,
+        "field" : "password",
+        "value" : password,
+        "timestamp" : `${new Date().getTime()}`
+    }
+    axios.put(`${BASE_URL}/user/update`, data)
+        .then((response) => {
+            if (response.data.updateSuccessful){
+                cb(null, "Success");
+            } else {
+                cb("error", "Such a user does not exist");
+            }
+        })
+        .catch(e => {
+            console.log(e);
+            cb("error", "some server error");
+        });
+}

@@ -1,4 +1,6 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import * as actions from '../../actions/auth';
 
 import { Container, Grid, Segment, Input, Header, Button, Icon } from 'semantic-ui-react';
 
@@ -20,12 +22,19 @@ class UpdatePassword extends Component {
         super(props);
 
         this.state = {
-            password: ""
+            password: "",
+            user: props.match.params.username
         }
     }
 
     componentWillMount() {
       document.title = "Update Password";  
+    }
+
+    handleUserChange(e) {
+        this.setState({
+            user: e.target.value
+        })
     }
 
     handlePasswordChange(e) {
@@ -35,7 +44,19 @@ class UpdatePassword extends Component {
     }
 
     handleSubmit() {
-        /* Handler code goes here */
+        console.log("reached handleSubmit");
+        if((this.state.password.length>=1) && ((this.state.password) !== ('\ '))) {
+            this.props.changePassword(this.state.user, this.state.password, (err, res) => {
+                if (!err) {
+                  alert("Password updated successfully.");
+                } else {
+                  console.log(err);
+                }
+                this.props.history.push("/users");
+            });
+        } else {
+            alert(" Please Enter a New Password");
+        }
     }
 
     renderPasswordUpdateForm() {
@@ -47,6 +68,12 @@ class UpdatePassword extends Component {
                             <Header as='h2' color='teal' textAlign='center'>
                                 {' '}Set a new password
                             </Header>
+
+                            <p
+                                onChange={this.handleUserChange.bind(this)}
+                                value={this.state.user} />
+
+                                <br />
 
                             <Input
                                 onChange={this.handlePasswordChange.bind(this)}
@@ -83,5 +110,4 @@ class UpdatePassword extends Component {
     }
 
 }
-
-export default UpdatePassword;
+export default connect(null, actions)(UpdatePassword);
