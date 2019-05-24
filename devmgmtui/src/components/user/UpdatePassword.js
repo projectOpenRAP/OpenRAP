@@ -31,12 +31,6 @@ class UpdatePassword extends Component {
       document.title = "Update Password";  
     }
 
-    handleUserChange(e) {
-        this.setState({
-            user: e.target.value
-        })
-    }
-
     handlePasswordChange(e) {
         this.setState({
             password: e.target.value
@@ -44,12 +38,12 @@ class UpdatePassword extends Component {
     }
 
     handleSubmit() {
-        if((this.state.password.length>=1) && ((this.state.password) !== ('\ '))) {
+        if(this.state.password.length>0) {
             this.props.changePassword(this.state.user, this.state.password, (err, res) => {
                 if (!err) {
-                  alert("Password updated successfully.");
+                  alert(res);
                 } else {
-                  console.log(err);
+                    console.log(res);
                 }
                 this.props.history.push("/users");
             });
@@ -67,12 +61,6 @@ class UpdatePassword extends Component {
                             <Header as='h2' color='teal' textAlign='center'>
                                 {' '}Set a new password
                             </Header>
-
-                            <p
-                                onChange={this.handleUserChange.bind(this)}
-                                value={this.state.user} />
-
-                                <br />
 
                             <Input
                                 onChange={this.handlePasswordChange.bind(this)}
