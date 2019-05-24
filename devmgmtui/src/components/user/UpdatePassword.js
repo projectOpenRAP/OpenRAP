@@ -44,7 +44,6 @@ class UpdatePassword extends Component {
     }
 
     handleSubmit() {
-        console.log("reached handleSubmit");
         if((this.state.password.length>=1) && ((this.state.password) !== ('\ '))) {
             this.props.changePassword(this.state.user, this.state.password, (err, res) => {
                 if (!err) {
