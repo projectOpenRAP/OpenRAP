@@ -41,7 +41,7 @@ class App extends Component {
                     <Route exact path={"/create/user"} component={verifyAuth(CreateUser)} />
                     <Route exact path={"/users"} component={verifyAuth(UserList)} />
                     <Route exact path={"/ssid/set"} component={verifyAuth(SetSSID)} />
-                    <Route exact path={"/update/password"} component={verifyAuth(UpdatePassword)} />
+                    <Route exact path={"/update/password/:username"} component={verifyAuth(UpdatePassword)} />
                     <Route exact path={"/upgrade"} component={verifyAuth(Upgrade)} />
                     <Route exact path={"/filemgmt"} component={verifyAuth(FileMgmt)} />
                     <Route exact path={"/dashboard"} component={verifyAuth(Dashboard)} />
