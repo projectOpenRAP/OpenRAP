@@ -248,6 +248,20 @@ let deleteFileFromDisk = (req, res) => {
   
   if (ext === '.ecar') {
     cmd = `rm -rf ${file}* ${json_dir}* ${xcontent}*`;
+     //count the no of files in ecar_files's dir
+    fs.readdir(dir, (err, files) => {
+      let ecar_count = files.length - 1;
+      if (ecar_count === 0) {
+        let XC = path.resolve(dir, '..', 'xcontent');
+        fs.readdir(XC, (err, files) => {
+          if (err) throw err;
+
+          for (const xc_folder of files) {
+            exec(`rm -rf ${XC}/${xc_folder}`);
+          }
+        });
+     }
+    });
   } else {
     if(!(dir.startsWith(config.root_dir))){
       fileToDelete = fileToDelete.replace(/\W/g,"\\$&");
