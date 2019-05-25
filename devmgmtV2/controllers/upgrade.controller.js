@@ -31,7 +31,7 @@ let writeUpdateFile = (req, res) => {
 }
 
 let checkPreviousVersion = (req,res) => {
-    let previousVersionPath = '/opt/opencdn.old'
+    let previousVersionPath = '/opt/opencdn.old/CDN/version.txt'
     if(fs.existsSync(previousVersionPath)) {
         res.status(200).json({success : true});
       } else {
@@ -42,11 +42,15 @@ let checkPreviousVersion = (req,res) => {
 let revertVersion = (req, res) => {
   exec('/opt/opencdn/CDN/revert.sh', (error, stdout, stderr) => {
     if (error) {
+      console.log("Error occured while reverting version");
       res.status(200).json({success : false});
     } else {
     console.log(`stdout: ${stdout}`);
     console.log(`stderr: ${stderr}`);
     res.status(200).json({success : true});
+    setTimeout(() => {
+      exec('/sbin/reboot');
+    }, 5000);
     }
   });
 }
