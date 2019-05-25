@@ -88,13 +88,13 @@ export const changePassword = (user, password, cb) => () => {
     axios.put(`${BASE_URL}/user/update`, data)
         .then((response) => {
             if (response.data.updateSuccessful){
-                cb(null, "Success");
+                cb(null, response.data.msg);
             } else {
-                cb("error", "Such a user does not exist");
+                cb("error",response.data.msg);
             }
         })
         .catch(e => {
             console.log(e);
-            cb("error", "some server error");
+            cb("error", "Some Server Error");
         });
 }
