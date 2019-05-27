@@ -9,7 +9,7 @@ let bodyParser = require('body-parser');
 let cors = require('cors');
 let app = express();
 let { exec } = require('child_process');
-let { repeatedlyCheckForInternet, repeatedlyCheckUsers } = require('./telemetry_cron.js');
+let { repeatedlyCheckForInternet, repeatedlyCheckUsers, repeatedlyCheckCpu, repeatedlyCheckMemory } = require('./telemetry_cron.js');
 let { initiateTelemetrySync } = require('./telemetry_sync');
 let { generateOriginalJWTs } = require('./helpers/cloud.helper.js');
 
@@ -18,9 +18,9 @@ const request = require('request');
 const q = require('q');
 
 const {
-	isInternetActive,
+  isInternetActive,
     getTelemetryData,
-	zipContents
+  zipContents
 } = require('../telemetrysdk');
 
 app.use(cors())
@@ -44,11 +44,13 @@ app.listen(8080, err => {
     if (err)
         console.log(err);
     else {
-		    initiateTelemetrySync();
+        initiateTelemetrySync();
 
         cron.schedule("*/15 * * * * *", () => {
             repeatedlyCheckForInternet();
             repeatedlyCheckUsers();
+            repeatedlyCheckCpu();
+            repeatedlyCheckMemory();
         });
 
         console.log("server running on port 8080");

@@ -46,6 +46,8 @@ let util = require('util');
 let cp = require('child_process');
 const dns = require('dns')
 const q = require("q");
+const os = require ('os-utils');
+const diskspace = require('diskspace');
 
 let telemetryPath = "/home/admin/telemetry"
 cp.exec(`mkdir -p ${telemetryPath}/raw ${telemetryPath}/log ${telemetryPath}/zip`, (err, stdout, stderr) => {
@@ -115,8 +117,8 @@ let sendTelemetryToCloud = (url, path) => {
 // });
 
 let zipContents = (plugin, content) => {
-	const zipFileName = `${plugin}-zip-log-${new Date().getTime()}`;
-	const zipName = `${telemetryPath}/zip/${zipFileName}`;
+    const zipFileName = `${plugin}-zip-log-${new Date().getTime()}`;
+    const zipName = `${telemetryPath}/zip/${zipFileName}`;
 
     zip.file(`${zipFileName}`, JSON.stringify(content));
     const data = zip.generate({ base64: false, compression: 'DEFLATE' });
@@ -137,6 +139,33 @@ let isInternetActive = () => {
             return defer.resolve({ success: true, iAccess: true });
         }
     })
+    return defer.promise;
+}
+
+let getSystemCpu = () => {
+    let defer = q.defer();
+    os.cpuUsage(function(v, err){
+        if (err) {
+            console.log(err);
+            return defer.reject({ success : false});
+        } else {
+            v = v * 100;
+            return defer.resolve({ success : v});
+        }
+    });
+    return defer.promise;
+}
+
+let getMemory = () => {
+    let defer = q.defer();
+    diskspace.check('/', function (result, err) {
+        if (err) {
+            return defer.reject({ success : false});
+        } else {
+            let val = result.used / result.total * 100;
+            return defer.resolve ({ success : val});
+        }
+    });
     return defer.promise;
 }
 
@@ -380,10 +409,12 @@ let getTelemetryData = (plugin, filesToSend = 2, order = "ASC") => {
 
 
 module.exports = {
-	saveTelemetry,
-	isInternetActive,
+    saveTelemetry,
+    isInternetActive,
     getTelemetryData,
-	zipContents
+    zipContents,
+    getSystemCpu,
+    getMemory
 }
 
 // getLastLines()
