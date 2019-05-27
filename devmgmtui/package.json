@@ -8,6 +8,8 @@
     "draft-js": "^0.10.5",
     "draftjs-to-html": "^0.8.2",
     "immutable": "^3.8.2",
+    "local-storage": "^1.4.2",
+    "lodash": "^4.17.11",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-draft-wysiwyg": "^1.12.5",
@@ -29,7 +31,6 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "eslint": "^5.6.0",
     "eslint-plugin-react": "^7.11.1"
   },
   "browserslist": [
