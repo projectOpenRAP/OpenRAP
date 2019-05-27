@@ -2,65 +2,68 @@ let path = require('path');
 let { exec } = require('child_process');
 let q = require('q');
 let { addAgnosticDataAndSave } = require("./helpers/telemetry.helper.js");
+let fs = require ('fs');
 
 const {
-	isInternetActive,
-    saveTelemetry
-} = require('../telemetrysdk');
+    isInternetActive,
+    saveTelemetry,
+    getSystemCpu,
+    getMemory
+} = require('../telemetrysdk/index');
 
 const telemetryStructure = {
-	'eid': '', // Event ID
-	'ets': '', // Event timestamp
-	'ver': '', // Structure version
-	'mid': '', // Message ID
-	'actor': {
-		'id': '', // ID of the entity causing the event
-		'type': '' // Type of entity
-	},
-	'context': {
-		'channel': '', // Where event occurred
-		'pdata': {
-			'id': '', // Device ID
-			'pid': '', // Process ID
-			'ver': '' // Version of the firmware
-		},
-		'env': '', // Event environment
-		'sid': '', // Optional
-		'did': '', // Optional
-		'cdata': [{ // Optional
-			'type':'',
-			'id': ''
-		}],
-		'rollup': { // Optional
-			'l1': '',
-			'l2': '',
-			'l3': '',
-			'l4': ''
-		}
-	},
-	'object': { // Optional
-		'id': '',
-		'type': '',
-		'ver': '',
-		'rollup': {
-			'l1': '',
-			'l2': '',
-			'l3': '',
-			'l4': ''
-		}
-	},
-	'edata': { // Event spcific data
-		'event': '',
-		'value': '',
-		'actor': '',
-		'actorDetails': '',
+    'eid': '', // Event ID
+    'ets': '', // Event timestamp
+    'ver': '', // Structure version
+    'mid': '', // Message ID
+    'actor': {
+        'id': '', // ID of the entity causing the event
+        'type': '' // Type of entity
+    },
+    'context': {
+        'channel': '', // Where event occurred
+        'pdata': {
+            'id': '', // Device ID
+            'pid': '', // Process ID
+            'ver': '' // Version of the firmware
+        },
+        'env': '', // Event environment
+        'sid': '', // Optional
+        'did': '', // Optional
+        'cdata': [{ // Optional
+            'type':'',
+            'id': ''
+        }],
+        'rollup': { // Optional
+            'l1': '',
+            'l2': '',
+            'l3': '',
+            'l4': ''
+        }
+    },
+    'object': { // Optional
+        'id': '',
+        'type': '',
+        'ver': '',
+        'rollup': {
+            'l1': '',
+            'l2': '',
+            'l3': '',
+            'l4': ''
+        }
+    },
+    'edata': { // Event spcific data
+        'event': '',
+        'value': '',
+        'actor': '',
+        'actorDetails': '',
         'params': [
             {
                 'timestamp': ''
             }
         ]
-	},
-	'tags': ['']
+    },
+    'tags': ['']
 }
 
 let internetConnectivitySkeleton = {
@@ -93,6 +96,8 @@ let usersConnectedSkeleton = {
 let internetConnected = null;
 let numberOfUsers = null;
 let timeInterval = 15000;
+let cpuLoad = null;
+let memLoad = null;
 
 let generateTelemetry = (telemetryType, telemetryValue) => {
     let telemetryNow = null;
@@ -104,6 +109,22 @@ let generateTelemetry = (telemetryType, telemetryValue) => {
         case 'usersConnected' :
             telemetryNow = telemetryStructure;
             telemetryNow.edata.params[0].count = parseInt(telemetryValue);
+            break;
+        case 'cpuThreshold' : 
+            telemetryNow = telemetryStructure;
+            if(telemetryValue) {
+                telemetryNow.edata.err = "CPU consumption over 95%";
+                telemetryNow.edata.errtype = "SYSTEM"
+                telemetryNow.edata.message = "CPU usage crossed the threshold";
+            } 
+            break;
+        case 'memThreshold' :
+            telemetryNow = telemetryStructure;
+            if (telemetryValue) {
+                telemetryNow.edata.err = "Memory consumption over 95%";
+                telemetryNow.edata.errtype = "SYSTEM";
+                telemetryNow.edata.message = "Low Storage Space left";
+            }
             break;
         default :
             break;
@@ -152,9 +173,43 @@ let repeatedlyCheckUsers = () => {
     });
 }
 
+let repeatedlyCheckCpu = () => {
+    getSystemCpu().then(value =>{
+        let cThreshold = true;
+        if (value.success > 95) {
+            cpuLoad = cThreshold;
+            generateTelemetry('cpuThreshold', cThreshold);
+        }
+    }).catch(e => {
+        let cThreshold = false;
+        if(cThreshold !== cpuLoad){
+            cpuLoad = cThreshold;
+            generateTelemetry('cpuThreshold', cThreshold);
+        }
+    });
+}
+
+let repeatedlyCheckMemory = () => {
+    getMemory().then(value =>{
+        let mThreshold = true;
+        if (value.success > 95) {
+            memLoad = mThreshold;
+            generateTelemetry('memThreshold', mThreshold);
+        }
+    }).catch(e => {
+        let mThreshold = false;
+        if(mThreshold !== memLoad){
+            memLoad = mThreshold;
+            generateTelemetry('memThreshold', mThreshold);
+        }
+    });
+}
+
 module.exports = {
     repeatedlyCheckForInternet,
-    repeatedlyCheckUsers
+    repeatedlyCheckUsers,
+    repeatedlyCheckCpu,
+    repeatedlyCheckMemory
 }
 
 const saveCronTelemetryData = eData => {
