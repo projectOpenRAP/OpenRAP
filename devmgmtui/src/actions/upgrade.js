@@ -29,3 +29,32 @@ export const uploadFile = (prefix, fileData, cb) => (dispatch) => {
     cb("Error", "Server error")
   })
 }
+
+export const checkPreviousVersion = (cb) => () => {
+  axios.get(`${BASE_URL}/check`).then((response) => {
+    if(response.data.success) {
+      cb(null, "Previous version exists");
+    } else {
+      cb("Error", "Previous version does not exist");
+    }
+  })
+  .catch(e => {
+    console.log(e);
+    cb("Error", "Server error")
+  })
+}
+
+export const revertVersion = (cb) => () => {
+  axios.post(`${BASE_URL}/revert`).then((response) => {
+    if(response.data.success) {
+      cb(null, "Successfully reverted back");
+    } else {
+      cb("Error", "Could not revert back");
+    }
+  })
+  .catch(e => {
+    console.log(e);
+    cb("Error", "Server error")
+  })
+}
+
