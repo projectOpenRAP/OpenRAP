@@ -61,8 +61,13 @@ systemctl enable syncthing
 
 systemctl enable aria2
 
-#There were two NTP clients on the system, ntp and systemd-timesyncd.Both were trying to set the date and were conflicting.The ntp is purged to resolve the conflict.
-echo "Y" | apt purge ntp
+which ntpd
+x=$(echo $?)
+if [ $x -eq 0 ]
+then
+  #There were two NTP clients on the system, ntp and systemd-timesyncd.Both were trying to set the date and were conflicting.The ntp is purged to resolve the conflict.
+  echo "Y" | apt purge ntp
+fi
 
 #Optimize the system
 rm -rf /var/log/daemon.log
