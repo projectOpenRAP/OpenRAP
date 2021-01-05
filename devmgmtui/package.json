@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "aria2": "^4.0.3",
-    "axios": "^0.17.1",
+    "axios": "^0.21.1",
     "draft-js": "^0.10.5",
     "draftjs-to-html": "^0.8.2",
     "immutable": "^3.8.2",
